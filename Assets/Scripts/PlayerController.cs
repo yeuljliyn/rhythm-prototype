@@ -3,46 +3,53 @@ using UnityEngine.InputSystem;
 using System.Collections;
 
 /// <summary>
-/// 4-direction input: A/← = Left, S/↓ = Down, W/↑ = Up, D/→ = Right
+/// Single-button input: SPACE or Z hits the nearest beat circle.
+/// The player visual sits at the bottom-center of the screen.
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
     public SpriteRenderer bodyRenderer;
 
-    Coroutine flashRoutine;
+    Coroutine _flashRoutine;
 
-    static readonly Color[] LaneColors = {
-        new Color(0.3f, 0.6f, 1f),     // Left  — blue
-        new Color(0.3f, 1f,  0.45f),   // Down  — green
-        new Color(1f,  0.9f, 0.2f),    // Up    — yellow
-        new Color(1f,  0.35f,0.35f),   // Right — red
-    };
+    static readonly Color ColHit  = new Color(0.35f, 0.85f, 1.00f);
+    static readonly Color ColMiss = new Color(1.00f, 0.30f, 0.25f);
 
     void Update()
     {
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        if (kb.aKey.wasPressedThisFrame     || kb.leftArrowKey.wasPressedThisFrame)  HitLane(0);
-        if (kb.sKey.wasPressedThisFrame     || kb.downArrowKey.wasPressedThisFrame)  HitLane(1);
-        if (kb.wKey.wasPressedThisFrame     || kb.upArrowKey.wasPressedThisFrame)    HitLane(2);
-        if (kb.dKey.wasPressedThisFrame     || kb.rightArrowKey.wasPressedThisFrame) HitLane(3);
+        if (kb.spaceKey.wasPressedThisFrame || kb.zKey.wasPressedThisFrame)
+            HitNote();
     }
 
-    void HitLane(int lane)
+    void HitNote()
     {
-        var note = NoteManager.Instance.GetNearest(lane, RhythmManager.Instance.SongTime, Note.GoodWindow);
-        note?.TryHit();
+        var note = NoteManager.Instance.GetNearest(
+            RhythmManager.Instance.SongTime, Note.GoodWindow);
 
-        if (flashRoutine != null) StopCoroutine(flashRoutine);
-        flashRoutine = StartCoroutine(Flash(LaneColors[lane]));
+        if (note != null)
+        {
+            note.TryHit();
+            Flash(ColHit);
+        }
     }
 
-    IEnumerator Flash(Color color)
+    /// <summary>Called by BossController when a miss attack lands on the player.</summary>
+    public void FlashDamage() => Flash(ColMiss);
+
+    void Flash(Color color)
+    {
+        if (_flashRoutine != null) StopCoroutine(_flashRoutine);
+        _flashRoutine = StartCoroutine(FlashRoutine(color));
+    }
+
+    IEnumerator FlashRoutine(Color color)
     {
         if (bodyRenderer != null) bodyRenderer.color = color;
-        yield return new WaitForSeconds(0.08f);
+        yield return new WaitForSeconds(0.10f);
         if (bodyRenderer != null) bodyRenderer.color = Color.white;
     }
 }

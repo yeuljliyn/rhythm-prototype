@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Tracks active notes per lane (0=Left, 1=Down, 2=Up, 3=Right).
+/// Tracks all active beat circles on screen.
+/// No lanes — notes are positioned randomly near the boss.
 /// </summary>
 public class NoteManager : MonoBehaviour
 {
@@ -13,35 +14,29 @@ public class NoteManager : MonoBehaviour
         private set { _instance = value; }
     }
 
-    readonly List<Note>[] lanes = new List<Note>[4];
+    readonly List<Note> _notes = new List<Note>();
 
     void Awake()
     {
         if (_instance == null) Instance = this;
         else if (_instance != this) Destroy(gameObject);
-
-        for (int i = 0; i < 4; i++)
-            lanes[i] = new List<Note>();
     }
 
     public void Register(Note note)
     {
-        var list = lanes[note.Lane];
-        list.Add(note);
-        list.Sort((a, b) => a.HitTime.CompareTo(b.HitTime));
+        _notes.Add(note);
+        _notes.Sort((a, b) => a.HitTime.CompareTo(b.HitTime));
     }
 
-    public void Unregister(Note note)
-    {
-        lanes[note.Lane].Remove(note);
-    }
+    public void Unregister(Note note) => _notes.Remove(note);
 
-    public Note GetNearest(int lane, float songTime, float timeWindow)
+    /// <summary>Returns the note closest in time to songTime within the given window.</summary>
+    public Note GetNearest(float songTime, float timeWindow)
     {
         Note  best     = null;
         float bestDiff = float.MaxValue;
 
-        foreach (var note in lanes[lane])
+        foreach (var note in _notes)
         {
             float diff = Mathf.Abs(songTime - note.HitTime);
             if (diff <= timeWindow && diff < bestDiff)

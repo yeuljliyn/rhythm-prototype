@@ -1,66 +1,43 @@
 using UnityEngine;
 
 /// <summary>
-/// Cross-shaped track with 4 receptor markers.
-/// Lane 0=Left(blue)  1=Down(green)  2=Up(yellow)  3=Right(red)
+/// Arena layout: draws a player sprite at the bottom-center,
+/// a dividing line between player and boss zones, and ambient corner accents.
+/// The boss is handled separately by BossController.
 /// </summary>
 public class LaneIndicator : MonoBehaviour
 {
-    SpriteRenderer[] receptorSR = new SpriteRenderer[4];
-
-    static readonly Color[] LaneColors = {
-        new Color(0.3f, 0.6f, 1f),     // Left  — blue
-        new Color(0.3f, 1f,  0.45f),   // Down  — green
-        new Color(1f,  0.9f, 0.2f),    // Up    — yellow
-        new Color(1f,  0.35f,0.35f),   // Right — red
-    };
-
-    // Z rotation matching RhythmManager.LaneRotation so receptors show the same arrow direction
-    static readonly float[] ReceptorRotation = { 180f, -90f, 90f, 0f };
+    [Header("Player Visual")]
+    public SpriteRenderer playerRenderer;
 
     void Start()
     {
         var pixel = MakePixel();
 
-        // Horizontal guide line
-        CreateQuad("HTrack", Vector3.zero, new Vector3(30f, 0.04f, 1f),
-                   new Color(1f, 1f, 1f, 0.12f), pixel, 1);
-        // Vertical guide line
-        CreateQuad("VTrack", Vector3.zero, new Vector3(0.04f, 20f, 1f),
-                   new Color(1f, 1f, 1f, 0.12f), pixel, 1);
+        // Faint horizontal dividing line between player and boss zones
+        CreateQuad("Divider", new Vector3(0f, 0f, 0f),
+            new Vector3(30f, 0.03f, 1f), new Color(1f, 1f, 1f, 0.10f), pixel, 1);
 
-        // 4 receptor arrows
-        var arrowSprite = ArrowSprite.Get();
-        for (int i = 0; i < 4; i++)
+        // Subtle vertical center guide
+        CreateQuad("CenterGuide", Vector3.zero,
+            new Vector3(0.03f, 20f, 1f), new Color(1f, 1f, 1f, 0.05f), pixel, 1);
+
+        // Wire up PlayerController.bodyRenderer to the existing Player/Body if not set
+        var pc = FindObjectOfType<PlayerController>();
+        if (pc != null && pc.bodyRenderer == null)
         {
-            var hz = new GameObject($"Receptor_{i}");
-            hz.transform.SetParent(transform);
-            hz.transform.position   = RhythmManager.ReceptorPos[i];
-            hz.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
-            hz.transform.rotation   = Quaternion.Euler(0f, 0f, ReceptorRotation[i]);
-
-            var sr          = hz.AddComponent<SpriteRenderer>();
-            sr.sprite       = arrowSprite;
-            sr.color        = new Color(LaneColors[i].r, LaneColors[i].g, LaneColors[i].b, 0.45f);
-            sr.sortingOrder = 2;
-            receptorSR[i]   = sr;
-        }
-    }
-
-    void Update()
-    {
-        for (int i = 0; i < receptorSR.Length; i++)
-        {
-            if (receptorSR[i] == null) continue;
-            float a = 0.35f + 0.25f * Mathf.Sin(Time.time * 6f);
-            Color c = receptorSR[i].color;
-            receptorSR[i].color = new Color(c.r, c.g, c.b, a);
+            var bodyGO = GameObject.Find("Body");
+            if (bodyGO != null)
+            {
+                var sr = bodyGO.GetComponent<SpriteRenderer>();
+                if (sr != null) { pc.bodyRenderer = sr; playerRenderer = sr; }
+            }
         }
     }
 
     void CreateQuad(string goName, Vector3 pos, Vector3 scale, Color color, Sprite pixel, int order)
     {
-        var go          = new GameObject(goName);
+        var go = new GameObject(goName);
         go.transform.SetParent(transform);
         go.transform.position   = pos;
         go.transform.localScale = scale;
@@ -76,5 +53,40 @@ public class LaneIndicator : MonoBehaviour
         tex.SetPixel(0, 0, Color.white);
         tex.Apply();
         return Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+    }
+
+    static Sprite BuildPlayerSprite()
+    {
+        const int S = 64;
+        var pixels  = new Color[S * S];
+        var center  = new Vector2((S - 1) / 2f, (S - 1) / 2f);
+
+        for (int y = 0; y < S; y++)
+        for (int x = 0; x < S; x++)
+        {
+            float dx = (x - center.x) / (S / 2f);
+            float dy = (y - center.y) / (S / 2f);
+
+            // Shield shape: rounded top, pointed bottom
+            float halfW = 0.75f * (1f - Mathf.Pow(Mathf.Clamp01(-dy * 0.9f), 1.5f) * 0.4f);
+            bool  inShield = Mathf.Abs(dx) < halfW && dy < 0.80f && dy > -0.90f;
+
+            // Top arc
+            bool topArc = Vector2.Distance(new Vector2(dx, dy), new Vector2(0f, 0.50f)) < 0.75f;
+
+            if (inShield && topArc)
+            {
+                float edge = Mathf.Clamp01(1f - Mathf.Abs(dx) / halfW);
+                Color body = Color.Lerp(new Color(0.20f, 0.55f, 1.00f),
+                                        new Color(0.50f, 0.85f, 1.00f), edge * 0.6f + 0.2f);
+                pixels[y * S + x] = body;
+            }
+        }
+
+        var tex = new Texture2D(S, S, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Bilinear;
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, S, S), new Vector2(0.5f, 0.5f), S);
     }
 }

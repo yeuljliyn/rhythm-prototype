@@ -9,8 +9,8 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI judgementText;
     public TextMeshProUGUI hintText;
 
-    Coroutine judgeFadeRoutine;
-    Coroutine comboPulseRoutine;
+    Coroutine _judgeFadeRoutine;
+    Coroutine _comboPulseRoutine;
 
     void Start()
     {
@@ -19,7 +19,7 @@ public class UIManager : MonoBehaviour
         RefreshComboUI(0, 0);
 
         if (hintText != null)
-            hintText.text = "A ←   S ↓   W ↑   D →";
+            hintText.text = "SPACE / Z  — Hit the beat!";
     }
 
     void RefreshComboUI(int score, int combo)
@@ -28,8 +28,8 @@ public class UIManager : MonoBehaviour
         comboText.text = combo >= 2 ? $"{combo}<size=60%>x</size>" : "";
         if (combo >= 2)
         {
-            if (comboPulseRoutine != null) StopCoroutine(comboPulseRoutine);
-            comboPulseRoutine = StartCoroutine(PulseCombo());
+            if (_comboPulseRoutine != null) StopCoroutine(_comboPulseRoutine);
+            _comboPulseRoutine = StartCoroutine(PulseCombo());
         }
     }
 
@@ -39,20 +39,20 @@ public class UIManager : MonoBehaviour
 
         string txt;
         Color  col;
-        if      (type == JudgementType.Perfect) { txt = "PERFECT"; col = new Color(1f, 0.95f, 0.1f); }
-        else if (type == JudgementType.Good)    { txt = "GOOD";    col = new Color(0.2f, 1f,  0.5f); }
-        else                                    { txt = "MISS";    col = new Color(1f, 0.2f,  0.2f); }
+        if      (type == JudgementType.Perfect) { txt = "PERFECT"; col = new Color(1f, 0.92f, 0.10f); }
+        else if (type == JudgementType.Good)    { txt = "GOOD";    col = new Color(0.20f, 1f, 0.50f); }
+        else                                    { txt = "MISS";    col = new Color(1f, 0.22f, 0.18f); }
 
         judgementText.text  = txt;
         judgementText.color = col;
-        if (judgeFadeRoutine != null) StopCoroutine(judgeFadeRoutine);
-        judgeFadeRoutine = StartCoroutine(FadeJudgement(col));
+        if (_judgeFadeRoutine != null) StopCoroutine(_judgeFadeRoutine);
+        _judgeFadeRoutine = StartCoroutine(FadeJudgement(col));
     }
 
     IEnumerator FadeJudgement(Color startColor)
     {
-        float duration = 0.7f, elapsed = 0f;
-        Vector3 startPos = judgementText.transform.localPosition;
+        float    duration = 0.7f, elapsed = 0f;
+        Vector3  startPos = judgementText.transform.localPosition;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;

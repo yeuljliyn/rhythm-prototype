@@ -1,11 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// 4-direction arrow rhythm engine.
-/// Lane 0 = Left  (A / ←)  note travels RIGHT toward receptor
-/// Lane 1 = Down  (S / ↓)  note travels UP    toward receptor
-/// Lane 2 = Up    (W / ↑)  note travels DOWN  toward receptor
-/// Lane 3 = Right (D / →)  note travels LEFT  toward receptor
+/// Combat rhythm engine.
+/// Notes (beat circles) spawn at random positions near the boss and shrink on approach.
+/// The player presses SPACE / Z to hit each circle in time.
 /// </summary>
 public class RhythmManager : MonoBehaviour
 {
@@ -17,63 +15,33 @@ public class RhythmManager : MonoBehaviour
     }
 
     [Header("Timing")]
-    public float bpm           = 128f;
-    public float noteSpeed     = 3.5f;
-    public float spawnAheadTime = 2.5f;
+    public float bpm            = 128f;
+    public float spawnAheadTime = 2.2f;
 
-    [Header("Prefab")]
-    public GameObject notePrefab;
+    [Header("Note Spawn Area — near the boss")]
+    public Vector2 spawnCenter  = new Vector2(0f, 2.8f);
+    public float   spawnRadius  = 1.6f;
 
     [Header("Intro")]
     public float introDelay = 2f;
 
-    // ── Lane definitions ─────────────────────────────────────────────
-    public static readonly Vector3[] ReceptorPos = {
-        new Vector3(-2.5f,  0f,   0f),   // 0  Left
-        new Vector3( 0f,   -2.5f, 0f),   // 1  Down
-        new Vector3( 0f,    2.5f, 0f),   // 2  Up
-        new Vector3( 2.5f,  0f,   0f),   // 3  Right
-    };
-
-    public static readonly Vector3[] NoteDir = {
-        Vector3.right,   // 0 Left  lane — travels right
-        Vector3.up,      // 1 Down  lane — travels up
-        Vector3.down,    // 2 Up    lane — travels down
-        Vector3.left,    // 3 Right lane — travels left
-    };
-
-    // Z rotation: arrow points toward the KEY the player must press (right-facing sprite as base)
-    // Lane 0 = Left  (A/←) → 180°  Lane 1 = Down (S/↓) → -90°
-    // Lane 2 = Up   (W/↑) →  90°  Lane 3 = Right(D/→) →   0°
-    static readonly float[] LaneRotation = { 180f, -90f, 90f, 0f };
-
-    static readonly Color[] LaneColors = {
-        new Color(0.3f, 0.6f, 1f),     // Left  — blue
-        new Color(0.3f, 1f,  0.45f),   // Down  — green
-        new Color(1f,  0.9f, 0.2f),    // Up    — yellow
-        new Color(1f,  0.35f,0.35f),   // Right — red
-    };
-
-    // ── Runtime ──────────────────────────────────────────────────────
-    public float SongTime { get; private set; }
-
+    // ── Runtime ───────────────────────────────────────────────────────
+    public float SongTime  { get; private set; }
     float beatInterval;
     int   nextNoteIndex;
     bool  isRunning;
 
-    // ── Beatmap: { beat, lane }  lane: 0=Left 1=Down 2=Up 3=Right ───
-    static readonly int[,] Beatmap =
+    // ── Beatmap: beat numbers (one note per entry) ────────────────────
+    static readonly int[] Beatmap =
     {
-        {1,0},{2,3},{3,2},{4,1},
-        {5,0},{6,2},{7,3},{8,1},
-        {9,0},{10,0},{11,2},{12,3},
-        {13,1},{14,3},{15,2},{16,0},
-        {17,0},{17,3},{18,1},{18,2},
-        {19,0},{20,3},{21,2},{22,1},
-        {23,0},{23,2},{24,1},{24,3},
-        {25,0},{26,2},{27,1},{28,3},
-        {29,0},{29,2},{30,1},{30,3},
-        {31,0},{31,3},{32,1},{32,2},
+         1,  2,  3,  4,
+         5,  6,  7,  8,
+         9, 10, 11, 12,
+        13, 14, 15, 16,
+        17, 18, 19, 20,
+        21, 22, 23, 24,
+        25, 26, 27, 28,
+        29, 30, 31, 32,
     };
 
     void Awake()
@@ -94,36 +62,28 @@ public class RhythmManager : MonoBehaviour
         if (!isRunning) return;
         SongTime += Time.deltaTime;
 
-        int total = Beatmap.GetLength(0);
-        while (nextNoteIndex < total)
+        while (nextNoteIndex < Beatmap.Length)
         {
-            float hitTime   = Beatmap[nextNoteIndex, 0] * beatInterval;
+            float hitTime   = Beatmap[nextNoteIndex] * beatInterval;
             float spawnTime = hitTime - spawnAheadTime;
 
             if (SongTime >= spawnTime)
             {
-                SpawnNote(Beatmap[nextNoteIndex, 1], hitTime);
+                SpawnNote(hitTime);
                 nextNoteIndex++;
             }
             else break;
         }
     }
 
-    void SpawnNote(int lane, float hitTime)
+    void SpawnNote(float hitTime)
     {
-        if (notePrefab == null)
-        {
-            Debug.LogWarning("notePrefab not assigned on RhythmManager!");
-            return;
-        }
+        // Random position within the spawn area around the boss
+        Vector2 offset   = Random.insideUnitCircle * spawnRadius;
+        var     spawnPos = new Vector3(spawnCenter.x + offset.x, spawnCenter.y + offset.y, 0f);
 
-        Vector3 spawnPos = ReceptorPos[lane] + (-NoteDir[lane]) * noteSpeed * spawnAheadTime;
-        spawnPos.z = 0f;
-
-        var go  = Instantiate(notePrefab, spawnPos, Quaternion.Euler(0f, 0f, LaneRotation[lane]));
-        var sr  = go.GetComponent<SpriteRenderer>();
-        if (sr != null) sr.color = LaneColors[lane];
-
-        go.GetComponent<Note>().Initialize(lane, hitTime, noteSpeed, NoteDir[lane]);
+        var go = new GameObject("BeatCircle");
+        go.transform.position = spawnPos;
+        go.AddComponent<Note>().Initialize(hitTime, SongTime);
     }
 }
