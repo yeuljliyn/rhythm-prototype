@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Tracks all active beat circles on screen.
-/// No lanes — notes are positioned randomly near the boss.
+/// Supports type-filtered queries so each key only hits its matching note type.
 /// </summary>
 public class NoteManager : MonoBehaviour
 {
@@ -30,14 +30,19 @@ public class NoteManager : MonoBehaviour
 
     public void Unregister(Note note) => _notes.Remove(note);
 
-    /// <summary>Returns the note closest in time to songTime within the given window.</summary>
-    public Note GetNearest(float songTime, float timeWindow)
+    /// <summary>
+    /// Returns the note closest in time that matches the given type.
+    /// NoteType.Normal only matches Normal notes; arrow types only match their direction.
+    /// </summary>
+    public Note GetNearest(float songTime, float timeWindow, NoteType type)
     {
         Note  best     = null;
         float bestDiff = float.MaxValue;
 
         foreach (var note in _notes)
         {
+            if (note.Type != type) continue;
+
             float diff = Mathf.Abs(songTime - note.HitTime);
             if (diff <= timeWindow && diff < bestDiff)
             {

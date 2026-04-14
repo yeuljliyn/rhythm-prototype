@@ -4,21 +4,22 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Boss entity at the top-center of the screen.
+/// HP: 200.  Perfect hit = -12 HP.  Good hit = -7 HP.
 /// Takes damage on successful note hits; attacks the player on misses.
-/// Builds its own sprite and HP bar at runtime.
 /// </summary>
 public class BossController : MonoBehaviour
 {
     public static BossController Instance { get; private set; }
 
     [Header("Stats")]
-    public float maxHP = 100f;
+    public float maxHP = 200f;
     public float HP    { get; private set; }
 
     SpriteRenderer _sr;
     Vector3        _basePos;
     Coroutine      _shakeRoutine;
     Image          _hpFill;
+    Image          _hpBg;
 
     static readonly Color ColBody    = new Color(0.60f, 0.05f, 0.75f);
     static readonly Color ColBodyDim = new Color(0.28f, 0.00f, 0.40f);
@@ -30,7 +31,6 @@ public class BossController : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
-
         HP = maxHP;
     }
 
@@ -50,7 +50,8 @@ public class BossController : MonoBehaviour
     // ── Combat ────────────────────────────────────────────────────────
     public void TakeDamage(JudgementType j)
     {
-        float dmg = j == JudgementType.Perfect ? 15f : 8f;
+        if (HP <= 0f) return;
+        float dmg = j == JudgementType.Perfect ? 12f : 7f;
         HP = Mathf.Clamp(HP - dmg, 0f, maxHP);
         RefreshHPBar();
 
@@ -63,7 +64,6 @@ public class BossController : MonoBehaviour
         if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
         _shakeRoutine = StartCoroutine(AttackFlash());
 
-        // Notify player to flash red
         var player = FindObjectOfType<PlayerController>();
         player?.FlashDamage();
     }
@@ -72,8 +72,7 @@ public class BossController : MonoBehaviour
     IEnumerator HitShake(JudgementType j)
     {
         float intensity = j == JudgementType.Perfect ? 0.18f : 0.10f;
-        float duration  = 0.30f;
-        float elapsed   = 0f;
+        float duration  = 0.30f, elapsed = 0f;
 
         if (_sr != null) _sr.color = ColHit;
 
@@ -85,17 +84,14 @@ public class BossController : MonoBehaviour
             if (_sr != null) _sr.color = Color.Lerp(ColHit, Color.white, t);
             yield return null;
         }
-
         transform.position = _basePos;
         if (_sr != null) _sr.color = Color.white;
     }
 
     IEnumerator AttackFlash()
     {
-        // Boss lunges forward slightly
-        float duration = 0.20f;
-        float elapsed  = 0f;
-        Vector3 lunge  = new Vector3(0f, -0.35f, 0f);
+        float duration = 0.20f, elapsed = 0f;
+        Vector3 lunge  = new Vector3(0f, -0.40f, 0f);
 
         if (_sr != null) _sr.color = ColAttack;
 
@@ -107,7 +103,6 @@ public class BossController : MonoBehaviour
             if (_sr != null) _sr.color = Color.Lerp(ColAttack, Color.white, t);
             yield return null;
         }
-
         transform.position = _basePos;
         if (_sr != null) _sr.color = Color.white;
     }
@@ -129,11 +124,9 @@ public class BossController : MonoBehaviour
         bgRect.anchorMax        = new Vector2(0.5f, 1f);
         bgRect.pivot            = new Vector2(0.5f, 1f);
         bgRect.anchoredPosition = new Vector2(0f, -28f);
-        bgRect.sizeDelta        = new Vector2(360f, 8f);
-        bgGO.AddComponent<Image>().color = new Color(0.08f, 0.02f, 0.12f, 0.9f);
-
-        // Label
-        // (skipped for simplicity — gauge color indicates boss HP)
+        bgRect.sizeDelta        = new Vector2(400f, 9f);
+        _hpBg = bgGO.AddComponent<Image>();
+        _hpBg.color             = new Color(0.10f, 0.02f, 0.14f, 0.9f);
 
         // Fill
         var fillGO   = new GameObject("BossHPFill");
@@ -155,11 +148,9 @@ public class BossController : MonoBehaviour
     void RefreshHPBar()
     {
         if (_hpFill == null) return;
-        _hpFill.fillAmount = HP / maxHP;
-
-        // Color shifts: purple → red as HP drops
-        float t = HP / maxHP;
-        _hpFill.color = Color.Lerp(new Color(1f, 0.1f, 0.1f), new Color(0.85f, 0.15f, 0.9f), t);
+        float t         = HP / maxHP;
+        _hpFill.fillAmount = t;
+        _hpFill.color = Color.Lerp(new Color(1f, 0.10f, 0.10f), new Color(0.85f, 0.15f, 0.90f), t);
     }
 
     // ── Boss Sprite ───────────────────────────────────────────────────
@@ -177,28 +168,17 @@ public class BossController : MonoBehaviour
             float adx = Mathf.Abs(dx);
             float ady = Mathf.Abs(dy);
 
-            // Outer diamond silhouette
             bool inDiamond = (adx + ady) <= 0.92f;
-
-            // Two hollow "eye" circles
-            bool eye1 = Vector2.Distance(new Vector2(dx, dy), new Vector2(-0.28f, 0.18f)) < 0.20f;
-            bool eye2 = Vector2.Distance(new Vector2(dx, dy), new Vector2( 0.28f, 0.18f)) < 0.20f;
-
-            // Fang notch at bottom
-            bool fang = ady < 0.15f && adx < 0.10f && dy < -0.40f;
+            bool eye1      = Vector2.Distance(new Vector2(dx, dy), new Vector2(-0.28f, 0.18f)) < 0.20f;
+            bool eye2      = Vector2.Distance(new Vector2(dx, dy), new Vector2( 0.28f, 0.18f)) < 0.20f;
 
             if (inDiamond && !eye1 && !eye2)
             {
                 float edge = Mathf.InverseLerp(0.92f, 0.70f, adx + ady);
-                Color body = Color.Lerp(ColBodyDim, ColBody, edge);
-
-                if (fang) body = new Color(1f, 0.9f, 0.85f);
-
-                pixels[y * S + x] = body;
+                pixels[y * S + x] = Color.Lerp(ColBodyDim, ColBody, edge);
             }
             else if (eye1 || eye2)
             {
-                // Glowing eyes
                 float eyeDist = eye1
                     ? Vector2.Distance(new Vector2(dx, dy), new Vector2(-0.28f, 0.18f)) / 0.20f
                     : Vector2.Distance(new Vector2(dx, dy), new Vector2( 0.28f, 0.18f)) / 0.20f;

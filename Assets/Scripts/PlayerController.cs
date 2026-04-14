@@ -3,8 +3,9 @@ using UnityEngine.InputSystem;
 using System.Collections;
 
 /// <summary>
-/// Single-button input: SPACE or Z hits the nearest beat circle.
-/// The player visual sits at the bottom-center of the screen.
+/// Input handler for the combat rhythm game.
+/// SPACE / Z       → hit Normal (white) notes.
+/// ← A / ↓ S / ↑ W / → D → hit the matching colored Special note.
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -13,27 +14,39 @@ public class PlayerController : MonoBehaviour
 
     Coroutine _flashRoutine;
 
-    static readonly Color ColHit  = new Color(0.35f, 0.85f, 1.00f);
-    static readonly Color ColMiss = new Color(1.00f, 0.30f, 0.25f);
+    static readonly Color ColHitNormal  = new Color(0.35f, 0.85f, 1.00f);
+    static readonly Color ColHitSpecial = new Color(1.00f, 0.92f, 0.20f);
+    static readonly Color ColMiss       = new Color(1.00f, 0.30f, 0.25f);
 
     void Update()
     {
         var kb = Keyboard.current;
         if (kb == null) return;
 
+        // Normal attack
         if (kb.spaceKey.wasPressedThisFrame || kb.zKey.wasPressedThisFrame)
-            HitNote();
+            TryHit(NoteType.Normal, ColHitNormal);
+
+        // Special attacks — directional
+        if (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)
+            TryHit(NoteType.ArrowLeft,  new Color(0.30f, 0.60f, 1.00f));
+        if (kb.downArrowKey.wasPressedThisFrame  || kb.sKey.wasPressedThisFrame)
+            TryHit(NoteType.ArrowDown,  new Color(0.30f, 1.00f, 0.45f));
+        if (kb.upArrowKey.wasPressedThisFrame    || kb.wKey.wasPressedThisFrame)
+            TryHit(NoteType.ArrowUp,    new Color(1.00f, 0.90f, 0.20f));
+        if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame)
+            TryHit(NoteType.ArrowRight, new Color(1.00f, 0.35f, 0.35f));
     }
 
-    void HitNote()
+    void TryHit(NoteType type, Color flashColor)
     {
         var note = NoteManager.Instance.GetNearest(
-            RhythmManager.Instance.SongTime, Note.GoodWindow);
+            RhythmManager.Instance.SongTime, Note.GoodWindow, type);
 
         if (note != null)
         {
             note.TryHit();
-            Flash(ColHit);
+            Flash(flashColor);
         }
     }
 

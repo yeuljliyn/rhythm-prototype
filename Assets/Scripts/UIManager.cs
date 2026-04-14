@@ -19,7 +19,7 @@ public class UIManager : MonoBehaviour
         RefreshComboUI(0, 0);
 
         if (hintText != null)
-            hintText.text = "SPACE / Z  — Hit the beat!";
+            hintText.text = "SPACE / Z  ——  ← ↓ ↑ →  special";
     }
 
     void RefreshComboUI(int score, int combo)

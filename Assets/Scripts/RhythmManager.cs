@@ -2,8 +2,9 @@ using UnityEngine;
 
 /// <summary>
 /// Combat rhythm engine.
-/// Notes (beat circles) spawn at random positions near the boss and shrink on approach.
-/// The player presses SPACE / Z to hit each circle in time.
+/// Normal notes (white) → SPACE / Z.
+/// Special notes (colored + arrow) → matching direction key.
+/// About 25 % of notes are specials, giving a "special attack" feel.
 /// </summary>
 public class RhythmManager : MonoBehaviour
 {
@@ -19,8 +20,8 @@ public class RhythmManager : MonoBehaviour
     public float spawnAheadTime = 2.2f;
 
     [Header("Note Spawn Area — near the boss")]
-    public Vector2 spawnCenter  = new Vector2(0f, 2.8f);
-    public float   spawnRadius  = 1.6f;
+    public Vector2 spawnCenter = new Vector2(0f, 2.8f);
+    public float   spawnRadius = 1.6f;
 
     [Header("Intro")]
     public float introDelay = 2f;
@@ -31,17 +32,19 @@ public class RhythmManager : MonoBehaviour
     int   nextNoteIndex;
     bool  isRunning;
 
-    // ── Beatmap: beat numbers (one note per entry) ────────────────────
-    static readonly int[] Beatmap =
+    // ── Beatmap: { beat, noteType }
+    // noteType: 0=Normal  1=ArrowLeft  2=ArrowDown  3=ArrowUp  4=ArrowRight
+    // Special notes appear roughly every 4 beats (~25 %) for a "special attack" cadence.
+    static readonly int[,] Beatmap =
     {
-         1,  2,  3,  4,
-         5,  6,  7,  8,
-         9, 10, 11, 12,
-        13, 14, 15, 16,
-        17, 18, 19, 20,
-        21, 22, 23, 24,
-        25, 26, 27, 28,
-        29, 30, 31, 32,
+        { 1, 0},{ 2, 0},{ 3, 0},{ 4, 1},   // beat 4  → Left  (special)
+        { 5, 0},{ 6, 0},{ 7, 0},{ 8, 3},   // beat 8  → Up    (special)
+        { 9, 0},{10, 0},{11, 0},{12, 4},    // beat 12 → Right (special)
+        {13, 0},{14, 0},{15, 0},{16, 2},    // beat 16 → Down  (special)
+        {17, 0},{18, 0},{19, 1},{20, 0},    // beat 19 → Left  (special mid-phrase)
+        {21, 0},{22, 0},{23, 3},{24, 0},    // beat 23 → Up    (special)
+        {25, 0},{26, 4},{27, 0},{28, 0},    // beat 26 → Right (special)
+        {29, 0},{30, 2},{31, 0},{32, 0},    // beat 30 → Down  (special)
     };
 
     void Awake()
@@ -62,28 +65,28 @@ public class RhythmManager : MonoBehaviour
         if (!isRunning) return;
         SongTime += Time.deltaTime;
 
-        while (nextNoteIndex < Beatmap.Length)
+        int total = Beatmap.GetLength(0);
+        while (nextNoteIndex < total)
         {
-            float hitTime   = Beatmap[nextNoteIndex] * beatInterval;
+            float hitTime   = Beatmap[nextNoteIndex, 0] * beatInterval;
             float spawnTime = hitTime - spawnAheadTime;
 
             if (SongTime >= spawnTime)
             {
-                SpawnNote(hitTime);
+                SpawnNote(hitTime, (NoteType)Beatmap[nextNoteIndex, 1]);
                 nextNoteIndex++;
             }
             else break;
         }
     }
 
-    void SpawnNote(float hitTime)
+    void SpawnNote(float hitTime, NoteType type)
     {
-        // Random position within the spawn area around the boss
         Vector2 offset   = Random.insideUnitCircle * spawnRadius;
         var     spawnPos = new Vector3(spawnCenter.x + offset.x, spawnCenter.y + offset.y, 0f);
 
         var go = new GameObject("BeatCircle");
         go.transform.position = spawnPos;
-        go.AddComponent<Note>().Initialize(hitTime, SongTime);
+        go.AddComponent<Note>().Initialize(hitTime, SongTime, type);
     }
 }

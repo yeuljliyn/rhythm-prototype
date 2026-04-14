@@ -1,56 +1,100 @@
 using UnityEngine;
 
+public enum NoteType
+{
+    Normal,      // SPACE or Z
+    ArrowLeft,   // ← / A
+    ArrowDown,   // ↓ / S
+    ArrowUp,     // ↑ / W
+    ArrowRight,  // → / D
+}
+
 /// <summary>
 /// Combat beat circle.
-/// An outer approach ring shrinks toward the inner circle.
-/// The player presses the hit key when the ring overlaps the inner circle.
-/// Spawns near the boss; a hit damages the boss, a miss lets the boss attack.
+/// Normal notes: white ring — press SPACE/Z.
+/// Special notes: colored ring with arrow — press the matching direction key.
 /// </summary>
 public class Note : MonoBehaviour
 {
     public const float PerfectWindow = 0.08f;
     public const float GoodWindow    = 0.15f;
 
-    public float HitTime  { get; private set; }
-    public bool  IsHit    { get; private set; }
+    public float    HitTime  { get; private set; }
+    public bool     IsHit    { get; private set; }
+    public NoteType Type     { get; private set; }
 
     Transform      _ring;
     SpriteRenderer _ringSR;
-    SpriteRenderer _circleSR;
     float          _spawnTime;
+    Color          _ringBase;
 
-    const float MaxRingScale = 3.2f;
+    const float MaxRingScale     = 3.2f;
+    const float SpecialNoteScale = 0.65f;   // slightly larger than Normal
+    const float NormalNoteScale  = 0.55f;
 
-    static readonly Color ColCircle      = new Color(1.00f, 1.00f, 1.00f, 0.92f);
-    static readonly Color ColRingNormal  = new Color(0.40f, 0.75f, 1.00f, 0.95f);
-    static readonly Color ColRingPerfect = new Color(1.00f, 0.92f, 0.15f, 1.00f);
-    static readonly Color ColRingLate    = new Color(1.00f, 0.35f, 0.25f, 0.85f);
+    static readonly Color ColCircleNormal  = new Color(1.00f, 1.00f, 1.00f, 0.92f);
+    static readonly Color ColRingPerfect   = new Color(1.00f, 0.92f, 0.15f, 1.00f);
+    static readonly Color ColRingLate      = new Color(1.00f, 0.35f, 0.25f, 0.85f);
+
+    // Direction ring colors (same palette as original lanes)
+    static readonly Color[] TypeColors = {
+        new Color(0.40f, 0.75f, 1.00f, 0.95f), // Normal   — steel blue
+        new Color(0.30f, 0.60f, 1.00f, 0.95f), // Left     — blue
+        new Color(0.30f, 1.00f, 0.45f, 0.95f), // Down     — green
+        new Color(1.00f, 0.90f, 0.20f, 0.95f), // Up       — yellow
+        new Color(1.00f, 0.35f, 0.35f, 0.95f), // Right    — red
+    };
 
     // ── Initialization ────────────────────────────────────────────────
-    public void Initialize(float hitTime, float spawnTime)
+    public void Initialize(float hitTime, float spawnTime, NoteType type = NoteType.Normal)
     {
         HitTime    = hitTime;
         _spawnTime = spawnTime;
+        Type       = type;
 
-        // Inner filled circle
-        _circleSR              = gameObject.AddComponent<SpriteRenderer>();
-        _circleSR.sprite       = CircleSprites.GetCircle();
-        _circleSR.color        = ColCircle;
-        _circleSR.sortingOrder = 5;
-        transform.localScale   = Vector3.one * 0.55f;
+        bool special = type != NoteType.Normal;
+        _ringBase    = TypeColors[(int)type];
+
+        // Inner circle
+        var circleSR         = gameObject.AddComponent<SpriteRenderer>();
+        circleSR.sprite      = CircleSprites.GetCircle();
+        circleSR.color       = ColCircleNormal;
+        circleSR.sortingOrder = 5;
+        transform.localScale = Vector3.one * (special ? SpecialNoteScale : NormalNoteScale);
+
+        // Direction arrow indicator (special notes only)
+        if (special)
+            AddArrowIndicator(type);
 
         // Approach ring child
-        var ringGO             = new GameObject("Ring");
+        var ringGO           = new GameObject("Ring");
         ringGO.transform.SetParent(transform, false);
-        _ring                  = ringGO.transform;
-        _ring.localScale       = Vector3.one * MaxRingScale;
+        _ring                = ringGO.transform;
+        _ring.localScale     = Vector3.one * MaxRingScale;
 
-        _ringSR                = ringGO.AddComponent<SpriteRenderer>();
-        _ringSR.sprite         = CircleSprites.GetRing();
-        _ringSR.color          = ColRingNormal;
-        _ringSR.sortingOrder   = 4;
+        _ringSR              = ringGO.AddComponent<SpriteRenderer>();
+        _ringSR.sprite       = CircleSprites.GetRing();
+        _ringSR.color        = _ringBase;
+        _ringSR.sortingOrder = 4;
 
         NoteManager.Instance.Register(this);
+    }
+
+    void AddArrowIndicator(NoteType type)
+    {
+        float rotation = type == NoteType.ArrowLeft  ? 180f :
+                         type == NoteType.ArrowDown  ? -90f :
+                         type == NoteType.ArrowUp    ?  90f : 0f;
+
+        var arrowGO = new GameObject("Arrow");
+        arrowGO.transform.SetParent(transform, false);
+        arrowGO.transform.localScale    = Vector3.one * 0.50f;
+        arrowGO.transform.localRotation = Quaternion.Euler(0f, 0f, rotation);
+
+        var sr          = arrowGO.AddComponent<SpriteRenderer>();
+        sr.sprite       = ArrowSprite.Get();
+        sr.color        = TypeColors[(int)type];
+        sr.sortingOrder = 6;
     }
 
     // ── Update ────────────────────────────────────────────────────────
@@ -61,7 +105,7 @@ public class Note : MonoBehaviour
         float songTime = RhythmManager.Instance.SongTime;
         float diff     = songTime - HitTime;
 
-        // Ring scale: MaxRingScale → 1.0 until hitTime, then 1.0 → 0.3 in GoodWindow
+        // Ring shrinks MaxRingScale → 1.0 by hitTime, then 1.0 → 0.3 during GoodWindow
         float scale;
         if (diff < 0f)
         {
@@ -75,16 +119,15 @@ public class Note : MonoBehaviour
         }
         _ring.localScale = Vector3.one * scale;
 
-        // Tint ring based on timing
+        // Ring tint feedback
         float absDiff = Mathf.Abs(diff);
         if (diff >= 0f)
             _ringSR.color = Color.Lerp(ColRingPerfect, ColRingLate, diff / GoodWindow);
         else if (absDiff <= PerfectWindow)
-            _ringSR.color = Color.Lerp(ColRingNormal, ColRingPerfect, 1f - absDiff / PerfectWindow);
+            _ringSR.color = Color.Lerp(_ringBase, ColRingPerfect, 1f - absDiff / PerfectWindow);
         else
-            _ringSR.color = ColRingNormal;
+            _ringSR.color = _ringBase;
 
-        // Auto miss after window closes
         if (diff > GoodWindow)
             AutoMiss();
     }
@@ -119,6 +162,7 @@ public class Note : MonoBehaviour
         else
         {
             BossController.Instance?.AttackPlayer();
+            PlayerHealthManager.Instance?.LoseHeart();
         }
 
         Destroy(gameObject);
