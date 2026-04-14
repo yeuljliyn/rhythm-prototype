@@ -9,7 +9,16 @@ using UnityEngine.UI;
 /// </summary>
 public class BossController : MonoBehaviour
 {
-    public static BossController Instance { get; private set; }
+    static BossController _instance;
+    public static BossController Instance
+    {
+        get
+        {
+            if (_instance == null) _instance = FindObjectOfType<BossController>();
+            return _instance;
+        }
+        private set { _instance = value; }
+    }
 
     [Header("Stats")]
     public float maxHP = 200f;
@@ -29,9 +38,14 @@ public class BossController : MonoBehaviour
     // ── Lifecycle ─────────────────────────────────────────────────────
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else { Destroy(gameObject); return; }
-        HP = maxHP;
+        Instance = this;
+        maxHP = 400f;
+        HP    = maxHP;
+    }
+
+    void OnDestroy()
+    {
+        if (_instance == this) _instance = null;
     }
 
     void Start()
@@ -51,9 +65,16 @@ public class BossController : MonoBehaviour
     public void TakeDamage(JudgementType j)
     {
         if (HP <= 0f) return;
-        float dmg = j == JudgementType.Perfect ? 12f : 7f;
+        float dmg = j == JudgementType.Perfect ? 20f : 12f;
         HP = Mathf.Clamp(HP - dmg, 0f, maxHP);
         RefreshHPBar();
+
+        if (HP <= 0f)
+        {
+            if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
+            _shakeRoutine = StartCoroutine(DeathAnim());
+            return;
+        }
 
         if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
         _shakeRoutine = StartCoroutine(HitShake(j));
@@ -107,6 +128,23 @@ public class BossController : MonoBehaviour
         if (_sr != null) _sr.color = Color.white;
     }
 
+    IEnumerator DeathAnim()
+    {
+        float duration = 0.8f, elapsed = 0f;
+        Vector3 startScale = transform.localScale;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            if (_sr != null) _sr.color = Color.Lerp(Color.white, new Color(0.3f, 0.3f, 0.3f, 0f), t);
+            transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
+            yield return null;
+        }
+        gameObject.SetActive(false);
+        if (_hpBg != null) _hpBg.gameObject.SetActive(false);
+    }
+
     // ── HP Bar ────────────────────────────────────────────────────────
     void BuildHPBar()
     {
@@ -123,24 +161,22 @@ public class BossController : MonoBehaviour
         bgRect.anchorMin        = new Vector2(0.5f, 1f);
         bgRect.anchorMax        = new Vector2(0.5f, 1f);
         bgRect.pivot            = new Vector2(0.5f, 1f);
-        bgRect.anchoredPosition = new Vector2(0f, -28f);
-        bgRect.sizeDelta        = new Vector2(400f, 9f);
+        bgRect.anchoredPosition = new Vector2(0f, -20f);
+        bgRect.sizeDelta        = new Vector2(400f, 16f);
         _hpBg = bgGO.AddComponent<Image>();
-        _hpBg.color             = new Color(0.10f, 0.02f, 0.14f, 0.9f);
+        _hpBg.color             = new Color(0.18f, 0.18f, 0.18f, 1f);
 
-        // Fill
+        // Fill — anchored to left edge, width shrinks as HP drops
         var fillGO   = new GameObject("BossHPFill");
         fillGO.transform.SetParent(bgGO.transform, false);
         var fillRect = fillGO.AddComponent<RectTransform>();
-        fillRect.anchorMin = Vector2.zero;
-        fillRect.anchorMax = Vector2.one;
-        fillRect.offsetMin = Vector2.zero;
-        fillRect.offsetMax = Vector2.zero;
-        _hpFill            = fillGO.AddComponent<Image>();
-        _hpFill.type       = Image.Type.Filled;
-        _hpFill.fillMethod = Image.FillMethod.Horizontal;
-        _hpFill.fillOrigin = 0;
-        _hpFill.color      = new Color(0.85f, 0.15f, 0.90f);
+        fillRect.anchorMin        = new Vector2(0f, 0f);
+        fillRect.anchorMax        = new Vector2(0f, 1f);
+        fillRect.pivot            = new Vector2(0f, 0.5f);
+        fillRect.anchoredPosition = Vector2.zero;
+        fillRect.sizeDelta        = new Vector2(400f, 0f);   // width = full, height from anchors
+        _hpFill                   = fillGO.AddComponent<Image>();
+        _hpFill.color             = new Color(0.85f, 0.15f, 0.90f);
 
         RefreshHPBar();
     }
@@ -148,9 +184,11 @@ public class BossController : MonoBehaviour
     void RefreshHPBar()
     {
         if (_hpFill == null) return;
-        float t         = HP / maxHP;
-        _hpFill.fillAmount = t;
-        _hpFill.color = Color.Lerp(new Color(1f, 0.10f, 0.10f), new Color(0.85f, 0.15f, 0.90f), t);
+        float t = HP / maxHP;
+        // Directly resize the fill bar width — no fillAmount tricks
+        var rt = _hpFill.rectTransform;
+        rt.sizeDelta = new Vector2(400f * t, rt.sizeDelta.y);
+        _hpFill.color = Color.Lerp(new Color(1f, 0.15f, 0.10f), new Color(0.85f, 0.15f, 0.90f), t);
     }
 
     // ── Boss Sprite ───────────────────────────────────────────────────

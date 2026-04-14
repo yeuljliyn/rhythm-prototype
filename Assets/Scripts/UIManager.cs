@@ -11,12 +11,15 @@ public class UIManager : MonoBehaviour
 
     Coroutine _judgeFadeRoutine;
     Coroutine _comboPulseRoutine;
+    Vector3   _judgementOrigin;
 
     void Start()
     {
         GameManager.Instance.OnScoreChanged += RefreshComboUI;
         GameManager.Instance.OnJudgement    += ShowJudgement;
         RefreshComboUI(0, 0);
+        if (judgementText != null)
+            _judgementOrigin = judgementText.transform.localPosition;
 
         if (hintText != null)
             hintText.text = "SPACE / Z  ——  ← ↓ ↑ →  special";
@@ -51,18 +54,18 @@ public class UIManager : MonoBehaviour
 
     IEnumerator FadeJudgement(Color startColor)
     {
-        float    duration = 0.7f, elapsed = 0f;
-        Vector3  startPos = judgementText.transform.localPosition;
+        float duration = 0.7f, elapsed = 0f;
+        judgementText.transform.localPosition = _judgementOrigin;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
             judgementText.color = new Color(startColor.r, startColor.g, startColor.b, 1f - t);
-            judgementText.transform.localPosition = startPos + Vector3.up * 40f * t;
+            judgementText.transform.localPosition = _judgementOrigin + Vector3.up * 40f * t;
             yield return null;
         }
         judgementText.text = "";
-        judgementText.transform.localPosition = startPos;
+        judgementText.transform.localPosition = _judgementOrigin;
     }
 
     IEnumerator PulseCombo()

@@ -106,7 +106,7 @@ public class PlayerHealthManager : MonoBehaviour
             // Normalise to [-1.2, 1.2]
             float nx = (x - S / 2f + 0.5f) / (S / 2.4f);
             float ny = (y - S / 2f + 0.5f) / (S / 2.4f);
-            ny = -ny + 0.15f;   // flip Y and nudge upward for aesthetic centering
+            ny = ny + 0.15f;    // nudge upward for aesthetic centering
 
             // Heart implicit equation: (x²+y²-1)³ - x²y³ ≤ 0
             float v = Mathf.Pow(nx * nx + ny * ny - 1f, 3f) - nx * nx * Mathf.Pow(ny, 3f);

@@ -28,9 +28,9 @@ public class Note : MonoBehaviour
     float          _spawnTime;
     Color          _ringBase;
 
-    const float MaxRingScale     = 3.2f;
-    const float SpecialNoteScale = 0.65f;   // slightly larger than Normal
-    const float NormalNoteScale  = 0.55f;
+    const float MaxRingScale     = 3.5f;
+    const float SpecialNoteScale = 0.90f;
+    const float NormalNoteScale  = 0.75f;
 
     static readonly Color ColCircleNormal  = new Color(1.00f, 1.00f, 1.00f, 0.92f);
     static readonly Color ColRingPerfect   = new Color(1.00f, 0.92f, 0.15f, 1.00f);
