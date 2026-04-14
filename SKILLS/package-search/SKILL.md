@@ -1,43 +1,37 @@
-﻿---
+---
 name: package-search
 description: "Search for packages in both Unity Package Manager registry and installed packages. Use this to find packages by name before installing them. Returns available versions and installation status. Searches both the Unity registry and locally installed packages (including Git, local, and embedded sources). Results are prioritized: exact name match, exact display name match, name substring, display name substring, description substring. Note: Online mode fetches exact matches from live registry, then supplements with cached substring matches."
 ---
 
 # Package Manager / Search
 
-Search for packages in both Unity Package Manager registry and installed packages. Use this to find packages by name before installing them. Returns available versions and installation status. Searches both the Unity registry and locally installed packages (including Git, local, and embedded sources). Results are prioritized: exact name match, exact display name match, name substring, display name substring, description substring. Note: Online mode fetches exact matches from live registry, then supplements with cached substring matches.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/package-search \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool package-search --input '{
   "query": "string_value",
   "maxResults": 0,
   "offlineMode": false
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool package-search --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool package-search --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/package-search \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "query": "string_value",
-  "maxResults": 0,
-  "offlineMode": false
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -54,16 +48,13 @@ curl -X POST http://localhost:53477/api/tools/package-search \
   "type": "object",
   "properties": {
     "query": {
-      "type": "string",
-      "description": "The package id, name, or description. Can be: Full package id \u0027com.unity.textmeshpro\u0027, Full package name \u0027TextMesh Pro\u0027, Partial name \u0027TextMesh\u0027 (will search in Unity registry and installed packages), Description keyword \u0027rendering\u0027 (searches in package descriptions)."
+      "type": "string"
     },
     "maxResults": {
-      "type": "integer",
-      "description": "Maximum number of results to return. Default: 10"
+      "type": "integer"
     },
     "offlineMode": {
-      "type": "boolean",
-      "description": "Whether to perform the search in offline mode (uses cached registry data only). Default: true. Set to false to fetch latest exact matches from Unity registry."
+      "type": "boolean"
     }
   },
   "required": [
@@ -81,11 +72,11 @@ curl -X POST http://localhost:53477/api/tools/package-search \
   "type": "object",
   "properties": {
     "result": {
-      "$ref": "#/$defs/System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Editor.API.Tool_Package\u002BPackageSearchResult\u003E"
+      "$ref": "#/$defs/System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Editor.API.Tool_Package+PackageSearchResult>"
     }
   },
   "$defs": {
-    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Package\u002BPackageSearchResult": {
+    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Package+PackageSearchResult": {
       "type": "object",
       "properties": {
         "Name": {
@@ -113,7 +104,7 @@ curl -X POST http://localhost:53477/api/tools/package-search \
           "description": "The currently installed version (if installed)."
         },
         "AvailableVersions": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003CSystem.String\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<System.String>",
           "description": "Available versions of this package (up to 5 most recent)."
         }
       },
@@ -122,16 +113,16 @@ curl -X POST http://localhost:53477/api/tools/package-search \
       ],
       "description": "Package search result with available versions."
     },
-    "System.Collections.Generic.List\u003CSystem.String\u003E": {
+    "System.Collections.Generic.List<System.String>": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Editor.API.Tool_Package\u002BPackageSearchResult\u003E": {
+    "System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Editor.API.Tool_Package+PackageSearchResult>": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Package\u002BPackageSearchResult",
+        "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Package+PackageSearchResult",
         "description": "Package search result with available versions."
       }
     }

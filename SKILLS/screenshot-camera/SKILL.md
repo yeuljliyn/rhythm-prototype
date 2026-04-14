@@ -1,43 +1,37 @@
-﻿---
+---
 name: screenshot-camera
 description: Captures a screenshot from a camera and returns it as an image. If no camera is specified, uses the Main Camera. Returns the image directly for visual inspection by the LLM.
 ---
 
 # Screenshot / Camera
 
-Captures a screenshot from a camera and returns it as an image. If no camera is specified, uses the Main Camera. Returns the image directly for visual inspection by the LLM.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/screenshot-camera \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool screenshot-camera --input '{
   "cameraRef": "string_value",
   "width": 0,
   "height": 0
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool screenshot-camera --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool screenshot-camera --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/screenshot-camera \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "cameraRef": "string_value",
-  "width": 0,
-  "height": 0
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -54,16 +48,13 @@ curl -X POST http://localhost:53477/api/tools/screenshot-camera \
   "type": "object",
   "properties": {
     "cameraRef": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectRef",
-      "description": "Reference to the camera GameObject. If not specified, uses the Main Camera."
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectRef"
     },
     "width": {
-      "type": "integer",
-      "description": "Width of the screenshot in pixels."
+      "type": "integer"
     },
     "height": {
-      "type": "integer",
-      "description": "Height of the screenshot in pixels."
+      "type": "integer"
     }
   },
   "$defs": {
@@ -75,11 +66,11 @@ curl -X POST http://localhost:53477/api/tools/screenshot-camera \
       "properties": {
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If it is \u00270\u0027 and \u0027path\u0027, \u0027name\u0027, \u0027assetPath\u0027 and \u0027assetGuid\u0027 is not provided, empty or null, then it will be used as \u0027null\u0027. Priority: 1 (Recommended)"
+          "description": "instanceID of the UnityEngine.Object. If it is '0' and 'path', 'name', 'assetPath' and 'assetGuid' is not provided, empty or null, then it will be used as 'null'. Priority: 1 (Recommended)"
         },
         "path": {
           "type": "string",
-          "description": "Path of a GameObject in the hierarchy Sample \u0027character/hand/finger/particle\u0027. Priority: 2."
+          "description": "Path of a GameObject in the hierarchy Sample 'character/hand/finger/particle'. Priority: 2."
         },
         "name": {
           "type": "string",
@@ -91,7 +82,7 @@ curl -X POST http://localhost:53477/api/tools/screenshot-camera \
         },
         "assetPath": {
           "type": "string",
-          "description": "Path to the asset within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the asset within the project. Starts with 'Assets/'"
         },
         "assetGuid": {
           "type": "string",

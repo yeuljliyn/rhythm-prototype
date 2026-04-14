@@ -1,22 +1,14 @@
-﻿---
+---
 name: type-get-json-schema
 description: Generates a JSON Schema for a given C# type name using reflection. Supports primitives, enums, arrays, generic collections, dictionaries, and complex objects. The type must be present in any loaded assembly. Use the full type name (e.g. 'UnityEngine.Vector3') for best results.
 ---
 
 # Type / Get Json Schema
 
-Generates a JSON Schema for a given C# type name using reflection. Supports primitives, enums, arrays, generic collections, dictionaries, and complex objects. The type must be present in any loaded assembly. Use the full type name (e.g. 'UnityEngine.Vector3') for best results.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/type-get-json-schema \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool type-get-json-schema --input '{
   "typeName": "string_value",
   "descriptionMode": "string_value",
   "propertyDescriptionMode": "string_value",
@@ -25,23 +17,23 @@ curl -X POST http://localhost:53477/api/tools/type-get-json-schema \
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool type-get-json-schema --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool type-get-json-schema --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/type-get-json-schema \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "typeName": "string_value",
-  "descriptionMode": "string_value",
-  "propertyDescriptionMode": "string_value",
-  "includeNestedTypes": false,
-  "writeIndented": false
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -60,8 +52,7 @@ curl -X POST http://localhost:53477/api/tools/type-get-json-schema \
   "type": "object",
   "properties": {
     "typeName": {
-      "type": "string",
-      "description": "Full C# type name to generate the schema for. Examples: \u0027System.String\u0027, \u0027UnityEngine.Vector3\u0027, \u0027System.Collections.Generic.List\u003CSystem.Int32\u003E\u0027. Simple names like \u0027Vector3\u0027 are also accepted when unambiguous."
+      "type": "string"
     },
     "descriptionMode": {
       "type": "string",
@@ -69,8 +60,7 @@ curl -X POST http://localhost:53477/api/tools/type-get-json-schema \
         "Include",
         "IncludeRecursively",
         "Ignore"
-      ],
-      "description": "Controls the type-level \u0027description\u0027 field. Include: keep on the target type only. IncludeRecursively: keep on the target type and inside $defs entries. Ignore: strip all type-level descriptions. Default: Ignore."
+      ]
     },
     "propertyDescriptionMode": {
       "type": "string",
@@ -78,16 +68,13 @@ curl -X POST http://localhost:53477/api/tools/type-get-json-schema \
         "Include",
         "IncludeRecursively",
         "Ignore"
-      ],
-      "description": "Controls \u0027description\u0027 fields on properties, fields, and array items. Include: keep on the target type\u0027s own properties/items only. IncludeRecursively: keep on all properties/items including those inside $defs entries. Ignore: strip all property/item descriptions. Default: Ignore."
+      ]
     },
     "includeNestedTypes": {
-      "type": "boolean",
-      "description": "When true, complex nested types are extracted into \u0027$defs\u0027 and referenced via \u0027$ref\u0027 instead of being inlined. Useful for large or recursive types. Default: false."
+      "type": "boolean"
     },
     "writeIndented": {
-      "type": "boolean",
-      "description": "Whether to format the output JSON with indentation for readability. Default: false."
+      "type": "boolean"
     }
   },
   "required": [

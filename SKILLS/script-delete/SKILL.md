@@ -1,39 +1,35 @@
-﻿---
+---
 name: script-delete
 description: Delete the script file(s). Does AssetDatabase.Refresh() and waits for Unity compilation to complete before reporting results. Use 'script-read' tool to read existing script files first.
 ---
 
 # Script / Delete
 
-Delete the script file(s). Does AssetDatabase.Refresh() and waits for Unity compilation to complete before reporting results. Use 'script-read' tool to read existing script files first.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/script-delete \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool script-delete --input '{
   "files": "string_value"
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool script-delete --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool script-delete --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/script-delete \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "files": "string_value"
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -48,8 +44,7 @@ curl -X POST http://localhost:53477/api/tools/script-delete \
   "type": "object",
   "properties": {
     "files": {
-      "$ref": "#/$defs/System.String[]",
-      "description": "File paths to the files. Sample: \u0022Assets/Scripts/MyScript.cs\u0022."
+      "$ref": "#/$defs/System.String[]"
     }
   },
   "$defs": {

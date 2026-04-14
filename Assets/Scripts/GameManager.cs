@@ -2,19 +2,24 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    static GameManager _instance;
+    public static GameManager Instance
+    {
+        get { if (_instance == null) _instance = FindObjectOfType<GameManager>(); return _instance; }
+        private set { _instance = value; }
+    }
 
     public int Score    { get; private set; }
     public int Combo    { get; private set; }
     public int MaxCombo { get; private set; }
 
-    public System.Action<int, int>      OnScoreChanged; // (score, combo)
+    public System.Action<int, int>      OnScoreChanged;
     public System.Action<JudgementType> OnJudgement;
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (_instance == null) Instance = this;
+        else if (_instance != this) Destroy(gameObject);
     }
 
     public void RegisterJudgement(JudgementType type)

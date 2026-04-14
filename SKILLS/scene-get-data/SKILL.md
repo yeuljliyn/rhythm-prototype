@@ -1,22 +1,14 @@
-﻿---
+---
 name: scene-get-data
 description: This tool retrieves the list of root GameObjects in the specified scene. Use 'scene-list-opened' tool to get the list of all opened scenes.
 ---
 
 # Scene / Get Data
 
-This tool retrieves the list of root GameObjects in the specified scene. Use 'scene-list-opened' tool to get the list of all opened scenes.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/scene-get-data \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool scene-get-data --input '{
   "openedSceneName": "string_value",
   "includeRootGameObjects": false,
   "includeChildrenDepth": 0,
@@ -25,23 +17,23 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool scene-get-data --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool scene-get-data --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/scene-get-data \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "openedSceneName": "string_value",
-  "includeRootGameObjects": false,
-  "includeChildrenDepth": 0,
-  "includeBounds": false,
-  "includeData": false
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -60,24 +52,19 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
   "type": "object",
   "properties": {
     "openedSceneName": {
-      "type": "string",
-      "description": "Name of the opened scene. If empty or null, the active scene will be used."
+      "type": "string"
     },
     "includeRootGameObjects": {
-      "type": "boolean",
-      "description": "If true, includes root GameObjects in the scene data."
+      "type": "boolean"
     },
     "includeChildrenDepth": {
-      "type": "integer",
-      "description": "Determines the depth of the hierarchy to include."
+      "type": "integer"
     },
     "includeBounds": {
-      "type": "boolean",
-      "description": "If true, includes bounding box information for GameObjects."
+      "type": "boolean"
     },
     "includeData": {
-      "type": "boolean",
-      "description": "If true, includes component data for GameObjects."
+      "type": "boolean"
     }
   }
 }
@@ -97,7 +84,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
     }
   },
   "$defs": {
-    "System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectData\u003E": {
+    "System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectData>": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectData"
@@ -133,11 +120,11 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
       "properties": {
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If it is \u00270\u0027 and \u0027path\u0027, \u0027name\u0027, \u0027assetPath\u0027 and \u0027assetGuid\u0027 is not provided, empty or null, then it will be used as \u0027null\u0027. Priority: 1 (Recommended)"
+          "description": "instanceID of the UnityEngine.Object. If it is '0' and 'path', 'name', 'assetPath' and 'assetGuid' is not provided, empty or null, then it will be used as 'null'. Priority: 1 (Recommended)"
         },
         "path": {
           "type": "string",
-          "description": "Path of a GameObject in the hierarchy Sample \u0027character/hand/finger/particle\u0027. Priority: 2."
+          "description": "Path of a GameObject in the hierarchy Sample 'character/hand/finger/particle'. Priority: 2."
         },
         "name": {
           "type": "string",
@@ -149,7 +136,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
         },
         "assetPath": {
           "type": "string",
-          "description": "Path to the asset within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the asset within the project. Starts with 'Assets/'"
         },
         "assetGuid": {
           "type": "string",
@@ -169,7 +156,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
       "properties": {
         "typeName": {
           "type": "string",
-          "description": "Full type name. Eg: \u0027System.String\u0027, \u0027System.Int32\u0027, \u0027UnityEngine.Vector3\u0027, etc."
+          "description": "Full type name. Eg: 'System.String', 'System.Int32', 'UnityEngine.Vector3', etc."
         },
         "name": {
           "type": "string",
@@ -184,7 +171,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
             "$ref": "#/$defs/com.IvanMurzak.ReflectorNet.Model.SerializedMember",
             "description": "Nested field value."
           },
-          "description": "Fields of the object, serialized as a list of \u0027SerializedMember\u0027."
+          "description": "Fields of the object, serialized as a list of 'SerializedMember'."
         },
         "props": {
           "type": "array",
@@ -192,7 +179,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
             "$ref": "#/$defs/com.IvanMurzak.ReflectorNet.Model.SerializedMember",
             "description": "Nested property value."
           },
-          "description": "Properties of the object, serialized as a list of \u0027SerializedMember\u0027."
+          "description": "Properties of the object, serialized as a list of 'SerializedMember'."
         }
       },
       "required": [
@@ -279,7 +266,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
           "type": "boolean"
         },
         "children": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectMetadata\u003E"
+          "$ref": "#/$defs/System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectMetadata>"
         }
       },
       "required": [
@@ -288,7 +275,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
         "activeInHierarchy"
       ]
     },
-    "System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectMetadata\u003E": {
+    "System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectMetadata>": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectMetadata"
@@ -327,7 +314,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
       "type": "object",
       "properties": {
         "RootGameObjects": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectData\u003E"
+          "$ref": "#/$defs/System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectData>"
         },
         "Name": {
           "type": "string"
@@ -350,7 +337,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
         },
         "path": {
           "type": "string",
-          "description": "Path to the Scene within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the Scene within the project. Starts with 'Assets/'"
         },
         "buildIndex": {
           "type": "integer",
@@ -358,7 +345,7 @@ curl -X POST http://localhost:53477/api/tools/scene-get-data \
         },
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If this is \u00270\u0027, then it will be used as \u0027null\u0027."
+          "description": "instanceID of the UnityEngine.Object. If this is '0', then it will be used as 'null'."
         }
       },
       "required": [

@@ -1,22 +1,14 @@
-﻿---
+---
 name: assets-prefab-instantiate
 description: Instantiates prefab in the current active scene. Use 'assets-find' tool to find prefab assets in the project.
 ---
 
 # Assets / Prefab / Instantiate
 
-Instantiates prefab in the current active scene. Use 'assets-find' tool to find prefab assets in the project.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/assets-prefab-instantiate \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool assets-prefab-instantiate --input '{
   "prefabAssetPath": "string_value",
   "gameObjectPath": "string_value",
   "position": "string_value",
@@ -26,24 +18,23 @@ curl -X POST http://localhost:53477/api/tools/assets-prefab-instantiate \
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool assets-prefab-instantiate --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool assets-prefab-instantiate --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/assets-prefab-instantiate \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "prefabAssetPath": "string_value",
-  "gameObjectPath": "string_value",
-  "position": "string_value",
-  "rotation": "string_value",
-  "scale": "string_value",
-  "isLocalSpace": false
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -63,28 +54,22 @@ curl -X POST http://localhost:53477/api/tools/assets-prefab-instantiate \
   "type": "object",
   "properties": {
     "prefabAssetPath": {
-      "type": "string",
-      "description": "Prefab asset path."
+      "type": "string"
     },
     "gameObjectPath": {
-      "type": "string",
-      "description": "GameObject path in the current active scene."
+      "type": "string"
     },
     "position": {
-      "$ref": "#/$defs/UnityEngine.Vector3",
-      "description": "Transform position of the GameObject."
+      "$ref": "#/$defs/UnityEngine.Vector3"
     },
     "rotation": {
-      "$ref": "#/$defs/UnityEngine.Vector3",
-      "description": "Transform rotation of the GameObject. Euler angles in degrees."
+      "$ref": "#/$defs/UnityEngine.Vector3"
     },
     "scale": {
-      "$ref": "#/$defs/UnityEngine.Vector3",
-      "description": "Transform scale of the GameObject."
+      "$ref": "#/$defs/UnityEngine.Vector3"
     },
     "isLocalSpace": {
-      "type": "boolean",
-      "description": "World or Local space of transform."
+      "type": "boolean"
     }
   },
   "$defs": {
@@ -138,11 +123,11 @@ curl -X POST http://localhost:53477/api/tools/assets-prefab-instantiate \
       "properties": {
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If it is \u00270\u0027 and \u0027path\u0027, \u0027name\u0027, \u0027assetPath\u0027 and \u0027assetGuid\u0027 is not provided, empty or null, then it will be used as \u0027null\u0027. Priority: 1 (Recommended)"
+          "description": "instanceID of the UnityEngine.Object. If it is '0' and 'path', 'name', 'assetPath' and 'assetGuid' is not provided, empty or null, then it will be used as 'null'. Priority: 1 (Recommended)"
         },
         "path": {
           "type": "string",
-          "description": "Path of a GameObject in the hierarchy Sample \u0027character/hand/finger/particle\u0027. Priority: 2."
+          "description": "Path of a GameObject in the hierarchy Sample 'character/hand/finger/particle'. Priority: 2."
         },
         "name": {
           "type": "string",
@@ -154,7 +139,7 @@ curl -X POST http://localhost:53477/api/tools/assets-prefab-instantiate \
         },
         "assetPath": {
           "type": "string",
-          "description": "Path to the asset within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the asset within the project. Starts with 'Assets/'"
         },
         "assetGuid": {
           "type": "string",

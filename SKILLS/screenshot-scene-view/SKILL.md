@@ -1,41 +1,36 @@
-﻿---
+---
 name: screenshot-scene-view
 description: Captures a screenshot from the Unity Editor Scene View and returns it as an image. Returns the image directly for visual inspection by the LLM.
 ---
 
 # Screenshot / Scene View
 
-Captures a screenshot from the Unity Editor Scene View and returns it as an image. Returns the image directly for visual inspection by the LLM.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/screenshot-scene-view \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool screenshot-scene-view --input '{
   "width": 0,
   "height": 0
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool screenshot-scene-view --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool screenshot-scene-view --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/screenshot-scene-view \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "width": 0,
-  "height": 0
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -51,12 +46,10 @@ curl -X POST http://localhost:53477/api/tools/screenshot-scene-view \
   "type": "object",
   "properties": {
     "width": {
-      "type": "integer",
-      "description": "Width of the screenshot in pixels."
+      "type": "integer"
     },
     "height": {
-      "type": "integer",
-      "description": "Height of the screenshot in pixels."
+      "type": "integer"
     }
   }
 }

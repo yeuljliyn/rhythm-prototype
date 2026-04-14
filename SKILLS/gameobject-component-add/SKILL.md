@@ -1,41 +1,36 @@
-﻿---
+---
 name: gameobject-component-add
 description: Add Component to GameObject in opened Prefab or in a Scene. Use 'gameobject-find' tool to find the target GameObject first. Use 'gameobject-component-list-all' tool to find the component type names to add.
 ---
 
 # GameObject / Component / Add
 
-Add Component to GameObject in opened Prefab or in a Scene. Use 'gameobject-find' tool to find the target GameObject first. Use 'gameobject-component-list-all' tool to find the component type names to add.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/gameobject-component-add \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool gameobject-component-add --input '{
   "componentNames": "string_value",
   "gameObjectRef": "string_value"
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool gameobject-component-add --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool gameobject-component-add --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/gameobject-component-add \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "componentNames": "string_value",
-  "gameObjectRef": "string_value"
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -51,12 +46,10 @@ curl -X POST http://localhost:53477/api/tools/gameobject-component-add \
   "type": "object",
   "properties": {
     "componentNames": {
-      "$ref": "#/$defs/System.String[]",
-      "description": "Full name of the Component. It should include full namespace path and the class name."
+      "$ref": "#/$defs/System.String[]"
     },
     "gameObjectRef": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectRef",
-      "description": "Find GameObject in opened Prefab or in the active Scene."
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectRef"
     }
   },
   "$defs": {
@@ -74,11 +67,11 @@ curl -X POST http://localhost:53477/api/tools/gameobject-component-add \
       "properties": {
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If it is \u00270\u0027 and \u0027path\u0027, \u0027name\u0027, \u0027assetPath\u0027 and \u0027assetGuid\u0027 is not provided, empty or null, then it will be used as \u0027null\u0027. Priority: 1 (Recommended)"
+          "description": "instanceID of the UnityEngine.Object. If it is '0' and 'path', 'name', 'assetPath' and 'assetGuid' is not provided, empty or null, then it will be used as 'null'. Priority: 1 (Recommended)"
         },
         "path": {
           "type": "string",
-          "description": "Path of a GameObject in the hierarchy Sample \u0027character/hand/finger/particle\u0027. Priority: 2."
+          "description": "Path of a GameObject in the hierarchy Sample 'character/hand/finger/particle'. Priority: 2."
         },
         "name": {
           "type": "string",
@@ -90,7 +83,7 @@ curl -X POST http://localhost:53477/api/tools/gameobject-component-add \
         },
         "assetPath": {
           "type": "string",
-          "description": "Path to the asset within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the asset within the project. Starts with 'Assets/'"
         },
         "assetGuid": {
           "type": "string",
@@ -119,11 +112,11 @@ curl -X POST http://localhost:53477/api/tools/gameobject-component-add \
   "type": "object",
   "properties": {
     "result": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_GameObject\u002BAddComponentResponse"
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_GameObject+AddComponentResponse"
     }
   },
   "$defs": {
-    "System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.ComponentDataShallow\u003E": {
+    "System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.ComponentDataShallow>": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.ComponentDataShallow"
@@ -152,29 +145,29 @@ curl -X POST http://localhost:53477/api/tools/gameobject-component-add \
         "isEnabled"
       ]
     },
-    "System.Collections.Generic.List\u003CSystem.String\u003E": {
+    "System.Collections.Generic.List<System.String>": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_GameObject\u002BAddComponentResponse": {
+    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_GameObject+AddComponentResponse": {
       "type": "object",
       "properties": {
         "AddedComponents": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.ComponentDataShallow\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.ComponentDataShallow>",
           "description": "List of successfully added components."
         },
         "Messages": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003CSystem.String\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<System.String>",
           "description": "List of success messages for added components."
         },
         "Warnings": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003CSystem.String\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<System.String>",
           "description": "List of warnings encountered during component addition."
         },
         "Errors": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003CSystem.String\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<System.String>",
           "description": "List of errors encountered during component addition."
         }
       }

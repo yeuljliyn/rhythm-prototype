@@ -1,39 +1,35 @@
-﻿---
+---
 name: scene-unload
 description: Unload scene from the Opened scenes in Unity Editor. Use 'scene-list-opened' tool to get the list of all opened scenes.
 ---
 
 # Scene / Unload
 
-Unload scene from the Opened scenes in Unity Editor. Use 'scene-list-opened' tool to get the list of all opened scenes.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/scene-unload \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool scene-unload --input '{
   "name": "string_value"
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool scene-unload --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool scene-unload --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/scene-unload \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "name": "string_value"
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -48,8 +44,7 @@ curl -X POST http://localhost:53477/api/tools/scene-unload \
   "type": "object",
   "properties": {
     "name": {
-      "type": "string",
-      "description": "Name of the loaded scene."
+      "type": "string"
     }
   },
   "required": [
@@ -67,7 +62,7 @@ curl -X POST http://localhost:53477/api/tools/scene-unload \
   "type": "object",
   "properties": {
     "result": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Scene\u002BUnloadSceneResult"
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Scene+UnloadSceneResult"
     }
   },
   "$defs": {
@@ -76,7 +71,7 @@ curl -X POST http://localhost:53477/api/tools/scene-unload \
       "properties": {
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If this is \u00270\u0027 and \u0027assetPath\u0027 and \u0027assetGuid\u0027 is not provided, empty or null, then it will be used as \u0027null\u0027."
+          "description": "instanceID of the UnityEngine.Object. If this is '0' and 'assetPath' and 'assetGuid' is not provided, empty or null, then it will be used as 'null'."
         },
         "assetType": {
           "$ref": "#/$defs/System.Type",
@@ -84,7 +79,7 @@ curl -X POST http://localhost:53477/api/tools/scene-unload \
         },
         "assetPath": {
           "type": "string",
-          "description": "Path to the asset within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the asset within the project. Starts with 'Assets/'"
         },
         "assetGuid": {
           "type": "string",
@@ -99,7 +94,7 @@ curl -X POST http://localhost:53477/api/tools/scene-unload \
     "System.Type": {
       "type": "string"
     },
-    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Scene\u002BUnloadSceneResult": {
+    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Scene+UnloadSceneResult": {
       "type": "object",
       "properties": {
         "Name": {

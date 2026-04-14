@@ -17,7 +17,14 @@
       "mcp__ai-game-developer__editor-application-set-state",
       "mcp__ai-game-developer__screenshot-game-view",
       "mcp__ai-game-developer__gameobject-find",
-      "mcp__ai-game-developer__assets-find-built-in"
+      "mcp__ai-game-developer__assets-find-built-in",
+      "mcp__ai-game-developer__gameobject-component-get",
+      "mcp__ai-game-developer__gameobject-destroy",
+      "mcp__ai-game-developer__gameobject-modify",
+      "mcp__ai-game-developer__gameobject-component-modify",
+      "mcp__ai-game-developer__gameobject-create",
+      "mcp__ai-game-developer__gameobject-component-add",
+      "mcp__ai-game-developer__scene-save"
     ]
   },
   "enableAllProjectMcpServers": true,

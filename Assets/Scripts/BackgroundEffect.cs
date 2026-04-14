@@ -20,6 +20,7 @@ public class BackgroundEffect : MonoBehaviour
 
     void Update()
     {
+        if (RhythmManager.Instance == null) return;
         float song  = RhythmManager.Instance.SongTime;
         float beat  = Mathf.Floor(song / beatInterval);
 

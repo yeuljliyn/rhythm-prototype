@@ -1,22 +1,14 @@
-﻿---
+---
 name: console-get-logs
 description: Retrieves Unity Editor logs. Useful for debugging and monitoring Unity Editor activity.
 ---
 
 # Console / Get Logs
 
-Retrieves Unity Editor logs. Useful for debugging and monitoring Unity Editor activity.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/console-get-logs \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool console-get-logs --input '{
   "maxEntries": 0,
   "logTypeFilter": "string_value",
   "includeStackTrace": false,
@@ -24,22 +16,23 @@ curl -X POST http://localhost:53477/api/tools/console-get-logs \
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool console-get-logs --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool console-get-logs --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/console-get-logs \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "maxEntries": 0,
-  "logTypeFilter": "string_value",
-  "includeStackTrace": false,
-  "lastMinutes": 0
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -57,20 +50,16 @@ curl -X POST http://localhost:53477/api/tools/console-get-logs \
   "type": "object",
   "properties": {
     "maxEntries": {
-      "type": "integer",
-      "description": "Maximum number of log entries to return. Minimum: 1. Default: 100"
+      "type": "integer"
     },
     "logTypeFilter": {
-      "$ref": "#/$defs/UnityEngine.LogType",
-      "description": "Filter by log type. \u0027null\u0027 means All."
+      "$ref": "#/$defs/UnityEngine.LogType"
     },
     "includeStackTrace": {
-      "type": "boolean",
-      "description": "Include stack traces in the output. Default: false"
+      "type": "boolean"
     },
     "lastMinutes": {
-      "type": "integer",
-      "description": "Return logs from the last N minutes. If 0, returns all available logs. Default: 0"
+      "type": "integer"
     }
   },
   "$defs": {

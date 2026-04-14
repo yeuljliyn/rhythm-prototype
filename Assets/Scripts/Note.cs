@@ -2,31 +2,32 @@ using UnityEngine;
 
 public class Note : MonoBehaviour
 {
-    // ── Judgement windows (seconds) ────────────────────────────────
     public const float PerfectWindow = 0.06f;
     public const float GoodWindow    = 0.12f;
 
-    // ── Public state ───────────────────────────────────────────────
     public int   Lane    { get; private set; }
     public float HitTime { get; private set; }
     public bool  IsHit   { get; private set; }
 
-    private float noteSpeed;
+    float   noteSpeed;
+    Vector3 moveDir;
 
-    // ── Init ───────────────────────────────────────────────────────
-    public void Initialize(int lane, float hitTime, float speed)
+    public void Initialize(int lane, float hitTime, float speed, Vector3 direction)
     {
         Lane      = lane;
         HitTime   = hitTime;
         noteSpeed = speed;
+        moveDir   = direction;
+
+        foreach (var sr in GetComponentsInChildren<SpriteRenderer>())
+            sr.sprite = ArrowSprite.Get();
 
         NoteManager.Instance.Register(this);
     }
 
-    // ── Movement ───────────────────────────────────────────────────
     void Update()
     {
-        transform.Translate(Vector3.left * noteSpeed * Time.deltaTime);
+        transform.Translate(moveDir * noteSpeed * Time.deltaTime, Space.World);
 
         if (!IsHit)
         {
@@ -36,7 +37,6 @@ public class Note : MonoBehaviour
         }
     }
 
-    // ── Hit / Miss ─────────────────────────────────────────────────
     public void TryHit()
     {
         if (IsHit) return;
@@ -46,15 +46,12 @@ public class Note : MonoBehaviour
         JudgementType j;
         if      (diff <= PerfectWindow) j = JudgementType.Perfect;
         else if (diff <= GoodWindow)    j = JudgementType.Good;
-        else    return;                 // outside window — ignore
+        else    return;
 
         Resolve(j);
     }
 
-    void AutoMiss()
-    {
-        Resolve(JudgementType.Miss);
-    }
+    void AutoMiss() => Resolve(JudgementType.Miss);
 
     void Resolve(JudgementType j)
     {
@@ -68,16 +65,15 @@ public class Note : MonoBehaviour
         Destroy(gameObject);
     }
 
-    // ── Hit VFX ────────────────────────────────────────────────────
     void SpawnHitFX()
     {
         var fx = new GameObject("HitFX");
-        fx.transform.position = transform.position;
+        fx.transform.position = RhythmManager.ReceptorPos[Lane];
+        fx.transform.rotation = transform.rotation;   // ← 노트 방향 그대로 복사
         var sr = fx.AddComponent<SpriteRenderer>();
-        sr.sprite        = GetComponent<SpriteRenderer>().sprite;
-        sr.color         = Color.white;
-        sr.sortingOrder  = 10;
+        sr.sprite       = GetComponent<SpriteRenderer>()?.sprite;
+        sr.color        = Color.white;
+        sr.sortingOrder = 10;
         fx.AddComponent<HitFX>();
     }
-
 }

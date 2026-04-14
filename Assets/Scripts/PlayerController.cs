@@ -2,56 +2,47 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 
+/// <summary>
+/// 4-direction input: A/← = Left, S/↓ = Down, W/↑ = Up, D/→ = Right
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
     public SpriteRenderer bodyRenderer;
-    public SpriteRenderer swordRenderer;
 
-    Coroutine attackRoutine;
+    Coroutine flashRoutine;
+
+    static readonly Color[] LaneColors = {
+        new Color(0.3f, 0.6f, 1f),     // Left  — blue
+        new Color(0.3f, 1f,  0.45f),   // Down  — green
+        new Color(1f,  0.9f, 0.2f),    // Up    — yellow
+        new Color(1f,  0.35f,0.35f),   // Right — red
+    };
 
     void Update()
     {
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        if (kb.zKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame)
-        { Debug.Log("[PC] Ground attack"); Attack(0); }
-        if (kb.xKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame)
-        { Debug.Log("[PC] Air attack"); Attack(1); }
+        if (kb.aKey.wasPressedThisFrame     || kb.leftArrowKey.wasPressedThisFrame)  HitLane(0);
+        if (kb.sKey.wasPressedThisFrame     || kb.downArrowKey.wasPressedThisFrame)  HitLane(1);
+        if (kb.wKey.wasPressedThisFrame     || kb.upArrowKey.wasPressedThisFrame)    HitLane(2);
+        if (kb.dKey.wasPressedThisFrame     || kb.rightArrowKey.wasPressedThisFrame) HitLane(3);
     }
 
-    void Attack(int lane)
+    void HitLane(int lane)
     {
         var note = NoteManager.Instance.GetNearest(lane, RhythmManager.Instance.SongTime, Note.GoodWindow);
         note?.TryHit();
 
-        Color flashColor = lane == 0 ? new Color(0.2f, 1f, 0.9f) : new Color(1f, 0.2f, 0.9f);
-        if (attackRoutine != null) StopCoroutine(attackRoutine);
-        attackRoutine = StartCoroutine(SlashAnim(lane, flashColor));
+        if (flashRoutine != null) StopCoroutine(flashRoutine);
+        flashRoutine = StartCoroutine(Flash(LaneColors[lane]));
     }
 
-    IEnumerator SlashAnim(int lane, Color color)
+    IEnumerator Flash(Color color)
     {
-        if (bodyRenderer != null) { bodyRenderer.color = color; }
-
-        if (swordRenderer != null)
-        {
-            float targetAngle = lane == 0 ? -40f : 40f;
-            float elapsed = 0f;
-            float duration = 0.12f;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = elapsed / duration;
-                float angle = Mathf.Lerp(0f, targetAngle, Mathf.Sin(t * Mathf.PI));
-                swordRenderer.transform.localRotation = Quaternion.Euler(0, 0, angle);
-                yield return null;
-            }
-            swordRenderer.transform.localRotation = Quaternion.identity;
-        }
-        else { yield return new WaitForSeconds(0.08f); }
-
-        if (bodyRenderer != null) { bodyRenderer.color = Color.white; }
+        if (bodyRenderer != null) bodyRenderer.color = color;
+        yield return new WaitForSeconds(0.08f);
+        if (bodyRenderer != null) bodyRenderer.color = Color.white;
     }
 }

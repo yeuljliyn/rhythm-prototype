@@ -2,42 +2,46 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Tracks active notes per lane for efficient hit detection.
+/// Tracks active notes per lane (0=Left, 1=Down, 2=Up, 3=Right).
 /// </summary>
 public class NoteManager : MonoBehaviour
 {
-    public static NoteManager Instance { get; private set; }
+    static NoteManager _instance;
+    public static NoteManager Instance
+    {
+        get { if (_instance == null) _instance = FindObjectOfType<NoteManager>(); return _instance; }
+        private set { _instance = value; }
+    }
 
-    // Sorted by HitTime ascending — closest-to-hit is index 0
-    private List<Note> groundNotes = new List<Note>();
-    private List<Note> airNotes    = new List<Note>();
+    readonly List<Note>[] lanes = new List<Note>[4];
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (_instance == null) Instance = this;
+        else if (_instance != this) Destroy(gameObject);
+
+        for (int i = 0; i < 4; i++)
+            lanes[i] = new List<Note>();
     }
 
     public void Register(Note note)
     {
-        var list = GetList(note.Lane);
+        var list = lanes[note.Lane];
         list.Add(note);
         list.Sort((a, b) => a.HitTime.CompareTo(b.HitTime));
     }
 
     public void Unregister(Note note)
     {
-        GetList(note.Lane).Remove(note);
+        lanes[note.Lane].Remove(note);
     }
 
-    /// <summary>Returns the nearest note in the lane within timeWindow, or null.</summary>
     public Note GetNearest(int lane, float songTime, float timeWindow)
     {
-        var list = GetList(lane);
-        Note best     = null;
+        Note  best     = null;
         float bestDiff = float.MaxValue;
 
-        foreach (var note in list)
+        foreach (var note in lanes[lane])
         {
             float diff = Mathf.Abs(songTime - note.HitTime);
             if (diff <= timeWindow && diff < bestDiff)
@@ -48,6 +52,4 @@ public class NoteManager : MonoBehaviour
         }
         return best;
     }
-
-    private List<Note> GetList(int lane) => lane == 0 ? groundNotes : airNotes;
 }

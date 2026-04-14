@@ -1,48 +1,43 @@
-﻿---
+---
 name: assets-copy
-description: Copy the asset at path and stores it at newPath. Does AssetDatabase.Refresh() at the end. Use 'assets-find' tool to find assets before copying.
+description: Copy assets at given paths and store them at new paths. Does AssetDatabase.Refresh() at the end. Use 'assets-find' tool to find assets before copying.
 ---
 
 # Assets / Copy
 
-Copy the asset at path and stores it at newPath. Does AssetDatabase.Refresh() at the end. Use 'assets-find' tool to find assets before copying.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/assets-copy \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool assets-copy --input '{
   "sourcePaths": "string_value",
   "destinationPaths": "string_value"
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool assets-copy --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool assets-copy --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/assets-copy \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "sourcePaths": "string_value",
-  "destinationPaths": "string_value"
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `sourcePaths` | `any` | Yes | The paths of the asset to copy. |
-| `destinationPaths` | `any` | Yes | The paths to store the copied asset. |
+| `sourcePaths` | `any` | Yes | The paths of the assets to copy. |
+| `destinationPaths` | `any` | Yes | The paths to store the copied assets. |
 
 ### Input JSON Schema
 
@@ -51,12 +46,10 @@ curl -X POST http://localhost:53477/api/tools/assets-copy \
   "type": "object",
   "properties": {
     "sourcePaths": {
-      "$ref": "#/$defs/System.String[]",
-      "description": "The paths of the asset to copy."
+      "$ref": "#/$defs/System.String[]"
     },
     "destinationPaths": {
-      "$ref": "#/$defs/System.String[]",
-      "description": "The paths to store the copied asset."
+      "$ref": "#/$defs/System.String[]"
     }
   },
   "$defs": {
@@ -83,11 +76,11 @@ curl -X POST http://localhost:53477/api/tools/assets-copy \
   "type": "object",
   "properties": {
     "result": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets\u002BCopyAssetsResponse"
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets+CopyAssetsResponse"
     }
   },
   "$defs": {
-    "System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.AssetObjectRef\u003E": {
+    "System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.AssetObjectRef>": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.AssetObjectRef",
@@ -99,7 +92,7 @@ curl -X POST http://localhost:53477/api/tools/assets-copy \
       "properties": {
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If this is \u00270\u0027 and \u0027assetPath\u0027 and \u0027assetGuid\u0027 is not provided, empty or null, then it will be used as \u0027null\u0027."
+          "description": "instanceID of the UnityEngine.Object. If this is '0' and 'assetPath' and 'assetGuid' is not provided, empty or null, then it will be used as 'null'."
         },
         "assetType": {
           "$ref": "#/$defs/System.Type",
@@ -107,7 +100,7 @@ curl -X POST http://localhost:53477/api/tools/assets-copy \
         },
         "assetPath": {
           "type": "string",
-          "description": "Path to the asset within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the asset within the project. Starts with 'Assets/'"
         },
         "assetGuid": {
           "type": "string",
@@ -122,21 +115,21 @@ curl -X POST http://localhost:53477/api/tools/assets-copy \
     "System.Type": {
       "type": "string"
     },
-    "System.Collections.Generic.List\u003CSystem.String\u003E": {
+    "System.Collections.Generic.List<System.String>": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets\u002BCopyAssetsResponse": {
+    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets+CopyAssetsResponse": {
       "type": "object",
       "properties": {
         "CopiedAssets": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003Ccom.IvanMurzak.Unity.MCP.Runtime.Data.AssetObjectRef\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Runtime.Data.AssetObjectRef>",
           "description": "List of copied assets."
         },
         "Errors": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003CSystem.String\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<System.String>",
           "description": "List of errors encountered during copy operations."
         }
       }

@@ -1,75 +1,99 @@
 using UnityEngine;
 
 /// <summary>
-/// Core BPM engine.  Spawns notes from a hardcoded beatmap.
-/// Lane 0 = ground (Z key / Down Arrow)
-/// Lane 1 = air    (X key / Up Arrow)
+/// 4-direction arrow rhythm engine.
+/// Lane 0 = Left  (A / ←)  note travels RIGHT toward receptor
+/// Lane 1 = Down  (S / ↓)  note travels UP    toward receptor
+/// Lane 2 = Up    (W / ↑)  note travels DOWN  toward receptor
+/// Lane 3 = Right (D / →)  note travels LEFT  toward receptor
 /// </summary>
 public class RhythmManager : MonoBehaviour
 {
-    public static RhythmManager Instance { get; private set; }
+    static RhythmManager _instance;
+    public static RhythmManager Instance
+    {
+        get { if (_instance == null) _instance = FindObjectOfType<RhythmManager>(); return _instance; }
+        private set { _instance = value; }
+    }
 
-    // ── Inspector ──────────────────────────────────────────────────
     [Header("Timing")]
-    public float bpm       = 128f;
-    public float noteSpeed = 9f;      // units per second
+    public float bpm           = 128f;
+    public float noteSpeed     = 3.5f;
+    public float spawnAheadTime = 2.5f;
 
-    [Header("Scene References")]
-    public Transform noteSpawnPoint;  // right edge (X ≈ +11)
-    public Transform hitLine;         // player hit zone (X ≈ -5)
-
-    [Header("Prefabs")]
-    public GameObject groundNotePrefab;
-    public GameObject airNotePrefab;
+    [Header("Prefab")]
+    public GameObject notePrefab;
 
     [Header("Intro")]
-    public float introDelay = 2f;   // seconds of silence before first beat
+    public float introDelay = 2f;
 
-    // ── Runtime ────────────────────────────────────────────────────
+    // ── Lane definitions ─────────────────────────────────────────────
+    public static readonly Vector3[] ReceptorPos = {
+        new Vector3(-2.5f,  0f,   0f),   // 0  Left
+        new Vector3( 0f,   -2.5f, 0f),   // 1  Down
+        new Vector3( 0f,    2.5f, 0f),   // 2  Up
+        new Vector3( 2.5f,  0f,   0f),   // 3  Right
+    };
+
+    public static readonly Vector3[] NoteDir = {
+        Vector3.right,   // 0 Left  lane — travels right
+        Vector3.up,      // 1 Down  lane — travels up
+        Vector3.down,    // 2 Up    lane — travels down
+        Vector3.left,    // 3 Right lane — travels left
+    };
+
+    // Z rotation: arrow points toward the KEY the player must press (right-facing sprite as base)
+    // Lane 0 = Left  (A/←) → 180°  Lane 1 = Down (S/↓) → -90°
+    // Lane 2 = Up   (W/↑) →  90°  Lane 3 = Right(D/→) →   0°
+    static readonly float[] LaneRotation = { 180f, -90f, 90f, 0f };
+
+    static readonly Color[] LaneColors = {
+        new Color(0.3f, 0.6f, 1f),     // Left  — blue
+        new Color(0.3f, 1f,  0.45f),   // Down  — green
+        new Color(1f,  0.9f, 0.2f),    // Up    — yellow
+        new Color(1f,  0.35f,0.35f),   // Right — red
+    };
+
+    // ── Runtime ──────────────────────────────────────────────────────
     public float SongTime { get; private set; }
 
     float beatInterval;
-    float spawnAheadTime;
     int   nextNoteIndex;
     bool  isRunning;
 
-    // ── Beatmap: { beat, lane }  (beat 1-based, lane 0=ground 1=air) ──
-    // 32-beat pattern — cyberpunk battle rhythm
+    // ── Beatmap: { beat, lane }  lane: 0=Left 1=Down 2=Up 3=Right ───
     static readonly int[,] Beatmap =
     {
-        {1,0},{2,0},{3,1},{4,0},
-        {5,0},{6,1},{7,0},{8,1},
-        {9,0},{10,0},{11,1},{12,0},
-        {13,1},{14,0},{15,0},{16,1},
-        {17,0},{18,1},{19,0},{20,0},
-        {21,1},{22,0},{23,1},{24,0},
-        {25,0},{25,1},{26,0},{27,1},
-        {28,0},{29,0},{30,1},{31,0},
-        {32,0},{32,1},
+        {1,0},{2,3},{3,2},{4,1},
+        {5,0},{6,2},{7,3},{8,1},
+        {9,0},{10,0},{11,2},{12,3},
+        {13,1},{14,3},{15,2},{16,0},
+        {17,0},{17,3},{18,1},{18,2},
+        {19,0},{20,3},{21,2},{22,1},
+        {23,0},{23,2},{24,1},{24,3},
+        {25,0},{26,2},{27,1},{28,3},
+        {29,0},{29,2},{30,1},{30,3},
+        {31,0},{31,3},{32,1},{32,2},
     };
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (_instance == null) Instance = this;
+        else if (_instance != this) Destroy(gameObject);
     }
 
     void Start()
     {
-        beatInterval    = 60f / bpm;
-        float distance  = noteSpawnPoint.position.x - hitLine.position.x;
-        spawnAheadTime  = distance / noteSpeed;
-        SongTime        = -introDelay;   // count up from negative → notes have lead time
-        isRunning       = true;
+        beatInterval = 60f / bpm;
+        SongTime     = -introDelay;
+        isRunning    = true;
     }
 
     void Update()
     {
         if (!isRunning) return;
-
         SongTime += Time.deltaTime;
 
-        // Spawn all notes whose spawn-time has arrived
         int total = Beatmap.GetLength(0);
         while (nextNoteIndex < total)
         {
@@ -87,18 +111,19 @@ public class RhythmManager : MonoBehaviour
 
     void SpawnNote(int lane, float hitTime)
     {
-        // Y position: ground lane = -2.2, air lane = 0.8
-        float y = lane == 0 ? -2.2f : 0.8f;
-        var   pos    = new Vector3(noteSpawnPoint.position.x, y, 0f);
-        var   prefab = lane == 0 ? groundNotePrefab : airNotePrefab;
-
-        if (prefab == null)
+        if (notePrefab == null)
         {
-            Debug.LogWarning("Note prefab not assigned on RhythmManager!");
+            Debug.LogWarning("notePrefab not assigned on RhythmManager!");
             return;
         }
 
-        var go = Instantiate(prefab, pos, Quaternion.identity);
-        go.GetComponent<Note>().Initialize(lane, hitTime, noteSpeed);
+        Vector3 spawnPos = ReceptorPos[lane] + (-NoteDir[lane]) * noteSpeed * spawnAheadTime;
+        spawnPos.z = 0f;
+
+        var go  = Instantiate(notePrefab, spawnPos, Quaternion.Euler(0f, 0f, LaneRotation[lane]));
+        var sr  = go.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.color = LaneColors[lane];
+
+        go.GetComponent<Note>().Initialize(lane, hitTime, noteSpeed, NoteDir[lane]);
     }
 }

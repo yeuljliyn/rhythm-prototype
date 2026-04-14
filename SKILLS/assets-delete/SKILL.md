@@ -1,39 +1,35 @@
-﻿---
+---
 name: assets-delete
 description: Delete the assets at paths from the project. Does AssetDatabase.Refresh() at the end. Use 'assets-find' tool to find assets before deleting.
 ---
 
 # Assets / Delete
 
-Delete the assets at paths from the project. Does AssetDatabase.Refresh() at the end. Use 'assets-find' tool to find assets before deleting.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/assets-delete \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool assets-delete --input '{
   "paths": "string_value"
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool assets-delete --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool assets-delete --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/assets-delete \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "paths": "string_value"
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -48,8 +44,7 @@ curl -X POST http://localhost:53477/api/tools/assets-delete \
   "type": "object",
   "properties": {
     "paths": {
-      "$ref": "#/$defs/System.String[]",
-      "description": "The paths of the assets"
+      "$ref": "#/$defs/System.String[]"
     }
   },
   "$defs": {
@@ -75,25 +70,25 @@ curl -X POST http://localhost:53477/api/tools/assets-delete \
   "type": "object",
   "properties": {
     "result": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets\u002BDeleteAssetsResponse"
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets+DeleteAssetsResponse"
     }
   },
   "$defs": {
-    "System.Collections.Generic.List\u003CSystem.String\u003E": {
+    "System.Collections.Generic.List<System.String>": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets\u002BDeleteAssetsResponse": {
+    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Assets+DeleteAssetsResponse": {
       "type": "object",
       "properties": {
         "DeletedPaths": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003CSystem.String\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<System.String>",
           "description": "List of paths of deleted assets."
         },
         "Errors": {
-          "$ref": "#/$defs/System.Collections.Generic.List\u003CSystem.String\u003E",
+          "$ref": "#/$defs/System.Collections.Generic.List<System.String>",
           "description": "List of errors encountered during delete operations."
         }
       }

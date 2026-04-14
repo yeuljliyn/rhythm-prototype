@@ -1,39 +1,35 @@
-﻿---
+---
 name: package-add
 description: "Install a package from the Unity Package Manager registry, Git URL, or local path. This operation modifies the project's manifest.json and triggers package resolution. Note: Package installation may trigger a domain reload. The result will be sent after the reload completes. Use 'package-search' tool to search for packages and 'package-list' to list installed packages."
 ---
 
 # Package Manager / Add
 
-Install a package from the Unity Package Manager registry, Git URL, or local path. This operation modifies the project's manifest.json and triggers package resolution. Note: Package installation may trigger a domain reload. The result will be sent after the reload completes. Use 'package-search' tool to search for packages and 'package-list' to list installed packages.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/package-add \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool package-add --input '{
   "packageId": "string_value"
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool package-add --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool package-add --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/package-add \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "packageId": "string_value"
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -48,8 +44,7 @@ curl -X POST http://localhost:53477/api/tools/package-add \
   "type": "object",
   "properties": {
     "packageId": {
-      "type": "string",
-      "description": "The package ID to install. Formats: Package ID \u0027com.unity.textmeshpro\u0027 (installs latest compatible version), Package ID with version \u0027com.unity.textmeshpro@3.0.6\u0027, Git URL \u0027https://github.com/user/repo.git\u0027, Git URL with branch/tag \u0027https://github.com/user/repo.git#v1.0.0\u0027, Local path \u0027file:../MyPackage\u0027."
+      "type": "string"
     }
   },
   "required": [

@@ -1,37 +1,35 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using System.Collections;
-// v2
+
 public class UIManager : MonoBehaviour
 {
     [Header("UI References")]
-    public TextMeshProUGUI scoreText;
     public TextMeshProUGUI comboText;
     public TextMeshProUGUI judgementText;
-    public TextMeshProUGUI titleText;
+    public TextMeshProUGUI hintText;
 
     Coroutine judgeFadeRoutine;
     Coroutine comboPulseRoutine;
 
     void Start()
     {
-        GameManager.Instance.OnScoreChanged += RefreshScoreUI;
+        GameManager.Instance.OnScoreChanged += RefreshComboUI;
         GameManager.Instance.OnJudgement    += ShowJudgement;
-        RefreshScoreUI(0, 0);
-        if (titleText != null)
-            titleText.text = "CYBER SHAMAN\n<size=60%>SPIRIT CLEANSE</size>";
+        RefreshComboUI(0, 0);
+
+        if (hintText != null)
+            hintText.text = "A ←   S ↓   W ↑   D →";
     }
 
-    void RefreshScoreUI(int score, int combo)
+    void RefreshComboUI(int score, int combo)
     {
-        if (scoreText != null)
-            scoreText.text = score.ToString("D7");
-        if (comboText != null)
+        if (comboText == null) return;
+        comboText.text = combo >= 2 ? $"{combo}<size=60%>x</size>" : "";
+        if (combo >= 2)
         {
-            comboText.text = combo >= 2 ? combo + "<size=60%>x</size>" : "";
             if (comboPulseRoutine != null) StopCoroutine(comboPulseRoutine);
-            if (combo >= 2) comboPulseRoutine = StartCoroutine(PulseCombo());
+            comboPulseRoutine = StartCoroutine(PulseCombo());
         }
     }
 
@@ -40,10 +38,10 @@ public class UIManager : MonoBehaviour
         if (judgementText == null) return;
 
         string txt;
-        Color col;
-        if (type == JudgementType.Perfect)      { txt = "PERFECT!"; col = new Color(1f, 0.95f, 0.1f); }
-        else if (type == JudgementType.Good)    { txt = "GOOD";     col = new Color(0.2f, 1f, 0.5f); }
-        else                                    { txt = "MISS";     col = new Color(1f, 0.2f, 0.2f); }
+        Color  col;
+        if      (type == JudgementType.Perfect) { txt = "PERFECT"; col = new Color(1f, 0.95f, 0.1f); }
+        else if (type == JudgementType.Good)    { txt = "GOOD";    col = new Color(0.2f, 1f,  0.5f); }
+        else                                    { txt = "MISS";    col = new Color(1f, 0.2f,  0.2f); }
 
         judgementText.text  = txt;
         judgementText.color = col;
@@ -53,15 +51,14 @@ public class UIManager : MonoBehaviour
 
     IEnumerator FadeJudgement(Color startColor)
     {
-        float duration = 0.7f;
-        float elapsed  = 0f;
+        float duration = 0.7f, elapsed = 0f;
         Vector3 startPos = judgementText.transform.localPosition;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
-            judgementText.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-            judgementText.transform.localPosition = startPos + Vector3.up * 40f * (elapsed / duration);
+            float t = elapsed / duration;
+            judgementText.color = new Color(startColor.r, startColor.g, startColor.b, 1f - t);
+            judgementText.transform.localPosition = startPos + Vector3.up * 40f * t;
             yield return null;
         }
         judgementText.text = "";
@@ -71,13 +68,11 @@ public class UIManager : MonoBehaviour
     IEnumerator PulseCombo()
     {
         comboText.transform.localScale = Vector3.one * 1.35f;
-        float elapsed = 0f;
-        float duration = 0.15f;
+        float elapsed = 0f, duration = 0.15f;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float s = Mathf.Lerp(1.35f, 1f, elapsed / duration);
-            comboText.transform.localScale = Vector3.one * s;
+            comboText.transform.localScale = Vector3.one * Mathf.Lerp(1.35f, 1f, elapsed / duration);
             yield return null;
         }
         comboText.transform.localScale = Vector3.one;

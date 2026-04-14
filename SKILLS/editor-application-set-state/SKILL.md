@@ -1,41 +1,36 @@
-﻿---
+---
 name: editor-application-set-state
 description: Control the Unity Editor application state. You can start, stop, or pause the 'playmode'. Use 'editor-application-get-state' tool to get the current state first.
 ---
 
 # Editor / Application / Set State
 
-Control the Unity Editor application state. You can start, stop, or pause the 'playmode'. Use 'editor-application-get-state' tool to get the current state first.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/editor-application-set-state \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool editor-application-set-state --input '{
   "isPlaying": false,
   "isPaused": false
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool editor-application-set-state --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool editor-application-set-state --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/editor-application-set-state \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "isPlaying": false,
-  "isPaused": false
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -51,12 +46,10 @@ curl -X POST http://localhost:53477/api/tools/editor-application-set-state \
   "type": "object",
   "properties": {
     "isPlaying": {
-      "type": "boolean",
-      "description": "If true, the \u0027playmode\u0027 will be started. If false, the \u0027playmode\u0027 will be stopped."
+      "type": "boolean"
     },
     "isPaused": {
-      "type": "boolean",
-      "description": "If true, the \u0027playmode\u0027 will be paused. If false, the \u0027playmode\u0027 will be resumed."
+      "type": "boolean"
     }
   }
 }
@@ -71,12 +64,12 @@ curl -X POST http://localhost:53477/api/tools/editor-application-set-state \
   "type": "object",
   "properties": {
     "result": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Editor\u002BEditorStatsData",
-      "description": "Available information about \u0027UnityEditor.EditorApplication\u0027."
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Editor.API.Tool_Editor+EditorStatsData",
+      "description": "Available information about 'UnityEditor.EditorApplication'."
     }
   },
   "$defs": {
-    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Editor\u002BEditorStatsData": {
+    "com.IvanMurzak.Unity.MCP.Editor.API.Tool_Editor+EditorStatsData": {
       "type": "object",
       "properties": {
         "IsPlaying": {
@@ -120,7 +113,7 @@ curl -X POST http://localhost:53477/api/tools/editor-application-set-state \
         "IsUpdating",
         "TimeSinceStartup"
       ],
-      "description": "Available information about \u0027UnityEditor.EditorApplication\u0027."
+      "description": "Available information about 'UnityEditor.EditorApplication'."
     }
   },
   "required": [

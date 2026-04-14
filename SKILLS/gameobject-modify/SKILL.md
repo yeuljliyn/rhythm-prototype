@@ -1,41 +1,36 @@
-﻿---
+---
 name: gameobject-modify
 description: Modify GameObject fields and properties in opened Prefab or in a Scene. You can modify multiple GameObjects at once. Just provide the same number of GameObject references and SerializedMember objects.
 ---
 
 # GameObject / Modify
 
-Modify GameObject fields and properties in opened Prefab or in a Scene. You can modify multiple GameObjects at once. Just provide the same number of GameObject references and SerializedMember objects.
-
 ## How to Call
 
-### HTTP API (Direct Tool Execution)
-
-Execute this tool directly via the MCP Plugin HTTP API:
-
 ```bash
-curl -X POST http://localhost:53477/api/tools/gameobject-modify \
-  -H "Content-Type: application/json" \
-  -d '{
+unity-mcp-cli run-tool gameobject-modify --input '{
   "gameObjectRefs": "string_value",
   "gameObjectDiffs": "string_value"
 }'
 ```
 
-#### With Authorization (if required)
+> For complex input (multi-line strings, code), save the JSON to a file and use:
+> ```bash
+> unity-mcp-cli run-tool gameobject-modify --input-file args.json
+> ```
+>
+> Or pipe via stdin (recommended):
+> ```bash
+> unity-mcp-cli run-tool gameobject-modify --input-file - <<'EOF'
+> {"param": "value"}
+> EOF
+> ```
 
-```bash
-curl -X POST http://localhost:53477/api/tools/gameobject-modify \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-  "gameObjectRefs": "string_value",
-  "gameObjectDiffs": "string_value"
-}'
-```
 
-> The token is stored in the file: `UserSettings/AI-Game-Developer-Config.json`
-> Using the format: `"token": "YOUR_TOKEN"`
+### Troubleshooting
+
+If `unity-mcp-cli` is not found, either install it globally (`npm install -g unity-mcp-cli`) or use `npx unity-mcp-cli` instead.
+Read the /unity-initial-setup skill for detailed installation instructions.
 
 ## Input
 
@@ -51,12 +46,10 @@ curl -X POST http://localhost:53477/api/tools/gameobject-modify \
   "type": "object",
   "properties": {
     "gameObjectRefs": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectRefList",
-      "description": "Array of GameObjects in opened Prefab or in the active Scene."
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Runtime.Data.GameObjectRefList"
     },
     "gameObjectDiffs": {
-      "$ref": "#/$defs/com.IvanMurzak.ReflectorNet.Model.SerializedMemberList",
-      "description": "Each item in the array represents a GameObject modification of the \u0027gameObjectRefs\u0027 at the same index. Usually a GameObject is a container for components. Each component may have fields and properties for modification. If you need to modify components of a GameObject, please use \u0027gameobject-component-modify\u0027 tool. Ignore values that should not be modified. Any unknown or wrong located fields and properties will be ignored. Check the result of this command to see what was changed. The ignored fields and properties will be listed."
+      "$ref": "#/$defs/com.IvanMurzak.ReflectorNet.Model.SerializedMemberList"
     }
   },
   "$defs": {
@@ -65,11 +58,11 @@ curl -X POST http://localhost:53477/api/tools/gameobject-modify \
       "properties": {
         "instanceID": {
           "type": "integer",
-          "description": "instanceID of the UnityEngine.Object. If it is \u00270\u0027 and \u0027path\u0027, \u0027name\u0027, \u0027assetPath\u0027 and \u0027assetGuid\u0027 is not provided, empty or null, then it will be used as \u0027null\u0027. Priority: 1 (Recommended)"
+          "description": "instanceID of the UnityEngine.Object. If it is '0' and 'path', 'name', 'assetPath' and 'assetGuid' is not provided, empty or null, then it will be used as 'null'. Priority: 1 (Recommended)"
         },
         "path": {
           "type": "string",
-          "description": "Path of a GameObject in the hierarchy Sample \u0027character/hand/finger/particle\u0027. Priority: 2."
+          "description": "Path of a GameObject in the hierarchy Sample 'character/hand/finger/particle'. Priority: 2."
         },
         "name": {
           "type": "string",
@@ -81,7 +74,7 @@ curl -X POST http://localhost:53477/api/tools/gameobject-modify \
         },
         "assetPath": {
           "type": "string",
-          "description": "Path to the asset within the project. Starts with \u0027Assets/\u0027"
+          "description": "Path to the asset within the project. Starts with 'Assets/'"
         },
         "assetGuid": {
           "type": "string",
@@ -115,7 +108,7 @@ curl -X POST http://localhost:53477/api/tools/gameobject-modify \
       "properties": {
         "typeName": {
           "type": "string",
-          "description": "Full type name. Eg: \u0027System.String\u0027, \u0027System.Int32\u0027, \u0027UnityEngine.Vector3\u0027, etc."
+          "description": "Full type name. Eg: 'System.String', 'System.Int32', 'UnityEngine.Vector3', etc."
         },
         "name": {
           "type": "string",
@@ -130,7 +123,7 @@ curl -X POST http://localhost:53477/api/tools/gameobject-modify \
             "$ref": "#/$defs/com.IvanMurzak.ReflectorNet.Model.SerializedMember",
             "description": "Nested field value."
           },
-          "description": "Fields of the object, serialized as a list of \u0027SerializedMember\u0027."
+          "description": "Fields of the object, serialized as a list of 'SerializedMember'."
         },
         "props": {
           "type": "array",
@@ -138,7 +131,7 @@ curl -X POST http://localhost:53477/api/tools/gameobject-modify \
             "$ref": "#/$defs/com.IvanMurzak.ReflectorNet.Model.SerializedMember",
             "description": "Nested property value."
           },
-          "description": "Properties of the object, serialized as a list of \u0027SerializedMember\u0027."
+          "description": "Properties of the object, serialized as a list of 'SerializedMember'."
         }
       },
       "required": [
