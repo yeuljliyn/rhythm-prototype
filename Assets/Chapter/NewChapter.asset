@@ -1,0 +1,143 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3c44b624ebf6424a8ef5d9a90936a82, type: 3}
+  m_Name: NewChapter
+  m_EditorClassIdentifier: Assembly-CSharp::ChapterData
+  chapterName: Chapter 1
+  music: {fileID: 8300000, guid: f404e168ecd119641bc3fd4c16f5c077, type: 3}
+  bpm: 128
+  introDelay: 2
+  notes:
+  - beat: 0.5
+    type: 0
+  - beat: 1.25
+    type: 0
+  - beat: 1.5
+    type: 4
+  - beat: 2.25
+    type: 0
+  - beat: 3.75
+    type: 0
+  - beat: 4.75
+    type: 0
+  - beat: 5.75
+    type: 0
+  - beat: 6.5
+    type: 0
+  - beat: 7.75
+    type: 0
+  - beat: 8.75
+    type: 0
+  - beat: 9.75
+    type: 0
+  - beat: 10.75
+    type: 0
+  - beat: 11.5
+    type: 0
+  - beat: 12.75
+    type: 0
+  - beat: 13.75
+    type: 0
+  - beat: 14.75
+    type: 0
+  - beat: 15.75
+    type: 0
+  - beat: 16.75
+    type: 0
+  - beat: 17.75
+    type: 0
+  - beat: 18.75
+    type: 2
+  - beat: 19.75
+    type: 1
+  - beat: 20.75
+    type: 3
+  - beat: 21.75
+    type: 4
+  - beat: 22.75
+    type: 3
+  - beat: 23.75
+    type: 1
+  - beat: 24.75
+    type: 4
+  - beat: 25.75
+    type: 3
+  - beat: 26.5
+    type: 0
+  - beat: 27.5
+    type: 0
+  - beat: 28.5
+    type: 1
+  - beat: 29.5
+    type: 4
+  - beat: 30.5
+    type: 0
+  - beat: 31.5
+    type: 3
+  - beat: 32.75
+    type: 1
+  - beat: 33.75
+    type: 2
+  - beat: 34.75
+    type: 4
+  - beat: 35.75
+    type: 3
+  - beat: 36.5
+    type: 0
+  - beat: 37.75
+    type: 1
+  - beat: 38.5
+    type: 2
+  - beat: 39.5
+    type: 4
+  - beat: 40.5
+    type: 3
+  - beat: 41.75
+    type: 1
+  - beat: 42.5
+    type: 0
+  - beat: 43.5
+    type: 2
+  - beat: 44.5
+    type: 1
+  - beat: 45.25
+    type: 4
+  - beat: 46.5
+    type: 3
+  - beat: 47.75
+    type: 1
+  - beat: 48.5
+    type: 0
+  - beat: 49.25
+    type: 4
+  - beat: 50.5
+    type: 2
+  - beat: 51.5
+    type: 1
+  - beat: 52.5
+    type: 3
+  - beat: 53.75
+    type: 0
+  - beat: 54.5
+    type: 1
+  - beat: 55.5
+    type: 2
+  - beat: 56.25
+    type: 4
+  - beat: 57.5
+    type: 3
+  - beat: 58.5
+    type: 0
+  - beat: 59.5
+    type: 2
+  - beat: 61
+    type: 1

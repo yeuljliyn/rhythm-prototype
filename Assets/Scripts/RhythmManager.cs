@@ -1,10 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Combat rhythm engine.
-/// Normal notes (white) → SPACE / Z.
-/// Special notes (colored + arrow) → matching direction key.
-/// About 25 % of notes are specials, giving a "special attack" feel.
+/// Drives note spawning from a ChapterData asset.
+/// Falls back to the built-in beatmap when no ChapterData is assigned,
+/// so the existing SampleScene still works without any setup.
 /// </summary>
 public class RhythmManager : MonoBehaviour
 {
@@ -15,38 +15,43 @@ public class RhythmManager : MonoBehaviour
         private set { _instance = value; }
     }
 
-    [Header("Timing")]
+    [Header("Chapter (overrides built-in beatmap when assigned)")]
+    public ChapterData chapter;
+
+    [Header("Fallback timing — used only when no Chapter assigned")]
     public float bpm            = 128f;
     public float spawnAheadTime = 2.2f;
+    public float introDelay     = 2f;
 
-    [Header("Note Spawn Area — near the boss")]
+    [Header("Note spawn area")]
     public Vector2 spawnCenter = new Vector2(0f, 2.8f);
     public float   spawnRadius = 1.6f;
 
-    [Header("Intro")]
-    public float introDelay = 2f;
-
     // ── Runtime ───────────────────────────────────────────────────────
-    public float SongTime  { get; private set; }
-    float beatInterval;
-    int   nextNoteIndex;
-    bool  isRunning;
+    public float SongTime { get; private set; }
 
-    // ── Beatmap: { beat, noteType }
-    // noteType: 0=Normal  1=ArrowLeft  2=ArrowDown  3=ArrowUp  4=ArrowRight
-    // Special notes appear roughly every 4 beats (~25 %) for a "special attack" cadence.
-    static readonly int[,] Beatmap =
+    float       _beatInterval;
+    int         _nextIdx;
+    bool        _isRunning;
+    AudioSource _audio;
+
+    struct ScheduledNote { public float hitTime; public NoteType type; }
+    List<ScheduledNote> _schedule;
+
+    // ── Built-in beatmap (fallback) ───────────────────────────────────
+    static readonly int[,] BuiltInBeatmap =
     {
-        { 1, 0},{ 2, 0},{ 3, 0},{ 4, 1},   // beat 4  → Left  (special)
-        { 5, 0},{ 6, 0},{ 7, 0},{ 8, 3},   // beat 8  → Up    (special)
-        { 9, 0},{10, 0},{11, 0},{12, 4},    // beat 12 → Right (special)
-        {13, 0},{14, 0},{15, 0},{16, 2},    // beat 16 → Down  (special)
-        {17, 0},{18, 0},{19, 1},{20, 0},    // beat 19 → Left  (special mid-phrase)
-        {21, 0},{22, 0},{23, 3},{24, 0},    // beat 23 → Up    (special)
-        {25, 0},{26, 4},{27, 0},{28, 0},    // beat 26 → Right (special)
-        {29, 0},{30, 2},{31, 0},{32, 0},    // beat 30 → Down  (special)
+        { 1, 0},{ 2, 0},{ 3, 0},{ 4, 1},
+        { 5, 0},{ 6, 0},{ 7, 0},{ 8, 3},
+        { 9, 0},{10, 0},{11, 0},{12, 4},
+        {13, 0},{14, 0},{15, 0},{16, 2},
+        {17, 0},{18, 0},{19, 1},{20, 0},
+        {21, 0},{22, 0},{23, 3},{24, 0},
+        {25, 0},{26, 4},{27, 0},{28, 0},
+        {29, 0},{30, 2},{31, 0},{32, 0},
     };
 
+    // ── Unity ─────────────────────────────────────────────────────────
     void Awake()
     {
         if (_instance == null) Instance = this;
@@ -55,36 +60,79 @@ public class RhythmManager : MonoBehaviour
 
     void Start()
     {
-        beatInterval = 60f / bpm;
-        SongTime     = -introDelay;
-        isRunning    = true;
+        float activeBpm   = chapter != null ? chapter.bpm        : bpm;
+        float activeIntro = chapter != null ? chapter.introDelay : introDelay;
+
+        _beatInterval = 60f / Mathf.Max(1f, activeBpm);
+        SongTime      = -activeIntro;
+        _isRunning    = true;
+
+        BuildSchedule();
+        PlayMusic(activeIntro);
     }
 
     void Update()
     {
-        if (!isRunning) return;
+        if (!_isRunning) return;
         SongTime += Time.deltaTime;
 
-        int total = Beatmap.GetLength(0);
-        while (nextNoteIndex < total)
+        while (_nextIdx < _schedule.Count)
         {
-            float hitTime   = Beatmap[nextNoteIndex, 0] * beatInterval;
+            float hitTime   = _schedule[_nextIdx].hitTime;
             float spawnTime = hitTime - spawnAheadTime;
+            if (SongTime < spawnTime) break;
 
-            if (SongTime >= spawnTime)
-            {
-                SpawnNote(hitTime, (NoteType)Beatmap[nextNoteIndex, 1]);
-                nextNoteIndex++;
-            }
-            else break;
+            SpawnNote(hitTime, _schedule[_nextIdx].type);
+            _nextIdx++;
         }
+    }
+
+    // ── Internals ─────────────────────────────────────────────────────
+    void BuildSchedule()
+    {
+        _schedule = new List<ScheduledNote>();
+
+        if (chapter != null && chapter.notes != null && chapter.notes.Count > 0)
+        {
+            foreach (NoteEntry e in chapter.notes)
+                _schedule.Add(new ScheduledNote
+                {
+                    hitTime = chapter.BeatToTime(e.beat),
+                    type    = e.type
+                });
+        }
+        else
+        {
+            int len = BuiltInBeatmap.GetLength(0);
+            for (int i = 0; i < len; i++)
+                _schedule.Add(new ScheduledNote
+                {
+                    hitTime = BuiltInBeatmap[i, 0] * _beatInterval,
+                    type    = (NoteType)BuiltInBeatmap[i, 1]
+                });
+        }
+
+        _schedule.Sort((a, b) => a.hitTime.CompareTo(b.hitTime));
+    }
+
+    void PlayMusic(float delay)
+    {
+        if (chapter == null || chapter.music == null) return;
+
+        _audio      = gameObject.GetComponent<AudioSource>();
+        if (_audio == null) _audio = gameObject.AddComponent<AudioSource>();
+
+        _audio.clip        = chapter.music;
+        _audio.playOnAwake = false;
+        _audio.loop        = false;
+        _audio.PlayScheduled(AudioSettings.dspTime + delay);
     }
 
     void SpawnNote(float hitTime, NoteType type)
     {
         Vector2 offset   = Random.insideUnitCircle * spawnRadius;
-        var     spawnPos = new Vector3(spawnCenter.x + offset.x, spawnCenter.y + offset.y, 0f);
-
+        var     spawnPos = new Vector3(spawnCenter.x + offset.x,
+                                       spawnCenter.y + offset.y, 0f);
         var go = new GameObject("BeatCircle");
         go.transform.position = spawnPos;
         go.AddComponent<Note>().Initialize(hitTime, SongTime, type);
