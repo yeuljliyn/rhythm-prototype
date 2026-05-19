@@ -28,7 +28,9 @@
       "PowerShell(ls -Recurse \"C:\\\\Users\\\\users\\\\Documents\\\\GitHub\\\\rhythm-prototype\\\\Assets\" -Directory | Where-Object { $_.FullName -notmatch \"TextMesh Pro\" -and $_.FullName -notmatch \"Settings\" } | Select-Object FullName | Sort-Object FullName)",
       "PowerShell($env:PATH += \";C:\\\\Program Files\\\\Git\\\\cmd\"; cd \"C:\\\\Users\\\\users\\\\Documents\\\\GitHub\\\\rhythm-prototype\"; git status)",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\users\\\\AppData\\\\Local\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"GitHub\" } | Select-Object FullName)",
-      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\users\\\\AppData\\\\Roaming\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"GitHub\" } | Select-Object FullName; Get-ChildItem \"C:\\\\Users\\\\users\\\\AppData\\\\Local\\\\Programs\" -ErrorAction SilentlyContinue | Select-Object Name)"
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\users\\\\AppData\\\\Roaming\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"GitHub\" } | Select-Object FullName; Get-ChildItem \"C:\\\\Users\\\\users\\\\AppData\\\\Local\\\\Programs\" -ErrorAction SilentlyContinue | Select-Object Name)",
+      "mcp__ai-game-developer__assets-get-data",
+      "Bash(git add *)"
     ]
   },
   "enableAllProjectMcpServers": true,

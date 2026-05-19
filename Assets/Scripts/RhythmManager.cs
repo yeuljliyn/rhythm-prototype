@@ -3,8 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Drives note spawning from a ChapterData asset.
-/// Falls back to the built-in beatmap when no ChapterData is assigned,
-/// so the existing SampleScene still works without any setup.
+/// Notes travel horizontally from spawnX (right/boss side) to hitZoneX (left/player side).
 /// </summary>
 public class RhythmManager : MonoBehaviour
 {
@@ -19,39 +18,33 @@ public class RhythmManager : MonoBehaviour
     public ChapterData chapter;
 
     [Header("Fallback timing — used only when no Chapter assigned")]
-    public float bpm            = 128f;
+    public float bpm        = 128f;
+    public float introDelay = 2f;
+
+    [Header("Note Lane")]
     public float spawnAheadTime = 2.2f;
-    public float introDelay     = 2f;
+    public float spawnX         =  8.0f;   // right side (off-screen)
+    public float hitZoneX       = -5.0f;   // left side (player)
+    public float noteY          = -2.5f;   // lane height
 
-    [Header("Note spawn area")]
-    public Vector2 spawnCenter = new Vector2(0f, 2.8f);
-    public float   spawnRadius = 1.6f;
+    public float SongTime     { get; private set; }
+    public float BeatInterval { get; private set; }
 
-    // ── Runtime ───────────────────────────────────────────────────────
-    public float SongTime { get; private set; }
-
-    float       _beatInterval;
     int         _nextIdx;
     bool        _isRunning;
     AudioSource _audio;
 
-    struct ScheduledNote { public float hitTime; public NoteType type; }
-    List<ScheduledNote> _schedule;
+    struct ScheduledNote { public float hitTime; }
+    List<ScheduledNote> _schedule = new List<ScheduledNote>();
 
-    // ── Built-in beatmap (fallback) ───────────────────────────────────
-    static readonly int[,] BuiltInBeatmap =
+    static readonly int[] BuiltInBeats =
     {
-        { 1, 0},{ 2, 0},{ 3, 0},{ 4, 1},
-        { 5, 0},{ 6, 0},{ 7, 0},{ 8, 3},
-        { 9, 0},{10, 0},{11, 0},{12, 4},
-        {13, 0},{14, 0},{15, 0},{16, 2},
-        {17, 0},{18, 0},{19, 1},{20, 0},
-        {21, 0},{22, 0},{23, 3},{24, 0},
-        {25, 0},{26, 4},{27, 0},{28, 0},
-        {29, 0},{30, 2},{31, 0},{32, 0},
+         1,  2,  3,  4,  5,  6,  7,  8,
+         9, 10, 11, 12, 13, 14, 15, 16,
+        17, 18, 19, 20, 21, 22, 23, 24,
+        25, 26, 27, 28, 29, 30, 31, 32,
     };
 
-    // ── Unity ─────────────────────────────────────────────────────────
     void Awake()
     {
         if (_instance == null) Instance = this;
@@ -63,12 +56,12 @@ public class RhythmManager : MonoBehaviour
         float activeBpm   = chapter != null ? chapter.bpm        : bpm;
         float activeIntro = chapter != null ? chapter.introDelay : introDelay;
 
-        _beatInterval = 60f / Mathf.Max(1f, activeBpm);
-        SongTime      = -activeIntro;
-        _isRunning    = true;
+        BeatInterval = 60f / Mathf.Max(1f, activeBpm);
+        SongTime     = -activeIntro;
 
         BuildSchedule();
         PlayMusic(activeIntro);
+        _isRunning = true;
     }
 
     void Update()
@@ -82,12 +75,11 @@ public class RhythmManager : MonoBehaviour
             float spawnTime = hitTime - spawnAheadTime;
             if (SongTime < spawnTime) break;
 
-            SpawnNote(hitTime, _schedule[_nextIdx].type);
+            SpawnNote(hitTime);
             _nextIdx++;
         }
     }
 
-    // ── Internals ─────────────────────────────────────────────────────
     void BuildSchedule()
     {
         _schedule = new List<ScheduledNote>();
@@ -95,21 +87,12 @@ public class RhythmManager : MonoBehaviour
         if (chapter != null && chapter.notes != null && chapter.notes.Count > 0)
         {
             foreach (NoteEntry e in chapter.notes)
-                _schedule.Add(new ScheduledNote
-                {
-                    hitTime = chapter.BeatToTime(e.beat),
-                    type    = e.type
-                });
+                _schedule.Add(new ScheduledNote { hitTime = chapter.BeatToTime(e.beat) });
         }
         else
         {
-            int len = BuiltInBeatmap.GetLength(0);
-            for (int i = 0; i < len; i++)
-                _schedule.Add(new ScheduledNote
-                {
-                    hitTime = BuiltInBeatmap[i, 0] * _beatInterval,
-                    type    = (NoteType)BuiltInBeatmap[i, 1]
-                });
+            foreach (int beat in BuiltInBeats)
+                _schedule.Add(new ScheduledNote { hitTime = beat * BeatInterval });
         }
 
         _schedule.Sort((a, b) => a.hitTime.CompareTo(b.hitTime));
@@ -119,22 +102,17 @@ public class RhythmManager : MonoBehaviour
     {
         if (chapter == null || chapter.music == null) return;
 
-        _audio      = gameObject.GetComponent<AudioSource>();
+        _audio = gameObject.GetComponent<AudioSource>();
         if (_audio == null) _audio = gameObject.AddComponent<AudioSource>();
-
         _audio.clip        = chapter.music;
         _audio.playOnAwake = false;
         _audio.loop        = false;
         _audio.PlayScheduled(AudioSettings.dspTime + delay);
     }
 
-    void SpawnNote(float hitTime, NoteType type)
+    void SpawnNote(float hitTime)
     {
-        Vector2 offset   = Random.insideUnitCircle * spawnRadius;
-        var     spawnPos = new Vector3(spawnCenter.x + offset.x,
-                                       spawnCenter.y + offset.y, 0f);
-        var go = new GameObject("BeatCircle");
-        go.transform.position = spawnPos;
-        go.AddComponent<Note>().Initialize(hitTime, SongTime, type);
+        var go = new GameObject("Note");
+        go.AddComponent<Note>().Initialize(hitTime, spawnX, hitZoneX, noteY, spawnAheadTime);
     }
 }

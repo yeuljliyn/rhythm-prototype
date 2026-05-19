@@ -26,6 +26,8 @@ MonoBehaviour:
   - beat: 2.25
     type: 0
   - beat: 3.75
+    type: 1
+  - beat: 3.75
     type: 0
   - beat: 4.75
     type: 0

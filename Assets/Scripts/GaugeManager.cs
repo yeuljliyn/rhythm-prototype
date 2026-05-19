@@ -2,25 +2,27 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Survival-style gauge: starts full, drains over time, fills on note hit.
-/// Builds its own UI bar at runtime — no prefab needed.
+/// Command bonus gauge — fills in segments when a command is completed.
+/// Does not drain. At 100% triggers OnGaugeFull and resets.
 /// </summary>
 public class GaugeManager : MonoBehaviour
 {
     public static GaugeManager Instance { get; private set; }
 
     [Header("Gauge Settings")]
-    public float drainPerSecond = 0.055f;
-    public float perfectFill   = 0.13f;
-    public float goodFill      = 0.07f;
+    [Range(0.05f, 1f)] public float fillPerCommand = 0.20f;   // 20% per success
 
-    public float Gauge { get; private set; } = 1f;
+    public float Gauge { get; private set; } = 0f;
 
-    Image _fill;
+    public System.Action OnGaugeFull;
 
-    static readonly Color ColHigh = new Color(0.15f, 0.90f, 1.00f);   // cyan
-    static readonly Color ColMid  = new Color(1.00f, 0.85f, 0.10f);   // yellow
-    static readonly Color ColLow  = new Color(1.00f, 0.20f, 0.15f);   // red
+    Image[]    _segments;
+    const int  SegmentCount = 5;
+    const float SegmentGap  = 6f;
+
+    static readonly Color ColEmpty = new Color(0.10f, 0.10f, 0.18f, 0.92f);
+    static readonly Color ColFill  = new Color(0.15f, 0.85f, 1.00f, 1.00f);
+    static readonly Color ColFull  = new Color(1.00f, 0.80f, 0.10f, 1.00f);
 
     void Awake()
     {
@@ -28,74 +30,95 @@ public class GaugeManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    void Start()
+    void Start() => BuildSegmentedBar();
+
+    /// <summary>Called by CommandSystem on a successful command.</summary>
+    public void FillFromCommand()
     {
-        BuildBar();
-        GameManager.Instance.OnJudgement += OnJudgement;
+        Gauge = Mathf.Clamp01(Gauge + fillPerCommand);
+        Refresh();
+
+        if (Gauge >= 1f)
+            TriggerFull();
+    }
+
+    void TriggerFull()
+    {
+        OnGaugeFull?.Invoke();
+        Debug.Log("[GaugeManager] Gauge FULL — effect TBD by designer");
+        Gauge = 0f;
         Refresh();
     }
 
-    void BuildBar()
+    void BuildSegmentedBar()
     {
-        // Parent to UIRoot (which corrects canvas Y-inversion) so anchors work normally
         var canvasGO = GameObject.Find("Canvas");
         if (canvasGO == null) { Debug.LogWarning("GaugeManager: Canvas not found"); return; }
+
         var uiRoot = canvasGO.transform.Find("UIRoot");
         var parent = uiRoot != null ? uiRoot : canvasGO.transform;
 
-        // ── Outer container (dark bg) ──────────────────────────────────
-        var bgGO   = new GameObject("GaugeBackground");
-        bgGO.transform.SetParent(parent, false);
-        var bgRect = bgGO.AddComponent<RectTransform>();
-        bgRect.anchorMin        = new Vector2(0.5f, 1f);
-        bgRect.anchorMax        = new Vector2(0.5f, 1f);
-        bgRect.pivot            = new Vector2(0.5f, 1f);
-        bgRect.anchoredPosition = new Vector2(0f, -14f);
-        bgRect.sizeDelta        = new Vector2(520f, 10f);
-        var bgImg  = bgGO.AddComponent<Image>();
-        bgImg.color             = new Color(0.08f, 0.08f, 0.12f, 0.92f);
+        // Root container (bottom center)
+        var rootGO   = new GameObject("GaugeRoot");
+        rootGO.transform.SetParent(parent, false);
+        var rootRect = rootGO.AddComponent<RectTransform>();
+        rootRect.anchorMin        = new Vector2(0.5f, 0f);
+        rootRect.anchorMax        = new Vector2(0.5f, 0f);
+        rootRect.pivot            = new Vector2(0f, 0f);   // left-bottom pivot (segments fill left→right)
+        rootRect.anchoredPosition = new Vector2(-200f, 18f); // offset left so visual center = screen center
+        rootRect.sizeDelta        = new Vector2(400f, 30f);
 
-        // ── Fill bar ───────────────────────────────────────────────────
-        var fillGO   = new GameObject("GaugeFill");
-        fillGO.transform.SetParent(bgGO.transform, false);
-        var fillRect = fillGO.AddComponent<RectTransform>();
-        fillRect.anchorMin  = Vector2.zero;
-        fillRect.anchorMax  = Vector2.one;
-        fillRect.offsetMin  = Vector2.zero;
-        fillRect.offsetMax  = Vector2.zero;
-        _fill               = fillGO.AddComponent<Image>();
-        _fill.type          = Image.Type.Filled;
-        _fill.fillMethod    = Image.FillMethod.Horizontal;
-        _fill.fillOrigin    = 0;   // left → right
-        _fill.color         = ColHigh;
-    }
+        // Label
+        var lblGO   = new GameObject("GaugeLabel");
+        lblGO.transform.SetParent(rootGO.transform, false);
+        var lblRect = lblGO.AddComponent<RectTransform>();
+        lblRect.anchorMin        = new Vector2(0.5f, 1f);
+        lblRect.anchorMax        = new Vector2(0.5f, 1f);
+        lblRect.pivot            = new Vector2(0.5f, 0f);
+        lblRect.anchoredPosition = new Vector2(0f, 2f);
+        lblRect.sizeDelta        = new Vector2(200f, 18f);
+        var lbl = lblGO.AddComponent<TMPro.TextMeshProUGUI>();
+        lbl.text      = "POWER";
+        lbl.fontSize  = 12f;
+        lbl.alignment = TMPro.TextAlignmentOptions.Center;
+        lbl.color     = new Color(0.7f, 0.85f, 1f, 0.8f);
 
-    void Update()
-    {
-        if (RhythmManager.Instance == null) return;
-        if (RhythmManager.Instance.SongTime < 0f) return;   // wait through intro
+        // Segments
+        _segments = new Image[SegmentCount];
+        float totalWidth = rootRect.sizeDelta.x;
+        float segW = (totalWidth - SegmentGap * (SegmentCount - 1)) / SegmentCount;
 
-        Gauge = Mathf.Clamp01(Gauge - drainPerSecond * Time.deltaTime);
-        Refresh();
-    }
+        for (int i = 0; i < SegmentCount; i++)
+        {
+            var segGO   = new GameObject($"Seg{i}");
+            segGO.transform.SetParent(rootGO.transform, false);
+            var segRect = segGO.AddComponent<RectTransform>();
+            // Anchor to left edge of parent, stack from left to right
+            segRect.anchorMin        = new Vector2(0f, 0f);
+            segRect.anchorMax        = new Vector2(0f, 1f);
+            segRect.pivot            = new Vector2(0f, 0.5f);
+            segRect.sizeDelta        = new Vector2(segW, 0f);
+            segRect.anchoredPosition = new Vector2(i * (segW + SegmentGap), 0f);
 
-    void OnJudgement(JudgementType type)
-    {
-        if      (type == JudgementType.Perfect) Gauge = Mathf.Clamp01(Gauge + perfectFill);
-        else if (type == JudgementType.Good)    Gauge = Mathf.Clamp01(Gauge + goodFill);
+            _segments[i]       = segGO.AddComponent<Image>();
+            _segments[i].color = ColEmpty;
+        }
+
         Refresh();
     }
 
     void Refresh()
     {
-        if (_fill == null) return;
-        _fill.fillAmount = Gauge;
+        if (_segments == null) return;
+        float filled = Gauge * SegmentCount;
+        bool  isFull = Gauge >= 1f;
 
-        // colour transitions: cyan → yellow → red
-        Color c;
-        if      (Gauge > 0.55f) c = Color.Lerp(ColMid,  ColHigh, (Gauge - 0.55f) / 0.45f);
-        else if (Gauge > 0.25f) c = Color.Lerp(ColMid,  ColHigh, (Gauge - 0.25f) / 0.30f);
-        else                    c = Color.Lerp(ColLow,  ColMid,  Gauge / 0.25f);
-        _fill.color = c;
+        for (int i = 0; i < SegmentCount; i++)
+        {
+            if (_segments[i] == null) continue;
+            _segments[i].color = i < filled
+                ? (isFull ? ColFull : ColFill)
+                : ColEmpty;
+        }
     }
 }

@@ -2,55 +2,50 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 
-/// <summary>
-/// Input handler for the combat rhythm game.
-/// SPACE / Z       → hit Normal (white) notes.
-/// ← A / ↓ S / ↑ W / → D → hit the matching colored Special note.
-/// </summary>
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
     public SpriteRenderer bodyRenderer;
+    public Animator       bodyAnimator;
 
     Coroutine _flashRoutine;
 
-    static readonly Color ColHitNormal  = new Color(0.35f, 0.85f, 1.00f);
-    static readonly Color ColHitSpecial = new Color(1.00f, 0.92f, 0.20f);
-    static readonly Color ColMiss       = new Color(1.00f, 0.30f, 0.25f);
+    static readonly Color ColHit    = new Color(0.35f, 0.85f, 1.00f);
+    static readonly Color ColMiss   = new Color(1.00f, 0.30f, 0.25f);
 
     void Update()
     {
+        // Arrow keys — forward to command system first, then also count as note hit
         var kb = Keyboard.current;
-        if (kb == null) return;
+        if (kb != null)
+        {
+            if (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)
+                CommandSystem.Instance?.TryInput(ArrowDir.Left);
+            else if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame)
+                CommandSystem.Instance?.TryInput(ArrowDir.Right);
+            else if (kb.upArrowKey.wasPressedThisFrame    || kb.wKey.wasPressedThisFrame)
+                CommandSystem.Instance?.TryInput(ArrowDir.Up);
+            else if (kb.downArrowKey.wasPressedThisFrame  || kb.sKey.wasPressedThisFrame)
+                CommandSystem.Instance?.TryInput(ArrowDir.Down);
+        }
 
-        // Normal attack
-        if (kb.spaceKey.wasPressedThisFrame || kb.zKey.wasPressedThisFrame)
-            TryHit(NoteType.Normal, ColHitNormal);
-
-        // Special attacks — directional
-        if (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)
-            TryHit(NoteType.ArrowLeft,  new Color(0.30f, 0.60f, 1.00f));
-        if (kb.downArrowKey.wasPressedThisFrame  || kb.sKey.wasPressedThisFrame)
-            TryHit(NoteType.ArrowDown,  new Color(0.30f, 1.00f, 0.45f));
-        if (kb.upArrowKey.wasPressedThisFrame    || kb.wKey.wasPressedThisFrame)
-            TryHit(NoteType.ArrowUp,    new Color(1.00f, 0.90f, 0.20f));
-        if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame)
-            TryHit(NoteType.ArrowRight, new Color(1.00f, 0.35f, 0.35f));
+        if (IsValidHitInput())
+            TryHitNote();
     }
 
-    void TryHit(NoteType type, Color flashColor)
+    void TryHitNote()
     {
         var note = NoteManager.Instance.GetNearest(
-            RhythmManager.Instance.SongTime, Note.GoodWindow, type);
+            RhythmManager.Instance.SongTime, Note.GoodWindow);
 
         if (note != null)
         {
             note.TryHit();
-            Flash(flashColor);
+            Flash(ColHit);
+            bodyAnimator?.SetTrigger("Attack");
         }
     }
 
-    /// <summary>Called by BossController when a miss attack lands on the player.</summary>
     public void FlashDamage() => Flash(ColMiss);
 
     void Flash(Color color)
@@ -64,5 +59,33 @@ public class PlayerController : MonoBehaviour
         if (bodyRenderer != null) bodyRenderer.color = color;
         yield return new WaitForSeconds(0.10f);
         if (bodyRenderer != null) bodyRenderer.color = Color.white;
+    }
+
+    static bool IsValidHitInput()
+    {
+        var ms = Mouse.current;
+        if (ms != null && (ms.leftButton.wasPressedThisFrame || ms.rightButton.wasPressedThisFrame))
+            return true;
+
+        var kb = Keyboard.current;
+        if (kb == null || !kb.anyKey.wasPressedThisFrame) return false;
+
+        // Exclude pause/modifier/system keys
+        if (kb.escapeKey.wasPressedThisFrame)      return false;
+        if (kb.leftCtrlKey.wasPressedThisFrame  || kb.rightCtrlKey.wasPressedThisFrame)  return false;
+        if (kb.leftAltKey.wasPressedThisFrame   || kb.rightAltKey.wasPressedThisFrame)   return false;
+        if (kb.leftShiftKey.wasPressedThisFrame || kb.rightShiftKey.wasPressedThisFrame) return false;
+        if (kb.leftMetaKey.wasPressedThisFrame  || kb.rightMetaKey.wasPressedThisFrame)  return false;
+        if (kb.f1Key.wasPressedThisFrame  || kb.f2Key.wasPressedThisFrame  ||
+            kb.f3Key.wasPressedThisFrame  || kb.f4Key.wasPressedThisFrame  ||
+            kb.f5Key.wasPressedThisFrame  || kb.f6Key.wasPressedThisFrame  ||
+            kb.f7Key.wasPressedThisFrame  || kb.f8Key.wasPressedThisFrame  ||
+            kb.f9Key.wasPressedThisFrame  || kb.f10Key.wasPressedThisFrame ||
+            kb.f11Key.wasPressedThisFrame || kb.f12Key.wasPressedThisFrame) return false;
+        if (kb.printScreenKey.wasPressedThisFrame) return false;
+        if (kb.scrollLockKey.wasPressedThisFrame)  return false;
+        if (kb.pauseKey.wasPressedThisFrame)       return false;
+
+        return true;
     }
 }

@@ -18,11 +18,12 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.OnScoreChanged += RefreshComboUI;
         GameManager.Instance.OnJudgement    += ShowJudgement;
         RefreshComboUI(0, 0);
+
         if (judgementText != null)
             _judgementOrigin = judgementText.transform.localPosition;
 
         if (hintText != null)
-            hintText.text = "SPACE / Z  ——  ← ↓ ↑ →  special";
+            hintText.text = "Any key / click → HIT  |  ← ↓ ↑ → → follow BONUS COMMAND";
     }
 
     void RefreshComboUI(int score, int combo)
