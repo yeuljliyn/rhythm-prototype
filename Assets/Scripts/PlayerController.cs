@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (SettingsManager.Instance != null && SettingsManager.Instance.IsPanelOpen) return;
+
         // Arrow keys — forward to command system first, then also count as note hit
         var kb = Keyboard.current;
         if (kb != null)

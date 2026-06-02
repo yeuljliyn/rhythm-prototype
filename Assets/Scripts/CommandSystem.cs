@@ -28,6 +28,8 @@ public class CommandSystem : MonoBehaviour
     TextMeshProUGUI   _commandText;
     Image             _panelBg;
 
+    TextMeshProUGUI   _inputHistoryText;
+
     // Colours for arrow display
     const string ColDone    = "#44FF88";
     const string ColCurrent = "#FFEE22";
@@ -113,6 +115,27 @@ public class CommandSystem : MonoBehaviour
             if (i < _command.Length - 1) sb.Append(" ");
         }
         _commandText.text = sb.ToString();
+
+        UpdateInputHistory();
+    }
+
+    void UpdateInputHistory()
+    {
+        if (_inputHistoryText == null) return;
+
+        if (_progress == 0)
+        {
+            _inputHistoryText.text = "<color=#444466>- - -</color>";
+            return;
+        }
+
+        var sb = new StringBuilder();
+        for (int i = 0; i < _progress; i++)
+        {
+            sb.Append($"<color={ColDone}><b>{DirToArrow(_command[i])}</b></color>");
+            if (i < _progress - 1) sb.Append(" ");
+        }
+        _inputHistoryText.text = sb.ToString();
     }
 
     Coroutine _failFlash;
@@ -190,5 +213,51 @@ public class CommandSystem : MonoBehaviour
         _commandText.fontSize      = 28f;
         _commandText.alignment     = TextAlignmentOptions.MidlineLeft;
         _commandText.richText      = true;
+
+        BuildInputHistoryUI(parent);
+    }
+
+    void BuildInputHistoryUI(Transform parent)
+    {
+        // Hearts container bottom edge ≈ y = -14 - 36 = -50; place panel 6px below
+        var panelGO   = new GameObject("InputHistoryPanel");
+        panelGO.transform.SetParent(parent, false);
+        var panelRect = panelGO.AddComponent<RectTransform>();
+        panelRect.anchorMin        = new Vector2(0.5f, 1f);
+        panelRect.anchorMax        = new Vector2(0.5f, 1f);
+        panelRect.pivot            = new Vector2(0.5f, 1f);
+        panelRect.anchoredPosition = new Vector2(0f, -90f);
+        panelRect.sizeDelta        = new Vector2(420f, 80f);
+
+        var bg  = panelGO.AddComponent<Image>();
+        bg.color = new Color(0.04f, 0.04f, 0.10f, 0.78f);
+
+        // "CURRENT INPUT" label
+        var lblGO   = new GameObject("InputLabel");
+        lblGO.transform.SetParent(panelGO.transform, false);
+        var lblRect = lblGO.AddComponent<RectTransform>();
+        lblRect.anchorMin        = Vector2.zero;
+        lblRect.anchorMax        = new Vector2(1f, 1f);
+        lblRect.offsetMin        = new Vector2(8f, 52f);
+        lblRect.offsetMax        = new Vector2(-8f, -6f);
+        var lbl          = lblGO.AddComponent<TextMeshProUGUI>();
+        lbl.text         = "CURRENT INPUT";
+        lbl.fontSize     = 14f;
+        lbl.color        = new Color(0.6f, 0.6f, 0.85f, 0.85f);
+        lbl.alignment    = TextAlignmentOptions.Center;
+
+        // Input arrow display
+        var inputGO   = new GameObject("InputArrows");
+        inputGO.transform.SetParent(panelGO.transform, false);
+        var inputRect = inputGO.AddComponent<RectTransform>();
+        inputRect.anchorMin        = Vector2.zero;
+        inputRect.anchorMax        = new Vector2(1f, 1f);
+        inputRect.offsetMin        = new Vector2(8f, 8f);
+        inputRect.offsetMax        = new Vector2(-8f, -28f);
+        _inputHistoryText          = inputGO.AddComponent<TextMeshProUGUI>();
+        _inputHistoryText.fontSize = 36f;
+        _inputHistoryText.alignment = TextAlignmentOptions.Center;
+        _inputHistoryText.richText  = true;
+        _inputHistoryText.text      = "<color=#444466>- - -</color>";
     }
 }

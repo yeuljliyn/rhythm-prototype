@@ -58,7 +58,8 @@ public class Note : MonoBehaviour
     public void TryHit()
     {
         if (IsHit) return;
-        float diff = Mathf.Abs(RhythmManager.Instance.SongTime - HitTime);
+        float offset = SettingsManager.InputOffset;
+        float diff = Mathf.Abs(RhythmManager.Instance.SongTime + offset - HitTime);
         JudgementType j;
         if      (diff <= PerfectWindow) j = JudgementType.Perfect;
         else if (diff <= GoodWindow)    j = JudgementType.Good;
