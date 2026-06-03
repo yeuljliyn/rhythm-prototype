@@ -17,9 +17,9 @@ public class CommandSystem : MonoBehaviour
     public static CommandSystem Instance { get; private set; }
 
     [Header("Command Settings")]
-    [Range(3, 10)] public int   commandMinLength  = 3;
-    [Range(3, 10)] public int   commandMaxLength  = 7;
     [Range(0.05f, 0.3f)] public float commandBeatWindow = 0.15f;
+
+    static readonly ArrowDir[] FixedCommand = { ArrowDir.Left, ArrowDir.Up, ArrowDir.Right, ArrowDir.Down };
 
     ArrowDir[]        _command;
     int               _progress;
@@ -90,11 +90,7 @@ public class CommandSystem : MonoBehaviour
 
     void GenerateNewCommand()
     {
-        commandMaxLength = Mathf.Max(commandMinLength, commandMaxLength);
-        int len = Random.Range(commandMinLength, commandMaxLength + 1);
-        _command = new ArrowDir[len];
-        for (int i = 0; i < len; i++)
-            _command[i] = (ArrowDir)Random.Range(0, 4);
+        _command  = (ArrowDir[])FixedCommand.Clone();
         _progress = 0;
         UpdateDisplay();
     }
@@ -183,7 +179,7 @@ public class CommandSystem : MonoBehaviour
         panelRect.anchorMax        = new Vector2(0f, 1f);
         panelRect.pivot            = new Vector2(0f, 1f);
         panelRect.anchoredPosition = new Vector2(12f, -12f);
-        panelRect.sizeDelta        = new Vector2(380f, 90f);
+        panelRect.sizeDelta        = new Vector2(320f, 100f);
         _panelBg               = panelGO.AddComponent<Image>();
         _panelBg.color         = new Color(0.06f, 0.06f, 0.12f, 0.80f);
 
@@ -210,7 +206,7 @@ public class CommandSystem : MonoBehaviour
         arrowRect.offsetMin        = new Vector2(10f, 8f);
         arrowRect.offsetMax        = new Vector2(-10f, -32f);
         _commandText               = arrowGO.AddComponent<TextMeshProUGUI>();
-        _commandText.fontSize      = 28f;
+        _commandText.fontSize      = 44f;
         _commandText.alignment     = TextAlignmentOptions.MidlineLeft;
         _commandText.richText      = true;
 

@@ -27,8 +27,9 @@ public class RhythmManager : MonoBehaviour
     public float hitZoneX       = -5.0f;   // left side (player)
     public float noteY          = -2.5f;   // lane height
 
-    public float SongTime     { get; private set; }
-    public float BeatInterval { get; private set; }
+    public float SongTime        { get; private set; }
+    public float BeatInterval    { get; private set; }
+    public bool  IsScheduleDone  => _nextIdx >= _schedule.Count;
 
     int         _nextIdx;
     bool        _isRunning;

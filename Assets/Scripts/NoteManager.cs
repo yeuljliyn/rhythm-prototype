@@ -18,6 +18,8 @@ public class NoteManager : MonoBehaviour
         else if (_instance != this) Destroy(gameObject);
     }
 
+    public int Count => _notes.Count;
+
     public void Register(Note note)
     {
         _notes.Add(note);

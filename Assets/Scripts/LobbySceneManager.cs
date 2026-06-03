@@ -8,7 +8,16 @@ public class LobbySceneManager : MonoBehaviour
 {
     // ── Stage data ────────────────────────────────────────────────────────
 
-    static readonly string[] StageTitles = { "Stage 1", "Stage 2", "Stage 3", "Stage 4" };
+    static readonly string[] StageTitles = { "Stage 1", "Stage 2", "Stage 3", "Stage 4", "Stage 5" };
+
+    static readonly string[] BossSprites =
+    {
+        "물귀신_배경제거",
+        "지박령_배경제거",
+        "총각귀신_배경제거",
+        "처녀귀신_배경제거",
+        "달걀귀신_배경제거",
+    };
 
     static readonly Color[] StageCharColors =
     {
@@ -16,6 +25,7 @@ public class LobbySceneManager : MonoBehaviour
         new Color(0.25f, 0.50f, 0.90f),
         new Color(0.90f, 0.55f, 0.20f),
         new Color(0.80f, 0.25f, 0.65f),
+        new Color(0.95f, 0.80f, 0.10f),
     };
 
     // ── Mugu item data ────────────────────────────────────────────────────
@@ -62,6 +72,20 @@ public class LobbySceneManager : MonoBehaviour
         _unlockedCount = PlayerPrefs.GetInt("unlocked_stages", 1);
         BuildUI();
         Highlight(_selectedIdx);
+        PlayBGM("Music/LobbyBGM");
+    }
+
+    void PlayBGM(string resourcePath)
+    {
+        var clip = Resources.Load<AudioClip>(resourcePath);
+        if (clip == null) { Debug.LogWarning($"BGM 로드 실패: {resourcePath}"); return; }
+        var go  = new GameObject("BGM");
+        var src = go.AddComponent<AudioSource>();
+        src.clip        = clip;
+        src.loop        = true;
+        src.playOnAwake = false;
+        src.volume      = SettingsManager.Volume;
+        src.Play();
     }
 
     void Update()
@@ -88,6 +112,7 @@ public class LobbySceneManager : MonoBehaviour
         int next = _selectedIdx + dir;
         if (next < 0 || next >= StageTitles.Length) return;
         _selectedIdx = next;
+        SFXManager.PlayNavigate();
         Highlight(_selectedIdx);
     }
 
@@ -97,6 +122,7 @@ public class LobbySceneManager : MonoBehaviour
             TryStart(idx);
         else
         {
+            SFXManager.PlayClick();
             _selectedIdx = idx;
             Highlight(_selectedIdx);
         }
@@ -105,6 +131,7 @@ public class LobbySceneManager : MonoBehaviour
     void TryStart(int idx)
     {
         if (idx >= _unlockedCount) return;
+        SFXManager.PlayConfirm();
         PlayerPrefs.SetInt("current_stage", idx);
         PlayerPrefs.Save();
         SettingsManager.Instance?.Close();
@@ -169,7 +196,7 @@ public class LobbySceneManager : MonoBehaviour
                                    new Vector2(0f,1f), new Vector2(160f,52f), new Vector2(20f,-20f));
         backGO.AddComponent<Image>().color = new Color(0.12f, 0.10f, 0.25f);
         var backBtn = backGO.AddComponent<Button>();
-        backBtn.onClick.AddListener(() => SceneManager.LoadScene("StartScene"));
+        backBtn.onClick.AddListener(() => { SFXManager.PlayBack(); SceneManager.LoadScene("StartScene"); });
         AddLabel(backGO.transform, "◀  BACK", 20f, Color.white);
 
         // Mugu button (bottom-right)
@@ -187,9 +214,9 @@ public class LobbySceneManager : MonoBehaviour
     void BuildStageCards(Transform parent)
     {
         int   n      = StageTitles.Length;
-        float cardW  = 280f;
-        float cardH  = 520f;
-        float gap    = 42f;
+        float cardW  = 240f;
+        float cardH  = 500f;
+        float gap    = 28f;
         float totalW = n * cardW + (n - 1) * gap;
         float startX = -totalW * 0.5f + cardW * 0.5f;
 
@@ -250,11 +277,22 @@ public class LobbySceneManager : MonoBehaviour
             rankTxt.raycastTarget = false;
             _rankTexts[i]         = rankTxt;
 
-            // ── Character placeholder (fills lower 70% of card) ──
-            var charGO   = MakeAnchored(card.transform, "Character",
-                               new Vector2(0.08f, 0.06f), new Vector2(0.92f, 0.72f),
-                               new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
-            charGO.AddComponent<Image>().color = StageCharColors[i];
+            // ── Boss image (fills lower 70% of card) ──
+            var charGO  = MakeAnchored(card.transform, "Character",
+                              new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.90f),
+                              new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            var charImg = charGO.AddComponent<Image>();
+            var bossSprite = Resources.Load<Sprite>(BossSprites[i]);
+            if (bossSprite != null)
+            {
+                charImg.sprite         = bossSprite;
+                charImg.preserveAspect = true;
+                charImg.color          = Color.white;
+            }
+            else
+            {
+                charImg.color = StageCharColors[i];
+            }
 
             // ── Lock overlay ──
             var lockGO  = MakeStretch(card.transform, "LockOverlay");
@@ -424,6 +462,7 @@ public class LobbySceneManager : MonoBehaviour
     {
         _muguOpen = !_muguOpen;
         _muguOverlay.SetActive(_muguOpen);
+        if (_muguOpen) SFXManager.PlayClick(); else SFXManager.PlayBack();
         if (!_muguOpen) HideMuguDetail();
     }
 

@@ -15,9 +15,9 @@ public class Note : MonoBehaviour
     float          _hitZoneX;
     SpriteRenderer _sr;
 
-    static readonly Color ColDefault = new Color(0.40f, 0.75f, 1.00f, 0.95f);
-    static readonly Color ColNear    = new Color(1.00f, 0.92f, 0.20f, 1.00f);
-    static readonly Color ColLate    = new Color(1.00f, 0.30f, 0.20f, 0.90f);
+    static readonly Color ColDefault = new Color(1.00f, 1.00f, 1.00f, 1.00f);  // 흰색
+    static readonly Color ColNear    = new Color(1.00f, 0.85f, 0.00f, 1.00f);  // 노란색 (히트 근접)
+    static readonly Color ColLate    = new Color(1.00f, 0.25f, 0.10f, 1.00f);  // 빨간색 (늦음)
 
     public void Initialize(float hitTime, float spawnX, float hitZoneX, float noteY, float spawnAheadTime)
     {
@@ -26,19 +26,20 @@ public class Note : MonoBehaviour
         _speed    = (spawnX - hitZoneX) / Mathf.Max(0.01f, spawnAheadTime);
 
         transform.position   = new Vector3(spawnX, noteY, 0f);
-        transform.localScale = Vector3.one * 0.55f;
+        transform.localScale = Vector3.one * 0.75f;
 
         _sr              = gameObject.AddComponent<SpriteRenderer>();
         _sr.sprite       = CircleSprites.GetCircle();
         _sr.color        = ColDefault;
         _sr.sortingOrder = 5;
 
-        NoteManager.Instance.Register(this);
+        NoteManager.Instance?.Register(this);
     }
 
     void Update()
     {
         if (IsHit) return;
+        if (_sr == null || RhythmManager.Instance == null) return;
 
         transform.position += Vector3.left * _speed * Time.deltaTime;
 
@@ -57,7 +58,7 @@ public class Note : MonoBehaviour
 
     public void TryHit()
     {
-        if (IsHit) return;
+        if (IsHit || RhythmManager.Instance == null) return;
         float offset = SettingsManager.InputOffset;
         float diff = Mathf.Abs(RhythmManager.Instance.SongTime + offset - HitTime);
         JudgementType j;

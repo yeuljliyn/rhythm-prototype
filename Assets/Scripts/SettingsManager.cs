@@ -40,10 +40,6 @@ public class SettingsManager : MonoBehaviour
     float         _currentOffset;
     Coroutine     _metronomeCr;
 
-    // calibration note visual
-    RectTransform _calNoteRect;
-    const float   CalNoteStartX  = 500f;
-    const float   CalNoteTargetX = 40f;
 
     // ── Pause state ───────────────────────────────────────────────────────
     AudioSource _gameAudio;
@@ -131,6 +127,7 @@ public class SettingsManager : MonoBehaviour
 
     public void Open(int page = 0)
     {
+        SFXManager.PlayClick();
         // Only pause the game if it isn't already paused (PauseMenuManager may have already done so)
         _pausedBySettings = Time.timeScale > 0f;
         if (_pausedBySettings)
@@ -150,6 +147,7 @@ public class SettingsManager : MonoBehaviour
 
     public void Close()
     {
+        SFXManager.PlayBack();
         StopCalibration();
         _panel.SetActive(false);
         IsPanelOpen = false;
@@ -295,6 +293,7 @@ public class SettingsManager : MonoBehaviour
 
     void ShowPage(int idx)
     {
+        SFXManager.PlayNavigate();
         _settingsPage?.SetActive(idx == 0);
         _calibrationPage?.SetActive(idx == 1);
         if (idx == 1) BeginCalibration();
@@ -397,51 +396,17 @@ public class SettingsManager : MonoBehaviour
         iRect.sizeDelta        = new Vector2(580f, 50f);
         iRect.anchoredPosition = new Vector2(0f, -120f);
         var instrTxt           = instrGO.AddComponent<TextMeshProUGUI>();
-        instrTxt.text          = "Watch the note reach the line AND listen to the click — tap SPACE with both cues.";
+        instrTxt.text          = "Listen to the click — tap SPACE when you hear it.";
         instrTxt.fontSize      = 15f;
         instrTxt.alignment     = TextAlignmentOptions.Center;
         instrTxt.color         = new Color(0.7f, 0.7f, 0.85f);
         instrTxt.raycastTarget = false;
 
-        // ── Track ─────────────────────────────────────────────────────────
-        var trackGO   = new GameObject("Track");
-        trackGO.transform.SetParent(page.transform, false);
-        var trackRect = trackGO.AddComponent<RectTransform>();
-        trackRect.anchorMin        = new Vector2(0.5f, 1f);
-        trackRect.anchorMax        = new Vector2(0.5f, 1f);
-        trackRect.pivot            = new Vector2(0.5f, 1f);
-        trackRect.sizeDelta        = new Vector2(560f, 70f);
-        trackRect.anchoredPosition = new Vector2(0f, -185f);
-        trackGO.AddComponent<Image>().color = new Color(0.08f, 0.08f, 0.18f);
-
-        // Hit zone line
-        var hzGO   = new GameObject("HitZone");
-        hzGO.transform.SetParent(trackGO.transform, false);
-        var hzRect = hzGO.AddComponent<RectTransform>();
-        hzRect.anchorMin        = new Vector2(0f, 0f);
-        hzRect.anchorMax        = new Vector2(0f, 1f);
-        hzRect.pivot            = new Vector2(0.5f, 0.5f);
-        hzRect.sizeDelta        = new Vector2(5f, 0f);
-        hzRect.anchoredPosition = new Vector2(CalNoteTargetX, 0f);
-        hzGO.AddComponent<Image>().color = new Color(1f, 0.9f, 0.2f);
-
-        // Moving note
-        var noteGO   = new GameObject("CalNote");
-        noteGO.transform.SetParent(trackGO.transform, false);
-        var noteRect = noteGO.AddComponent<RectTransform>();
-        noteRect.anchorMin        = new Vector2(0f, 0.5f);
-        noteRect.anchorMax        = new Vector2(0f, 0.5f);
-        noteRect.pivot            = new Vector2(0.5f, 0.5f);
-        noteRect.sizeDelta        = new Vector2(44f, 44f);
-        noteRect.anchoredPosition = new Vector2(CalNoteStartX, 0f);
-        noteGO.AddComponent<Image>().color = new Color(0.35f, 0.75f, 1f);
-        _calNoteRect = noteRect;
-
         // ── Labels ────────────────────────────────────────────────────────
         _offsetLabel = MakeCenteredLabel(page.transform, "Current offset: 0 ms", 17f,
-                                         Color.white, new Vector2(0f, -290f));
+                                         Color.white, new Vector2(0f, -190f));
         _tapResult   = MakeCenteredLabel(page.transform, "Tap SPACE to begin...", 15f,
-                                         new Color(0.5f, 1f, 0.6f), new Vector2(0f, -330f));
+                                         new Color(0.5f, 1f, 0.6f), new Vector2(0f, -230f));
 
         // Reset button
         var resetGO   = new GameObject("ResetButton");
@@ -501,14 +466,11 @@ public class SettingsManager : MonoBehaviour
         _calibrating = false;
         if (_metronomeCr != null) { StopCoroutine(_metronomeCr); _metronomeCr = null; }
         _metronomeSource?.Stop();
-
-        // Reset note to start position
-        if (_calNoteRect != null)
-            _calNoteRect.anchoredPosition = new Vector2(CalNoteStartX, 0f);
     }
 
     void ResetCalibration()
     {
+        SFXManager.PlayClick();
         InputOffset    = 0f;
         _currentOffset = 0f;
         _tapCount      = 0;
@@ -517,36 +479,16 @@ public class SettingsManager : MonoBehaviour
         if (_tapResult != null) _tapResult.text = "Offset reset to 0 ms";
     }
 
-    // Note flies from right to hit zone; click plays exactly on arrival.
-    // Player taps SPACE combining visual + audio → measures true A/V latency.
     IEnumerator CalibrationNoteLoop()
     {
-        const float bpm      = 120f;
-        const float interval = 60f / bpm; // 0.5 s at 120 BPM
+        const float bpm      = 100f;
+        const float interval = 60f / bpm;
 
         while (_calibrating)
         {
-            // Reset note to start
-            if (_calNoteRect != null)
-                _calNoteRect.anchoredPosition = new Vector2(CalNoteStartX, 0f);
-
-            // Animate note across track
-            float elapsed = 0f;
-            while (elapsed < interval)
-            {
-                elapsed += Time.unscaledDeltaTime;
-                float t = Mathf.Clamp01(elapsed / interval);
-                if (_calNoteRect != null)
-                    _calNoteRect.anchoredPosition =
-                        new Vector2(Mathf.Lerp(CalNoteStartX, CalNoteTargetX, t), 0f);
-                yield return null;
-            }
-
-            // Note arrives at hit zone → play click
             _lastClickTime = Time.unscaledTime;
             _metronomeSource?.PlayOneShot(_metronomeSource.clip);
-            if (_calNoteRect != null)
-                _calNoteRect.anchoredPosition = new Vector2(CalNoteTargetX, 0f);
+            yield return new WaitForSecondsRealtime(interval);
         }
     }
 
@@ -559,7 +501,7 @@ public class SettingsManager : MonoBehaviour
         float diff = Time.unscaledTime - _lastClickTime;
 
         // Clamp to ±half-beat to ignore accidental double-taps
-        const float halfBeat = 60f / 120f / 2f;
+        const float halfBeat = 60f / 100f / 2f;
         if (Mathf.Abs(diff) > halfBeat) return;
 
         _tapTimes[_tapCount % _tapTimes.Length] = diff;

@@ -10,15 +10,15 @@ public class GaugeManager : MonoBehaviour
     public static GaugeManager Instance { get; private set; }
 
     [Header("Gauge Settings")]
-    [Range(0.05f, 1f)] public float fillPerCommand = 0.20f;   // 20% per success
+    [Range(0.05f, 1f)] public float fillPerCommand = 0.10f;   // 10% per success → 10 commands = full
 
     public float Gauge { get; private set; } = 0f;
 
     public System.Action OnGaugeFull;
 
     Image[]    _segments;
-    const int  SegmentCount = 5;
-    const float SegmentGap  = 6f;
+    const int  SegmentCount = 10;
+    const float SegmentGap  = 5f;
 
     static readonly Color ColEmpty = new Color(0.10f, 0.10f, 0.18f, 0.92f);
     static readonly Color ColFill  = new Color(0.15f, 0.85f, 1.00f, 1.00f);
@@ -65,8 +65,8 @@ public class GaugeManager : MonoBehaviour
         rootRect.anchorMin        = new Vector2(0.5f, 0f);
         rootRect.anchorMax        = new Vector2(0.5f, 0f);
         rootRect.pivot            = new Vector2(0f, 0f);   // left-bottom pivot (segments fill left→right)
-        rootRect.anchoredPosition = new Vector2(-200f, 18f); // offset left so visual center = screen center
-        rootRect.sizeDelta        = new Vector2(400f, 30f);
+        rootRect.anchoredPosition = new Vector2(-275f, 18f);
+        rootRect.sizeDelta        = new Vector2(550f, 30f);
 
         // Label
         var lblGO   = new GameObject("GaugeLabel");

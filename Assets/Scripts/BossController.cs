@@ -54,6 +54,11 @@ public class BossController : MonoBehaviour
         if (_sr == null) _sr = gameObject.AddComponent<SpriteRenderer>();
         _sr.sortingOrder = 3;
 
+        // Always load 물귀신_공격 from Resources
+        var loaded = Resources.LoadAll<Sprite>("물귀신_공격");
+        if (loaded != null && loaded.Length > 0)
+            attackFrames = loaded;
+
         if (attackFrames != null && attackFrames.Length > 0)
         {
             _sr.sprite = attackFrames[0];

@@ -29,15 +29,15 @@ public class DialogueSceneManager : MonoBehaviour
         new Line { Speaker=Speaker.A, Text="Let's go. Feel so gut!" },
     };
 
-    static readonly string NameA = "LYRA";   // protagonist  — replace when named
-    static readonly string NameB = "VEGA";   // opponent     — replace when named
+    static readonly string NameA = "JACKDO";       // 플레이어
+    static readonly string NameB = "WATER GHOST"; // 보스 (물귀신)
 
     // ── Character appearance ──────────────────────────────────────────────
 
-    static readonly Color ColA_Active   = new Color(0.25f, 0.85f, 0.50f, 1.00f);
-    static readonly Color ColA_Inactive = new Color(0.08f, 0.22f, 0.13f, 1.00f);
-    static readonly Color ColB_Active   = new Color(0.80f, 0.20f, 0.95f, 1.00f);
-    static readonly Color ColB_Inactive = new Color(0.18f, 0.04f, 0.22f, 1.00f);
+    static readonly Color ColA_Active   = Color.white;
+    static readonly Color ColA_Inactive = new Color(0.30f, 0.30f, 0.30f, 0.65f);
+    static readonly Color ColB_Active   = Color.white;
+    static readonly Color ColB_Inactive = new Color(0.30f, 0.30f, 0.30f, 0.65f);
 
     static readonly Vector3 ScaleActive   = new Vector3(1.10f, 1.10f, 1f);
     static readonly Vector3 ScaleInactive = new Vector3(0.93f, 0.93f, 1f);
@@ -65,6 +65,13 @@ public class DialogueSceneManager : MonoBehaviour
     {
         BuildUI();
         BuildVoice();
+
+        // 캐릭터 이미지 로드
+        var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
+        if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; }
+
+        var spriteB = Resources.Load<Sprite>("물귀신_배경제거");
+        if (spriteB != null) { _charBImg.sprite = spriteB; _charBImg.preserveAspect = true; }
 
         // Set initial state: both characters at inactive scale/color
         _charARt.localScale = ScaleInactive;
@@ -111,7 +118,9 @@ public class DialogueSceneManager : MonoBehaviour
         bool isA  = line.Speaker == Speaker.A;
 
         _speakerTxt.text  = isA ? NameA : NameB;
-        _speakerTxt.color = isA ? ColA_Active : ColB_Active;
+        _speakerTxt.color = isA
+            ? new Color(0.25f, 0.85f, 0.50f)   // JACKDO — 초록
+            : new Color(0.80f, 0.40f, 1.00f);   // WATER GHOST — 보라
 
         if (_animCr != null) StopCoroutine(_animCr);
         _animCr = StartCoroutine(AnimateChars(isA));

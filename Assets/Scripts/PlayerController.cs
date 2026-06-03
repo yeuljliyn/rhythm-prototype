@@ -5,8 +5,9 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
-    public SpriteRenderer bodyRenderer;
-    public Animator       bodyAnimator;
+    public SpriteRenderer     bodyRenderer;
+    public Animator           bodyAnimator;
+    public PlayerDanceAnimator danceAnimator;
 
     Coroutine _flashRoutine;
 
@@ -22,13 +23,13 @@ public class PlayerController : MonoBehaviour
         if (kb != null)
         {
             if (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)
-                CommandSystem.Instance?.TryInput(ArrowDir.Left);
+            { CommandSystem.Instance?.TryInput(ArrowDir.Left);  danceAnimator?.ShowDirection(ArrowDir.Left); }
             else if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame)
-                CommandSystem.Instance?.TryInput(ArrowDir.Right);
+            { CommandSystem.Instance?.TryInput(ArrowDir.Right); danceAnimator?.ShowDirection(ArrowDir.Right); }
             else if (kb.upArrowKey.wasPressedThisFrame    || kb.wKey.wasPressedThisFrame)
-                CommandSystem.Instance?.TryInput(ArrowDir.Up);
+            { CommandSystem.Instance?.TryInput(ArrowDir.Up);    danceAnimator?.ShowDirection(ArrowDir.Up); }
             else if (kb.downArrowKey.wasPressedThisFrame  || kb.sKey.wasPressedThisFrame)
-                CommandSystem.Instance?.TryInput(ArrowDir.Down);
+            { CommandSystem.Instance?.TryInput(ArrowDir.Down);  danceAnimator?.ShowDirection(ArrowDir.Down); }
         }
 
         if (IsValidHitInput())
@@ -70,7 +71,12 @@ public class PlayerController : MonoBehaviour
             return true;
 
         var kb = Keyboard.current;
-        if (kb == null || !kb.anyKey.wasPressedThisFrame) return false;
+        if (kb == null) return false;
+
+        // Space 명시적 처리 (anyKey 누락 방지)
+        if (kb.spaceKey.wasPressedThisFrame) return true;
+
+        if (!kb.anyKey.wasPressedThisFrame) return false;
 
         // Exclude pause/modifier/system keys
         if (kb.escapeKey.wasPressedThisFrame)      return false;
