@@ -38,6 +38,7 @@ public class SettingsManager : MonoBehaviour
     float         _lastClickTime;
     AudioSource   _metronomeSource;
     float         _currentOffset;
+    float         _baseOffset;   // 이번 캘리브레이션 세션 시작 시의 오프셋
     Coroutine     _metronomeCr;
 
 
@@ -443,6 +444,7 @@ public class SettingsManager : MonoBehaviour
         _calibrating   = true;
         _tapCount      = 0;
         _lastClickTime = Time.unscaledTime;
+        _baseOffset    = InputOffset;   // 세션 기준값 저장
         _currentOffset = InputOffset;
         UpdateOffsetLabel();
         if (_tapResult != null) _tapResult.text = "Tap SPACE to begin...";
@@ -510,7 +512,8 @@ public class SettingsManager : MonoBehaviour
         int   collected = Mathf.Min(_tapCount, _tapTimes.Length);
         float sum       = 0f;
         for (int i = 0; i < collected; i++) sum += _tapTimes[i];
-        _currentOffset = -(sum / collected);
+        // 기존 오프셋에 새 오차를 누적 적용 → 재보정 시 ms가 점점 줄어듦
+        _currentOffset = _baseOffset - (sum / collected);
         UpdateOffsetLabel();
 
         if (_tapCount >= _tapTimes.Length)
