@@ -285,6 +285,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 070175e8c22da914d8ecf8fbe3385fc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbySceneManager
+  _bgSprite: {fileID: 21300000, guid: 2bf9820773abd3f42b4cfeab488ad00d, type: 3}
+  _backIconSprite: {fileID: 21300000, guid: 8266557851aa39044be1fd02034bfd94, type: 3}
+  _muguIconSprite: {fileID: 21300000, guid: dc1099f21dded0646858bf568ce5da8a, type: 3}
+  _leftArrowSprite: {fileID: 21300000, guid: c83ce07111899d74bbc0cf093ba4fe8f, type: 3}
+  _rightArrowSprite: {fileID: 21300000, guid: d2aa8bb364bdc4741855c167bbe8c895, type: 3}
+  _notPlayedSprite: {fileID: 21300000, guid: 6a7e487fe1e2ab848b36c1b7733157b2, type: 3}
+  _stage1IconSprite: {fileID: 21300000, guid: 9c29d49e7973ed745aa48db9ede9407b, type: 3}
+  _stage1BossSprite: {fileID: 21300000, guid: 853186a1bc7049b4994b5e15fe401eee, type: 3}
+  _rankS: {fileID: 21300000, guid: 92dd17bc6b5d2ca41b8fa89b2496392d, type: 3}
+  _rankA: {fileID: 21300000, guid: 748ca698e44b5674f8b9a2742071ad40, type: 3}
+  _rankB: {fileID: 21300000, guid: 51feae6e55c699147b61ad240eafd7f0, type: 3}
+  _rankC: {fileID: 21300000, guid: 53623f4c26ec6ba42bbea7f82a10c7c6, type: 3}
 --- !u!4 &1652313014
 Transform:
   m_ObjectHideFlags: 0
@@ -331,12 +343,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameProgressManager
   unlockedStages: 1
   stageRanks:
-  - S
   - --
   - --
   - --
   - --
-  muguObtained: 0100000000
+  - --
+  muguObtained: 0000000000
 --- !u!4 &2088349333
 Transform:
   m_ObjectHideFlags: 0
