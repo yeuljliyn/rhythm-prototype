@@ -47,7 +47,6 @@ public class CalibrationUI : MonoBehaviour
         }
     }
 
-    // Called by SettingsManager when switching to calibration tab
     public void Show()
     {
         _session.Stop();
@@ -57,10 +56,9 @@ public class CalibrationUI : MonoBehaviour
         _sessionResultLabel.text = "";
         _earlyLateLabel.text     = "";
         _statusLabel.text        = "";
-        _progressLabel.text      = "측정 시작 버튼을 누르세요";
+        _progressLabel.text      = "Press START to begin";
     }
 
-    // Called by SettingsManager when leaving calibration tab
     public void Hide()
     {
         _session.Stop();
@@ -71,23 +69,22 @@ public class CalibrationUI : MonoBehaviour
         if (_session == null || !_session.IsActive) return;
 
         _progressLabel.text = _session.IsWarmup
-            ? $"워밍업 ({_session.CurrentBeatIndex} / {_session.WarmupBeats})"
-            : $"측정 중:  {_session.ValidSampleCount} / {_session.TargetSamples}";
+            ? $"Warmup  ({_session.CurrentBeatIndex} / {_session.WarmupBeats})"
+            : $"Measuring:  {_session.ValidSampleCount} / {_session.TargetSamples}";
 
         _statusLabel.text = _session.IsWarmup
-            ? "박자에 맞춰 방향키를 눌러주세요"
-            : $"다음 방향:  {DirToStr(_session.CurrentTargetDir)}";
+            ? "Press arrow keys in rhythm"
+            : $"Next direction:  {DirToStr(_session.CurrentTargetDir)}";
     }
 
     void BuildUI()
     {
-        // Instruction
         MakeCenteredLabel(
-            "클릭 소리에 맞춰 표시된 방향키를 누르세요",
+            "Press the highlighted arrow key in time with each click",
             15f, new Color(0.65f, 0.65f, 0.85f), new Vector2(0f, -75f));
 
         _offsetLabel = MakeCenteredLabel(
-            "판정 오프셋: 0 ms", 22f, Color.white, new Vector2(0f, -105f));
+            "Judgement offset: 0 ms", 22f, Color.white, new Vector2(0f, -105f));
 
         _sessionResultLabel = MakeCenteredLabel(
             "", 17f, new Color(0.6f, 1f, 0.65f), new Vector2(0f, -135f));
@@ -96,26 +93,24 @@ public class CalibrationUI : MonoBehaviour
             "", 15f, new Color(0.65f, 0.65f, 0.90f), new Vector2(0f, -160f));
 
         _progressLabel = MakeCenteredLabel(
-            "측정 시작 버튼을 누르세요", 16f, new Color(0.55f, 0.80f, 1f), new Vector2(0f, -185f));
+            "Press START to begin", 16f, new Color(0.55f, 0.80f, 1f), new Vector2(0f, -185f));
 
         _statusLabel = MakeCenteredLabel(
             "", 17f, new Color(1f, 0.85f, 0.30f), new Vector2(0f, -210f));
 
-        // -- Buttons --
-
-        _startBtn = MakeButton("측정 시작", -120f, -370f, 200f, 52f,
+        _startBtn = MakeButton("START", -120f, -370f, 200f, 52f,
             new Color(0.10f, 0.55f, 0.30f), StartSession);
 
-        _retestBtn = MakeButton("다시 측정", -120f, -370f, 200f, 52f,
+        _retestBtn = MakeButton("RETRY", -120f, -370f, 200f, 52f,
             new Color(0.15f, 0.42f, 0.65f), StartSession);
         _retestBtn.gameObject.SetActive(false);
 
-        MakeButton("판정 −5ms",  80f, -320f, 175f, 48f,
+        MakeButton("Offset -5ms",  80f, -320f, 175f, 48f,
             new Color(0.50f, 0.15f, 0.15f), () => Adjust(-5f));
-        MakeButton("판정 +5ms", 260f, -320f, 175f, 48f,
+        MakeButton("Offset +5ms", 260f, -320f, 175f, 48f,
             new Color(0.15f, 0.15f, 0.50f), () => Adjust(+5f));
 
-        MakeButton("초기화", 80f, -370f, 175f, 48f,
+        MakeButton("RESET", 80f, -370f, 175f, 48f,
             new Color(0.42f, 0.10f, 0.10f), Reset);
     }
 
@@ -126,22 +121,21 @@ public class CalibrationUI : MonoBehaviour
         _retestBtn.gameObject.SetActive(false);
         _sessionResultLabel.text = "";
         _earlyLateLabel.text     = "";
-        _statusLabel.text        = "시작 중...";
+        _statusLabel.text        = "Starting...";
     }
 
     void OnSessionComplete()
     {
         RefreshOffsetLabel();
         _retestBtn.gameObject.SetActive(true);
-        _statusLabel.text = "측정 완료!";
+        _statusLabel.text = "Complete!";
 
-        float avg   = _session.LastAverageErrorMs;
-        string dir  = avg > 0f ? "늦음 (Late)" : "빠름 (Early)";
+        float  avg = _session.LastAverageErrorMs;
+        string dir = avg > 0f ? "Late" : "Early";
         _sessionResultLabel.text =
-            $"이번 평균 오차: {avg:+0.0;-0.0} ms ({dir})\n" +
-            $"→ 판정 오프셋: {_session.FinalOffsetMs:+0.0;-0.0;0} ms";
+            $"Avg error: {avg:+0.0;-0.0} ms ({dir})   New offset: {_session.FinalOffsetMs:+0.0;-0.0;0} ms";
         _earlyLateLabel.text =
-            $"Early {_session.EarlyCount}회  /  Late {_session.LateCount}회  /  제외 {_session.ExcludedCount}회";
+            $"Early {_session.EarlyCount}  /  Late {_session.LateCount}  /  Excluded {_session.ExcludedCount}";
     }
 
     void Adjust(float deltaMs)
@@ -159,27 +153,27 @@ public class CalibrationUI : MonoBehaviour
         _retestBtn.gameObject.SetActive(false);
         _sessionResultLabel.text = "";
         _earlyLateLabel.text     = "";
-        _statusLabel.text        = "초기화됨";
-        _progressLabel.text      = "측정 시작 버튼을 누르세요";
+        _statusLabel.text        = "Reset";
+        _progressLabel.text      = "Press START to begin";
     }
 
     void RefreshOffsetLabel()
     {
         float offset = CalibrationManager.Instance?.JudgementOffsetMs ?? 0f;
         if (_offsetLabel != null)
-            _offsetLabel.text = $"판정 오프셋:  {offset:+0.0;-0.0;0} ms";
+            _offsetLabel.text = $"Judgement offset:  {offset:+0.0;-0.0;0} ms";
     }
 
     static string DirToStr(ArrowDir dir) => dir switch
     {
-        ArrowDir.Up    => "↑ 위",
-        ArrowDir.Down  => "↓ 아래",
-        ArrowDir.Left  => "← 왼쪽",
-        ArrowDir.Right => "→ 오른쪽",
+        ArrowDir.Up    => "UP",
+        ArrowDir.Down  => "DOWN",
+        ArrowDir.Left  => "LEFT",
+        ArrowDir.Right => "RIGHT",
         _              => "?"
     };
 
-    // ── UI helpers ───────────────────────────────────────────────────────────
+    // ── UI helpers ────────────────────────────────────────────────────────
 
     TextMeshProUGUI MakeCenteredLabel(string text, float size, Color color, Vector2 pos)
     {

@@ -35,10 +35,10 @@ public class CalibrationVisualMetronome : MonoBehaviour
         _beatPulse.color  = Color.clear;
 
         // Arrow labels at cardinal positions around the circle
-        _upLabel    = MakeArrow(parent, "↑", new Vector2(0f,    -180f));
-        _downLabel  = MakeArrow(parent, "↓", new Vector2(0f,    -320f));
-        _leftLabel  = MakeArrow(parent, "←", new Vector2(-90f,  -250f));
-        _rightLabel = MakeArrow(parent, "→", new Vector2( 90f,  -250f));
+        _upLabel    = MakeArrow(parent, "UP",    new Vector2(0f,    -180f));
+        _downLabel  = MakeArrow(parent, "DOWN",  new Vector2(0f,    -320f));
+        _leftLabel  = MakeArrow(parent, "LEFT",  new Vector2(-100f, -250f));
+        _rightLabel = MakeArrow(parent, "RIGHT", new Vector2( 100f, -250f));
     }
 
     void Update()
@@ -95,7 +95,7 @@ public class CalibrationVisualMetronome : MonoBehaviour
         rect.anchoredPosition = pos;
         var lbl           = go.AddComponent<TextMeshProUGUI>();
         lbl.text          = symbol;
-        lbl.fontSize      = 56f;
+        lbl.fontSize      = 28f;
         lbl.alignment     = TextAlignmentOptions.Center;
         lbl.color         = ColDim;
         lbl.raycastTarget = false;

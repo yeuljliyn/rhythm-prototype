@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 /// <summary>
-/// 배틀 종료 감지 → 랭크 계산 → 결과 화면 표시.
-/// 실패 판정 없음. 랭크 B 이상이면 다음 스테이지 해금.
+/// Detects battle end, calculates rank, and shows result screen.
+/// No fail state. Rank B or above unlocks the next stage.
 /// </summary>
 public class BattleResultScreen : MonoBehaviour
 {
@@ -25,7 +25,7 @@ public class BattleResultScreen : MonoBehaviour
     {
         if (_triggered) return;
 
-        // F1: 개발용 즉시 완료 (S랭크)
+        // F1: dev shortcut — instant complete with S rank
         var kb = UnityEngine.InputSystem.Keyboard.current;
         if (kb != null && kb.f1Key.wasPressedThisFrame)
         {
@@ -58,12 +58,12 @@ public class BattleResultScreen : MonoBehaviour
         int  stageIdx  = PlayerPrefs.GetInt("current_stage", 0);
         bool unlockNext = rank == "S" || rank == "A" || rank == "B";
 
-        // 베스트 랭크 저장
+        // Save best rank
         string prev = PlayerPrefs.GetString($"stage_{stageIdx}_rank", "");
         if (IsBetterRank(rank, prev))
             PlayerPrefs.SetString($"stage_{stageIdx}_rank", rank);
 
-        // 다음 스테이지 해금 (B 이상)
+        // Unlock next stage (rank B or above)
         if (unlockNext)
         {
             int unlocked = PlayerPrefs.GetInt("unlocked_stages", 1);
@@ -82,7 +82,7 @@ public class BattleResultScreen : MonoBehaviour
 
         MakeStretch(p, new Color(0f, 0f, 0f, 0.85f));
 
-        // 해금 여부에 따라 타이틀 색상 변경
+        // Title color depends on unlock result
         Color titleCol = unlockNext
             ? new Color(1f, 0.9f, 0.1f)
             : new Color(0.7f, 0.7f, 0.7f);
@@ -117,7 +117,7 @@ public class BattleResultScreen : MonoBehaviour
         }
         else
         {
-            MakeC(p, "B 랭크 이상이면 다음 스테이지가 해금됩니다", 22f,
+            MakeC(p, "Reach rank B or above to unlock the next stage", 22f,
                   new Color(0.7f, 0.5f, 0.5f), 0f, -120f, 700f, 40f);
         }
 
@@ -131,7 +131,7 @@ public class BattleResultScreen : MonoBehaviour
         yield return null;
     }
 
-    // ── UI 헬퍼 ──────────────────────────────────────────────────────────────
+    // ── UI helpers ───────────────────────────────────────────────────────────
 
     static Transform BuildCanvas()
     {

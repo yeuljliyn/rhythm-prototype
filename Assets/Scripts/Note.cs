@@ -21,7 +21,7 @@ public class Note : MonoBehaviour
     static readonly Color ColNear    = new Color(1.00f, 0.85f, 0.00f, 1.00f);
     static readonly Color ColLate    = new Color(1.00f, 0.25f, 0.10f, 1.00f);
 
-    // 어프로치 링: 이 배율에서 시작해서 1.0으로 수축
+    // Approach ring: starts at this scale and shrinks to 1.0 at hit time
     const float RingStartScale = 3.0f;
 
     public void Initialize(float hitTime, float spawnX, float hitZoneX, float noteY, float spawnAheadTime)
@@ -39,7 +39,7 @@ public class Note : MonoBehaviour
         _sr.color        = ColDefault;
         _sr.sortingOrder = 5;
 
-        // 어프로치 링 (자식 오브젝트)
+        // Approach ring (child object)
         var ringGO = new GameObject("ApproachRing");
         ringGO.transform.SetParent(transform, false);
         ringGO.transform.localPosition = Vector3.zero;
@@ -61,7 +61,7 @@ public class Note : MonoBehaviour
 
         float diff = RhythmManager.Instance.SongTime - HitTime;
 
-        // 노트 색상 변화
+        // Note color based on timing
         if (Mathf.Abs(diff) <= GoodWindow)
             _sr.color = diff >= 0f
                 ? Color.Lerp(ColNear, ColLate, diff / GoodWindow)
@@ -69,7 +69,7 @@ public class Note : MonoBehaviour
         else if (diff < -GoodWindow)
             _sr.color = ColDefault;
 
-        // 어프로치 링 수축: 남은 시간 비율로 크기 계산
+        // Approach ring shrinks based on remaining time to hit
         if (_ringsr != null)
         {
             float timeRemaining = HitTime - RhythmManager.Instance.SongTime;
@@ -77,7 +77,7 @@ public class Note : MonoBehaviour
             float ringScale     = Mathf.Lerp(RingStartScale, 1f, progress);
             _ringsr.transform.localScale = Vector3.one * ringScale;
 
-            // 히트존 근접 시 링 색상도 변화
+            // Ring color shifts when near hit zone
             float alpha = Mathf.Lerp(0.7f, 0.2f, progress);
             _ringsr.color = Mathf.Abs(diff) <= GoodWindow
                 ? new Color(1f, 0.85f, 0f, alpha)
