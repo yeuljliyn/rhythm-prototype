@@ -105,23 +105,26 @@ public class CalibrationSession : MonoBehaviour
         if (kb == null) return;
         if (!kb.spaceKey.wasPressedThisFrame) return;
 
-        int beat = CurrentBeatIndex;
-        if (beat < _warmupBeats)    return;  // warmup: ignore
-        if (beat == _lastInputBeat) return;  // one sample per beat
+        double rawInputTime = AudioSettings.dspTime - _sessionStartDspTime;
+        // Round to nearest beat — floor would misassign early presses to the previous beat,
+        // producing huge error values that get excluded even when timing is correct.
+        int nearestBeat = (int)System.Math.Round(rawInputTime / _beatInterval);
 
-        _lastInputBeat = beat;
-        RecordSample(beat);
+        if (nearestBeat < _warmupBeats)    return;  // warmup: ignore
+        if (nearestBeat == _lastInputBeat) return;  // one sample per beat
+
+        _lastInputBeat = nearestBeat;
+        RecordSample(rawInputTime, nearestBeat);
     }
 
-    void RecordSample(int nearestBeat)
+    void RecordSample(double rawInputTime, int nearestBeat)
     {
-        double rawInputTime      = AudioSettings.dspTime - _sessionStartDspTime;
         // adjustedInputTime accounts for the current offset so that
         // errorMs reflects REMAINING error, enabling cumulative convergence
         double adjustedInputTime = rawInputTime +
             (CalibrationManager.Instance?.JudgementOffsetMs ?? 0f) / 1000.0;
-        double targetBeatTime    = nearestBeat * _beatInterval;
-        float  errorMs           = (float)((adjustedInputTime - targetBeatTime) * 1000.0);
+        double targetBeatTime = nearestBeat * _beatInterval;
+        float  errorMs        = (float)((adjustedInputTime - targetBeatTime) * 1000.0);
 
         if (Mathf.Abs(errorMs) > _maxErrorMs) { _excludedCount++; return; }
 

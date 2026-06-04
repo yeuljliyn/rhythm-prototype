@@ -118,6 +118,9 @@ public class CalibrationUI : MonoBehaviour
 
     void StartSession()
     {
+        // Deselect UI so EventSystem doesn't intercept spacebar as a button click
+        UnityEngine.EventSystems.EventSystem.current?.SetSelectedGameObject(null);
+
         _session.Begin();
         _startBtn.gameObject.SetActive(false);
         _retestBtn.gameObject.SetActive(false);
