@@ -98,22 +98,22 @@ public class CalibrationUI : MonoBehaviour
         _statusLabel = MakeCenteredLabel(
             "", 17f, new Color(1f, 0.85f, 0.30f), new Vector2(0f, -210f));
 
-        // Offset buttons: centered side by side
-        MakeButton("Offset -5ms", -100f, -300f, 175f, 48f,
-            new Color(0.50f, 0.20f, 0.20f), () => Adjust(-5f));
-        MakeButton("Offset +5ms",  100f, -300f, 175f, 48f,
-            new Color(0.20f, 0.20f, 0.55f), () => Adjust(+5f));
-
         // Action buttons: START/RETRY on left, RESET on right
-        _startBtn = MakeButton("START", -100f, -360f, 175f, 52f,
+        _startBtn = MakeButton("START", -100f, -470f, 175f, 52f,
             new Color(0.10f, 0.55f, 0.30f), StartSession);
 
-        _retestBtn = MakeButton("RETRY", -100f, -360f, 175f, 52f,
+        _retestBtn = MakeButton("RETRY", -100f, -470f, 175f, 52f,
             new Color(0.15f, 0.42f, 0.65f), StartSession);
         _retestBtn.gameObject.SetActive(false);
 
-        MakeButton("RESET", 100f, -360f, 175f, 52f,
+        MakeButton("RESET", 100f, -470f, 175f, 52f,
             new Color(0.42f, 0.10f, 0.10f), Reset);
+
+        // Offset buttons below action buttons
+        MakeButton("Offset -5ms", -100f, -535f, 175f, 48f,
+            new Color(0.50f, 0.20f, 0.20f), () => Adjust(-5f));
+        MakeButton("Offset +5ms",  100f, -535f, 175f, 48f,
+            new Color(0.20f, 0.20f, 0.55f), () => Adjust(+5f));
     }
 
     void StartSession()

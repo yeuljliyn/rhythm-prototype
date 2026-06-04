@@ -23,7 +23,7 @@ public class CalibrationVisualMetronome : MonoBehaviour
     {
         var pulseGO = MakeRect(parent, "BeatPulse",
             new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f),
-            new Vector2(120f, 120f), new Vector2(0f, -250f));
+            new Vector2(120f, 120f), new Vector2(0f, -340f));
         _beatPulse        = pulseGO.AddComponent<Image>();
         _beatPulse.sprite = BuildCircleSprite();
         _beatPulse.color  = Color.clear;
