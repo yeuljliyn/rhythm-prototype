@@ -73,14 +73,14 @@ public class CalibrationUI : MonoBehaviour
             : $"Measuring:  {_session.ValidSampleCount} / {_session.TargetSamples}";
 
         _statusLabel.text = _session.IsWarmup
-            ? "Press arrow keys in rhythm"
-            : $"Next direction:  {DirToStr(_session.CurrentTargetDir)}";
+            ? "Press SPACE in rhythm"
+            : "Press SPACE on each beat";
     }
 
     void BuildUI()
     {
         MakeCenteredLabel(
-            "Press the highlighted arrow key in time with each click",
+            "Press SPACE in time with each click",
             15f, new Color(0.65f, 0.65f, 0.85f), new Vector2(0f, -75f));
 
         _offsetLabel = MakeCenteredLabel(
@@ -98,19 +98,21 @@ public class CalibrationUI : MonoBehaviour
         _statusLabel = MakeCenteredLabel(
             "", 17f, new Color(1f, 0.85f, 0.30f), new Vector2(0f, -210f));
 
-        _startBtn = MakeButton("START", -120f, -370f, 200f, 52f,
+        // Offset buttons: centered side by side
+        MakeButton("Offset -5ms", -100f, -300f, 175f, 48f,
+            new Color(0.50f, 0.20f, 0.20f), () => Adjust(-5f));
+        MakeButton("Offset +5ms",  100f, -300f, 175f, 48f,
+            new Color(0.20f, 0.20f, 0.55f), () => Adjust(+5f));
+
+        // Action buttons: START/RETRY on left, RESET on right
+        _startBtn = MakeButton("START", -100f, -360f, 175f, 52f,
             new Color(0.10f, 0.55f, 0.30f), StartSession);
 
-        _retestBtn = MakeButton("RETRY", -120f, -370f, 200f, 52f,
+        _retestBtn = MakeButton("RETRY", -100f, -360f, 175f, 52f,
             new Color(0.15f, 0.42f, 0.65f), StartSession);
         _retestBtn.gameObject.SetActive(false);
 
-        MakeButton("Offset -5ms",  80f, -320f, 175f, 48f,
-            new Color(0.50f, 0.15f, 0.15f), () => Adjust(-5f));
-        MakeButton("Offset +5ms", 260f, -320f, 175f, 48f,
-            new Color(0.15f, 0.15f, 0.50f), () => Adjust(+5f));
-
-        MakeButton("RESET", 80f, -370f, 175f, 48f,
+        MakeButton("RESET", 100f, -360f, 175f, 52f,
             new Color(0.42f, 0.10f, 0.10f), Reset);
     }
 
@@ -163,15 +165,6 @@ public class CalibrationUI : MonoBehaviour
         if (_offsetLabel != null)
             _offsetLabel.text = $"Judgement offset:  {offset:+0.0;-0.0;0} ms";
     }
-
-    static string DirToStr(ArrowDir dir) => dir switch
-    {
-        ArrowDir.Up    => "UP",
-        ArrowDir.Down  => "DOWN",
-        ArrowDir.Left  => "LEFT",
-        ArrowDir.Right => "RIGHT",
-        _              => "?"
-    };
 
     // ── UI helpers ────────────────────────────────────────────────────────
 

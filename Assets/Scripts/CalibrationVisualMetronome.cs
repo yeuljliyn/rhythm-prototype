@@ -3,20 +3,15 @@ using TMPro;
 using UnityEngine.UI;
 
 /// <summary>
-/// Shows direction cues synced to CalibrationSession's beat using dspTime.
-/// No visual offset is stored or applied — timing is read raw from dspTime each frame.
+/// Simple beat-pulse visual for CalibrationSession (spacebar mode).
+/// Flashes a circle on each beat using dspTime — no direction cues.
 /// </summary>
 public class CalibrationVisualMetronome : MonoBehaviour
 {
     CalibrationSession _session;
 
-    TextMeshProUGUI _upLabel, _downLabel, _leftLabel, _rightLabel;
     Image           _beatPulse;
-
-    static readonly ArrowDir[] AllDirs    = { ArrowDir.Up, ArrowDir.Down, ArrowDir.Left, ArrowDir.Right };
-    static readonly Color      ColActive  = new Color(0.35f, 1.00f, 0.50f);
-    static readonly Color      ColWarmup  = new Color(0.90f, 0.80f, 0.30f, 0.65f);
-    static readonly Color      ColDim     = new Color(0.28f, 0.28f, 0.28f, 0.45f);
+    TextMeshProUGUI _spaceLabel;
 
     public void Initialize(CalibrationSession session, Transform parent)
     {
@@ -26,80 +21,51 @@ public class CalibrationVisualMetronome : MonoBehaviour
 
     void BuildUI(Transform parent)
     {
-        // Beat pulse backdrop
         var pulseGO = MakeRect(parent, "BeatPulse",
             new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f),
-            new Vector2(100f, 100f), new Vector2(0f, -250f));
+            new Vector2(120f, 120f), new Vector2(0f, -250f));
         _beatPulse        = pulseGO.AddComponent<Image>();
         _beatPulse.sprite = BuildCircleSprite();
         _beatPulse.color  = Color.clear;
 
-        // Arrow labels at cardinal positions around the circle
-        _upLabel    = MakeArrow(parent, "UP",    new Vector2(0f,    -180f));
-        _downLabel  = MakeArrow(parent, "DOWN",  new Vector2(0f,    -320f));
-        _leftLabel  = MakeArrow(parent, "LEFT",  new Vector2(-100f, -250f));
-        _rightLabel = MakeArrow(parent, "RIGHT", new Vector2( 100f, -250f));
+        // "SPACE" label inside the circle
+        var lblGO = new GameObject("SpaceLbl");
+        lblGO.transform.SetParent(pulseGO.transform, false);
+        var lblRect       = lblGO.AddComponent<RectTransform>();
+        lblRect.anchorMin = Vector2.zero;
+        lblRect.anchorMax = Vector2.one;
+        lblRect.offsetMin = lblRect.offsetMax = Vector2.zero;
+        _spaceLabel           = lblGO.AddComponent<TextMeshProUGUI>();
+        _spaceLabel.text      = "SPACE";
+        _spaceLabel.fontSize  = 18f;
+        _spaceLabel.alignment = TextAlignmentOptions.Center;
+        _spaceLabel.color     = new Color(0.7f, 0.7f, 0.7f, 0.6f);
+        _spaceLabel.raycastTarget = false;
     }
 
     void Update()
     {
-        if (_session == null || !_session.IsActive) return;
+        if (_session == null || !_session.IsActive)
+        {
+            if (_beatPulse != null) _beatPulse.color = Color.clear;
+            return;
+        }
 
         double elapsed = AudioSettings.dspTime - _session.SessionStartDspTime;
-        if (elapsed < 0) { SetAllDim(); return; }
+        if (elapsed < 0) { _beatPulse.color = Color.clear; return; }
 
-        double beatInterval = _session.BeatInterval;
-        double phase        = elapsed % beatInterval;
-        float  progress     = (float)(phase / beatInterval);   // 0 → 1 per beat
+        double phase    = elapsed % _session.BeatInterval;
+        float  progress = (float)(phase / _session.BeatInterval);  // 0 → 1 per beat
 
-        // Flash at the start of each beat
         float pulseFade = Mathf.Clamp01(1f - progress / 0.25f);
-        _beatPulse.color = new Color(0.25f, 0.85f, 1f, pulseFade * 0.50f);
 
-        bool     isWarmup = _session.IsWarmup;
-        ArrowDir target   = _session.CurrentTargetDir;
-        TextMeshProUGUI[] labels = { _upLabel, _downLabel, _leftLabel, _rightLabel };
+        Color pulseCol = _session.IsWarmup
+            ? new Color(0.90f, 0.80f, 0.30f, pulseFade * 0.60f)
+            : new Color(0.25f, 0.85f, 1.00f, pulseFade * 0.70f);
+        _beatPulse.color = pulseCol;
 
-        for (int i = 0; i < AllDirs.Length; i++)
-        {
-            bool isTarget = !isWarmup && AllDirs[i] == target;
-            float brightness = isTarget ? Mathf.Lerp(1f, 0.6f, progress) : 0f;
-
-            labels[i].color = isWarmup
-                ? Color.Lerp(ColDim, ColWarmup, pulseFade)
-                : isTarget
-                    ? Color.Lerp(ColDim, ColActive, Mathf.Clamp01(brightness + pulseFade))
-                    : ColDim;
-
-            labels[i].transform.localScale = isTarget
-                ? Vector3.one * Mathf.Lerp(1.35f, 1.0f, progress)
-                : Vector3.one;
-        }
-    }
-
-    void SetAllDim()
-    {
-        foreach (var lbl in new[] { _upLabel, _downLabel, _leftLabel, _rightLabel })
-            if (lbl != null) lbl.color = ColDim;
-    }
-
-    TextMeshProUGUI MakeArrow(Transform parent, string symbol, Vector2 pos)
-    {
-        var go   = new GameObject("Arrow_" + symbol);
-        go.transform.SetParent(parent, false);
-        var rect = go.AddComponent<RectTransform>();
-        rect.anchorMin        = new Vector2(0.5f, 1f);
-        rect.anchorMax        = new Vector2(0.5f, 1f);
-        rect.pivot            = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta        = new Vector2(70f, 70f);
-        rect.anchoredPosition = pos;
-        var lbl           = go.AddComponent<TextMeshProUGUI>();
-        lbl.text          = symbol;
-        lbl.fontSize      = 28f;
-        lbl.alignment     = TextAlignmentOptions.Center;
-        lbl.color         = ColDim;
-        lbl.raycastTarget = false;
-        return lbl;
+        float scale = Mathf.Lerp(1.15f, 1.0f, progress);
+        _beatPulse.transform.localScale = Vector3.one * scale;
     }
 
     static GameObject MakeRect(Transform parent, string name,
@@ -118,7 +84,7 @@ public class CalibrationVisualMetronome : MonoBehaviour
 
     static Sprite BuildCircleSprite()
     {
-        const int S = 32;
+        const int S = 64;
         float cx = (S - 1) / 2f, cy = (S - 1) / 2f, r = S / 2f - 1f;
         var pixels = new Color[S * S];
         for (int y = 0; y < S; y++)

@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// Manages one calibration session.
 /// Pre-generates a click-track AudioClip so metronome beats are perfectly
-/// DSP-scheduled. Collects direction-matched timing samples, filters outliers,
+/// DSP-scheduled. Collects spacebar timing samples, filters outliers,
 /// and applies a trimmed-mean error to CalibrationManager on completion.
 /// </summary>
 public class CalibrationSession : MonoBehaviour
@@ -15,9 +15,6 @@ public class CalibrationSession : MonoBehaviour
     [SerializeField] int   _targetSamples = 14;
     [SerializeField] float _maxErrorMs    = 180f;
     [SerializeField] float _trimFraction  = 0.15f;  // cut top/bottom 15% before mean
-
-    static readonly ArrowDir[] DirPattern =
-        { ArrowDir.Up, ArrowDir.Down, ArrowDir.Left, ArrowDir.Right };
 
     double _sessionStartDspTime;
     double _beatInterval;
@@ -42,9 +39,7 @@ public class CalibrationSession : MonoBehaviour
     public int CurrentBeatIndex =>
         _active ? Mathf.Max(0, (int)((AudioSettings.dspTime - _sessionStartDspTime) / _beatInterval)) : 0;
 
-    public bool     IsWarmup       => CurrentBeatIndex < _warmupBeats;
-    public ArrowDir CurrentTargetDir =>
-        DirPattern[Mathf.Max(0, CurrentBeatIndex - _warmupBeats) % DirPattern.Length];
+    public bool IsWarmup => CurrentBeatIndex < _warmupBeats;
 
     public int ValidSampleCount  => _validSamples.Count;
     public int EarlyCount        => _earlyCount;
@@ -108,25 +103,11 @@ public class CalibrationSession : MonoBehaviour
     {
         var kb = Keyboard.current;
         if (kb == null) return;
-
-        ArrowDir? pressed = null;
-        if      (kb.upArrowKey.wasPressedThisFrame    || kb.wKey.wasPressedThisFrame)    pressed = ArrowDir.Up;
-        else if (kb.downArrowKey.wasPressedThisFrame  || kb.sKey.wasPressedThisFrame)    pressed = ArrowDir.Down;
-        else if (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)    pressed = ArrowDir.Left;
-        else if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame)    pressed = ArrowDir.Right;
-
-        if (!pressed.HasValue) return;
+        if (!kb.spaceKey.wasPressedThisFrame) return;
 
         int beat = CurrentBeatIndex;
         if (beat < _warmupBeats)    return;  // warmup: ignore
         if (beat == _lastInputBeat) return;  // one sample per beat
-
-        // Wrong direction: skip, mark beat consumed
-        if (pressed.Value != CurrentTargetDir)
-        {
-            _lastInputBeat = beat;
-            return;
-        }
 
         _lastInputBeat = beat;
         RecordSample(beat);
