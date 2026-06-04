@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Drives note spawning from a ChapterData asset.
-/// Notes travel horizontally from spawnX (right/boss side) to hitZoneX (left/player side).
+/// Drives note spawning. SongTime is dspTime-based for accurate audio synchronization.
+/// SongTime == 0 when the music starts; negative during the intro delay.
 /// </summary>
 public class RhythmManager : MonoBehaviour
 {
@@ -23,16 +23,21 @@ public class RhythmManager : MonoBehaviour
 
     [Header("Note Lane")]
     public float spawnAheadTime = 2.2f;
-    public float spawnX         =  8.0f;   // right side (off-screen)
-    public float hitZoneX       = -5.0f;   // left side (player)
-    public float noteY          = -2.5f;   // lane height
+    public float spawnX         =  8.0f;
+    public float hitZoneX       = -5.0f;
+    public float noteY          = -2.5f;
 
-    public float SongTime        { get; private set; }
-    public float BeatInterval    { get; private set; }
-    public bool  IsScheduleDone  => _nextIdx >= _schedule.Count;
+    // SongTime == 0 when music starts; negative during intro
+    public float  SongTime  => _isRunning ? (float)(AudioSettings.dspTime - _scheduledMusicStartDsp) : 0f;
+    // Double-precision version for offset calculations in Note.TryHit
+    public double SongTimeD => _isRunning ? AudioSettings.dspTime - _scheduledMusicStartDsp : 0.0;
 
-    int         _nextIdx;
-    bool        _isRunning;
+    public float BeatInterval   { get; private set; }
+    public bool  IsScheduleDone => _nextIdx >= _schedule.Count;
+
+    int    _nextIdx;
+    bool   _isRunning;
+    double _scheduledMusicStartDsp;
     AudioSource _audio;
 
     struct ScheduledNote { public float hitTime; }
@@ -58,7 +63,12 @@ public class RhythmManager : MonoBehaviour
         float activeIntro = chapter != null ? chapter.introDelay : introDelay;
 
         BeatInterval = 60f / Mathf.Max(1f, activeBpm);
-        SongTime     = -activeIntro;
+
+        // Music is scheduled activeIntro seconds from now.
+        // SongTime = dspTime - _scheduledMusicStartDsp, so:
+        //   at Start():   SongTime = -activeIntro  (still in intro)
+        //   when music plays: SongTime = 0
+        _scheduledMusicStartDsp = AudioSettings.dspTime + activeIntro;
 
         BuildSchedule();
         PlayMusic(activeIntro);
@@ -68,14 +78,12 @@ public class RhythmManager : MonoBehaviour
     void Update()
     {
         if (!_isRunning) return;
-        SongTime += Time.deltaTime;
 
         while (_nextIdx < _schedule.Count)
         {
             float hitTime   = _schedule[_nextIdx].hitTime;
             float spawnTime = hitTime - spawnAheadTime;
             if (SongTime < spawnTime) break;
-
             SpawnNote(hitTime);
             _nextIdx++;
         }
@@ -108,7 +116,7 @@ public class RhythmManager : MonoBehaviour
         _audio.clip        = chapter.music;
         _audio.playOnAwake = false;
         _audio.loop        = false;
-        _audio.PlayScheduled(AudioSettings.dspTime + delay);
+        _audio.PlayScheduled(_scheduledMusicStartDsp);
     }
 
     void SpawnNote(float hitTime)

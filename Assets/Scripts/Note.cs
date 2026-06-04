@@ -91,8 +91,14 @@ public class Note : MonoBehaviour
     public void TryHit()
     {
         if (IsHit || RhythmManager.Instance == null) return;
-        float offset = SettingsManager.InputOffset;
-        float diff   = Mathf.Abs(RhythmManager.Instance.SongTime + offset - HitTime);
+
+        // judgementOffsetMs applied here only — single application point
+        double rawSongTime     = RhythmManager.Instance.SongTimeD;
+        double adjustedInputTime = CalibrationManager.Instance != null
+            ? CalibrationManager.Instance.GetAdjustedInputTimeS(rawSongTime)
+            : rawSongTime;
+
+        float diff = Mathf.Abs((float)adjustedInputTime - HitTime);
         JudgementType j;
         if      (diff <= PerfectWindow) j = JudgementType.Perfect;
         else if (diff <= GoodWindow)    j = JudgementType.Good;
