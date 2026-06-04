@@ -30,10 +30,10 @@ public class CalibrationUI : MonoBehaviour
         visualGO.transform.SetParent(transform, false);
         _visual = visualGO.AddComponent<CalibrationVisualMetronome>();
         _visual.Initialize(_session, transform);
-    }
 
-    void Start()
-    {
+        // Build UI in Awake so labels/buttons exist before Show() is called.
+        // SettingsManager calls Show() in the same frame as SetActive(true),
+        // before Start() would normally run.
         BuildUI();
         RefreshOffsetLabel();
     }
