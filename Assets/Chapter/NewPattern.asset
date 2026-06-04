@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a94ed0d5acdbb1545b360cb6bcb42acd, type: 3}
+  m_Name: NewPattern
+  m_EditorClassIdentifier: Assembly-CSharp::PatternData
+  chartName: Pattern 1
+  music: {fileID: 8300000, guid: f404e168ecd119641bc3fd4c16f5c077, type: 3}
+  bpm: 128
+  introDelay: 2
+  groups:
+  - spaceBeat: 4.51821
+    inputs:
+    - direction: 0
+      beat: 1.6903208
+    - direction: 2
+      beat: 2.104777
+    - direction: 1
+      beat: 2.616305
+    - direction: 3
+      beat: 3.3047354
+    - direction: 0
+      beat: 4.0104547
+  - spaceBeat: 11.96858
+    inputs:
+    - direction: 0
+      beat: 9.318539
+    - direction: 2
+      beat: 9.687212
+    - direction: 1
+      beat: 10.200987
+    - direction: 3
+      beat: 10.824451
+    - direction: 0
+      beat: 11.289443
+  - spaceBeat: 20.966679
+    inputs:
+    - direction: 0
+      beat: 17.368143
+    - direction: 2
+      beat: 17.801525
+    - direction: 1
+      beat: 18.37667
+    - direction: 3
+      beat: 19.733662
+  - spaceBeat: 32.185646
+    inputs:
+    - direction: 0
+      beat: 27.22802
+    - direction: 2
+      beat: 28.056149
+    - direction: 1
+      beat: 29.094767
+    - direction: 3
+      beat: 30.08831
+    - direction: 0
+      beat: 31.077604
+  - spaceBeat: 41.046524
+    inputs:
+    - direction: 0
+      beat: 37.45139
+    - direction: 2
+      beat: 38.12046
+    - direction: 1
+      beat: 39.04902
+    - direction: 3
+      beat: 40.03973
