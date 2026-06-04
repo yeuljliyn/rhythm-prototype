@@ -81,10 +81,10 @@ public class Note : MonoBehaviour
             SpawnHitFX(j);
             BossController.Instance?.TakeDamage(j);
         }
+        // Miss: 보스 시각 반응만 (체력 시스템 없음)
         else
         {
-            BossController.Instance?.AttackPlayer();
-            PlayerHealthManager.Instance?.LoseHeart();
+            BossController.Instance?.TakeDamage(j);
         }
         Destroy(gameObject);
     }

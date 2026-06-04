@@ -11,25 +11,23 @@ public class PlayerController : MonoBehaviour
 
     Coroutine _flashRoutine;
 
-    static readonly Color ColHit    = new Color(0.35f, 0.85f, 1.00f);
-    static readonly Color ColMiss   = new Color(1.00f, 0.30f, 0.25f);
+    static readonly Color ColHit = new Color(0.35f, 0.85f, 1.00f);
 
     void Update()
     {
         if (SettingsManager.Instance != null && SettingsManager.Instance.IsPanelOpen) return;
 
-        // Arrow keys — forward to command system first, then also count as note hit
         var kb = Keyboard.current;
         if (kb != null)
         {
-            if (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)
-            { CommandSystem.Instance?.TryInput(ArrowDir.Left);  danceAnimator?.ShowDirection(ArrowDir.Left); }
+            if      (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)
+                danceAnimator?.ShowDirection(ArrowDir.Left);
             else if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame)
-            { CommandSystem.Instance?.TryInput(ArrowDir.Right); danceAnimator?.ShowDirection(ArrowDir.Right); }
+                danceAnimator?.ShowDirection(ArrowDir.Right);
             else if (kb.upArrowKey.wasPressedThisFrame    || kb.wKey.wasPressedThisFrame)
-            { CommandSystem.Instance?.TryInput(ArrowDir.Up);    danceAnimator?.ShowDirection(ArrowDir.Up); }
+                danceAnimator?.ShowDirection(ArrowDir.Up);
             else if (kb.downArrowKey.wasPressedThisFrame  || kb.sKey.wasPressedThisFrame)
-            { CommandSystem.Instance?.TryInput(ArrowDir.Down);  danceAnimator?.ShowDirection(ArrowDir.Down); }
+                danceAnimator?.ShowDirection(ArrowDir.Down);
         }
 
         if (IsValidHitInput())
@@ -48,8 +46,6 @@ public class PlayerController : MonoBehaviour
             bodyAnimator?.SetTrigger("Attack");
         }
     }
-
-    public void FlashDamage() => Flash(ColMiss);
 
     void Flash(Color color)
     {
@@ -73,12 +69,9 @@ public class PlayerController : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return false;
 
-        // Space 명시적 처리 (anyKey 누락 방지)
         if (kb.spaceKey.wasPressedThisFrame) return true;
+        if (!kb.anyKey.wasPressedThisFrame)  return false;
 
-        if (!kb.anyKey.wasPressedThisFrame) return false;
-
-        // Exclude pause/modifier/system keys
         if (kb.escapeKey.wasPressedThisFrame)      return false;
         if (kb.leftCtrlKey.wasPressedThisFrame  || kb.rightCtrlKey.wasPressedThisFrame)  return false;
         if (kb.leftAltKey.wasPressedThisFrame   || kb.rightAltKey.wasPressedThisFrame)   return false;

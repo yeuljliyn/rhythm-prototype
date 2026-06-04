@@ -5,7 +5,8 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 /// <summary>
-/// 배틀 종료 감지 → 랭크 계산 → 클리어/실패 화면 표시.
+/// 배틀 종료 감지 → 랭크 계산 → 결과 화면 표시.
+/// 실패 판정 없음. 랭크 B 이상이면 다음 스테이지 해금.
 /// </summary>
 public class BattleResultScreen : MonoBehaviour
 {
@@ -19,34 +20,28 @@ public class BattleResultScreen : MonoBehaviour
     };
 
     bool _triggered;
-    bool _devClear;
 
     void Update()
     {
         if (_triggered) return;
 
+        // F1: 개발용 즉시 완료 (S랭크)
         var kb = UnityEngine.InputSystem.Keyboard.current;
-        if (kb != null)
+        if (kb != null && kb.f1Key.wasPressedThisFrame)
         {
-            if (kb.f1Key.wasPressedThisFrame) { _devClear = true;  Trigger(playerDied: false); return; }
-            if (kb.f2Key.wasPressedThisFrame) { _devClear = false; Trigger(playerDied: true);  return; }
+            Trigger(devRank: "S");
+            return;
         }
 
         if (RhythmManager.Instance == null || NoteManager.Instance == null) return;
 
-        if (PlayerHealthManager.Instance != null && PlayerHealthManager.Instance.Hearts <= 0)
-        {
-            Trigger(playerDied: true);
-            return;
-        }
-
         bool done = RhythmManager.Instance.IsScheduleDone
                  && NoteManager.Instance.Count == 0
                  && RhythmManager.Instance.SongTime > 0f;
-        if (done) Trigger(playerDied: false);
+        if (done) Trigger(devRank: null);
     }
 
-    void Trigger(bool playerDied)
+    void Trigger(string devRank)
     {
         if (_triggered) return;
         _triggered = true;
@@ -56,45 +51,50 @@ public class BattleResultScreen : MonoBehaviour
         var audioSrc = FindObjectOfType<AudioSource>();
         if (audioSrc != null && audioSrc.isPlaying) audioSrc.Pause();
 
-        var    gm      = GameManager.Instance;
-        bool   isClear = _devClear || (!playerDied && gm != null && gm.IsClear);
-        string rank    = _devClear ? "S"    : (gm != null ? gm.GetRank()         : "C");
-        float  acc     = _devClear ? 100f   : (gm != null ? gm.Accuracy * 100f   : 0f);
+        var    gm   = GameManager.Instance;
+        string rank = devRank ?? (gm != null ? gm.GetRank() : "C");
+        float  acc  = devRank != null ? 100f : (gm != null ? gm.Accuracy * 100f : 0f);
 
-        if (isClear)
+        int  stageIdx  = PlayerPrefs.GetInt("current_stage", 0);
+        bool unlockNext = rank == "S" || rank == "A" || rank == "B";
+
+        // 베스트 랭크 저장
+        string prev = PlayerPrefs.GetString($"stage_{stageIdx}_rank", "");
+        if (IsBetterRank(rank, prev))
+            PlayerPrefs.SetString($"stage_{stageIdx}_rank", rank);
+
+        // 다음 스테이지 해금 (B 이상)
+        if (unlockNext)
         {
-            int stageIdx = PlayerPrefs.GetInt("current_stage", 0);
             int unlocked = PlayerPrefs.GetInt("unlocked_stages", 1);
             if (stageIdx + 1 >= unlocked)
                 PlayerPrefs.SetInt("unlocked_stages", stageIdx + 2);
-            string prev = PlayerPrefs.GetString($"stage_{stageIdx}_rank", "");
-            if (IsBetterRank(rank, prev))
-                PlayerPrefs.SetString($"stage_{stageIdx}_rank", rank);
             PlayerPrefs.SetInt($"mugu_stage_{stageIdx}", 1);
-            PlayerPrefs.Save();
-            StartCoroutine(ShowClearScreen(rank, acc, stageIdx));
         }
-        else
-        {
-            BuildFailScreen(rank, acc);
-        }
+
+        PlayerPrefs.Save();
+        StartCoroutine(ShowResultScreen(rank, acc, stageIdx, unlockNext));
     }
 
-    // ── 클리어 화면 ──────────────────────────────────────────────────────────
-
-    IEnumerator ShowClearScreen(string rank, float acc, int stageIdx)
+    IEnumerator ShowResultScreen(string rank, float acc, int stageIdx, bool unlockNext)
     {
         var p = BuildCanvas();
 
         MakeStretch(p, new Color(0f, 0f, 0f, 0.85f));
-        MakeC(p, "STAGE CLEAR!", 68f, new Color(1f, 0.9f, 0.1f),  0f,  320f, 900f, 90f);
+
+        // 해금 여부에 따라 타이틀 색상 변경
+        Color titleCol = unlockNext
+            ? new Color(1f, 0.9f, 0.1f)
+            : new Color(0.7f, 0.7f, 0.7f);
+        string titleText = unlockNext ? "STAGE CLEAR!" : "STAGE COMPLETE";
+        MakeC(p, titleText, 68f, titleCol, 0f, 320f, 900f, 90f);
 
         Color rankCol = rank == "S" ? new Color(1f, 0.85f, 0f)
                       : rank == "A" ? new Color(0.4f, 0.8f, 1f)
                       : rank == "B" ? new Color(0.4f, 1f, 0.5f)
                       :               new Color(0.8f, 0.8f, 0.8f);
-        MakeC(p, rank,                    110f, rankCol,       0f, 180f, 200f, 130f);
-        MakeC(p, $"Accuracy  {acc:F1}%",   26f, Color.white,   0f,  70f, 500f,  50f);
+        MakeC(p, rank,                    110f, rankCol,     0f, 180f, 200f, 130f);
+        MakeC(p, $"Accuracy  {acc:F1}%",   26f, Color.white, 0f,  70f, 500f,  50f);
 
         var ln = new GameObject("Line"); ln.transform.SetParent(p, false);
         var lr = ln.AddComponent<RectTransform>();
@@ -102,18 +102,26 @@ public class BattleResultScreen : MonoBehaviour
         lr.anchoredPosition = new Vector2(0f, 10f); lr.sizeDelta = new Vector2(0f, 2f);
         ln.AddComponent<Image>().color = new Color(0.5f, 0.4f, 0.7f, 0.5f);
 
-        var (muguName, muguSprite) = StageRewards[Mathf.Clamp(stageIdx, 0, StageRewards.Length - 1)];
-        MakeC(p, "MUGU OBTAINED", 20f, new Color(0.8f, 0.6f, 1f), 0f, -40f, 400f, 36f);
+        if (unlockNext)
+        {
+            var (muguName, muguSprite) = StageRewards[Mathf.Clamp(stageIdx, 0, StageRewards.Length - 1)];
+            MakeC(p, "MUGU OBTAINED", 20f, new Color(0.8f, 0.6f, 1f), 0f, -40f, 400f, 36f);
 
-        var ig = MakeCImg(p, 0f, -150f, 150f, 150f);
-        var ii = ig.AddComponent<Image>();
-        var sp = Resources.Load<Sprite>(muguSprite);
-        if (sp != null) { ii.sprite = sp; ii.preserveAspect = true; }
-        else            { ii.color  = new Color(0.6f, 0.3f, 0.8f); }
+            var ig = MakeCImg(p, 0f, -150f, 150f, 150f);
+            var ii = ig.AddComponent<Image>();
+            var sp = Resources.Load<Sprite>(muguSprite);
+            if (sp != null) { ii.sprite = sp; ii.preserveAspect = true; }
+            else            { ii.color  = new Color(0.6f, 0.3f, 0.8f); }
 
-        MakeC(p, muguName, 22f, new Color(1f, 0.85f, 0.4f), 0f, -265f, 500f, 40f);
+            MakeC(p, muguName, 22f, new Color(1f, 0.85f, 0.4f), 0f, -265f, 500f, 40f);
+        }
+        else
+        {
+            MakeC(p, "B 랭크 이상이면 다음 스테이지가 해금됩니다", 22f,
+                  new Color(0.7f, 0.5f, 0.5f), 0f, -120f, 700f, 40f);
+        }
 
-        MakeBtn(p, "LOBBY", 0f, -350f, 320f, 62f, new Color(0.15f, 0.55f, 0.30f), () =>
+        MakeBtn(p, "LOBBY", 0f, -370f, 320f, 62f, new Color(0.15f, 0.45f, 0.70f), () =>
         {
             SFXManager.PlayConfirm();
             Time.timeScale = 1f;
@@ -121,33 +129,6 @@ public class BattleResultScreen : MonoBehaviour
         });
 
         yield return null;
-    }
-
-    // ── 실패 화면 ────────────────────────────────────────────────────────────
-
-    void BuildFailScreen(string rank, float acc)
-    {
-        var p = BuildCanvas();
-        MakeStretch(p, new Color(0f, 0f, 0f, 0.88f));
-
-        MakeC(p, "STAGE FAILED", 68f, new Color(1f, 0.25f, 0.2f),  0f,  260f, 900f, 90f);
-        MakeC(p, rank,            90f, new Color(0.8f, 0.3f, 0.3f), 0f,   90f, 180f, 120f);
-        MakeC(p, $"Accuracy  {acc:F1}%  (B rank or above to clear)",
-                                  22f, new Color(0.7f, 0.7f, 0.7f), 0f,  -10f, 750f,  50f);
-
-        MakeBtn(p, "RETRY", -170f, -150f, 260f, 70f, new Color(0.15f, 0.45f, 0.70f), () =>
-        {
-            SFXManager.PlayClick();
-            Time.timeScale = 1f;
-            GameManager.Instance?.ResetGame();
-            SceneManager.LoadScene("BattleScene");
-        });
-        MakeBtn(p, "LOBBY",  170f, -150f, 260f, 70f, new Color(0.25f, 0.15f, 0.35f), () =>
-        {
-            SFXManager.PlayBack();
-            Time.timeScale = 1f;
-            SceneManager.LoadScene("LobbyScene");
-        });
     }
 
     // ── UI 헬퍼 ──────────────────────────────────────────────────────────────
@@ -169,7 +150,6 @@ public class BattleResultScreen : MonoBehaviour
             return panel.transform;
         }
 
-        // fallback
         var go = new GameObject("ResultCanvas");
         var cv = go.AddComponent<Canvas>();
         cv.renderMode   = RenderMode.ScreenSpaceOverlay;
@@ -199,14 +179,14 @@ public class BattleResultScreen : MonoBehaviour
         go.transform.SetParent(p, false);
         var r = go.AddComponent<RectTransform>();
         r.anchorMin = r.anchorMax = new Vector2(0.5f, 0.5f);
-        r.pivot     = new Vector2(0.5f, 0.5f);
+        r.pivot            = new Vector2(0.5f, 0.5f);
         r.sizeDelta        = new Vector2(w, h);
         r.anchoredPosition = new Vector2(ox, oy);
         var t = go.AddComponent<TextMeshProUGUI>();
-        t.text      = text;
-        t.fontSize  = size;
-        t.alignment = TextAlignmentOptions.Center;
-        t.color     = color;
+        t.text          = text;
+        t.fontSize      = size;
+        t.alignment     = TextAlignmentOptions.Center;
+        t.color         = color;
         t.raycastTarget = false;
     }
 
@@ -216,7 +196,7 @@ public class BattleResultScreen : MonoBehaviour
         go.transform.SetParent(p, false);
         var r = go.AddComponent<RectTransform>();
         r.anchorMin = r.anchorMax = new Vector2(0.5f, 0.5f);
-        r.pivot     = new Vector2(0.5f, 0.5f);
+        r.pivot            = new Vector2(0.5f, 0.5f);
         r.sizeDelta        = new Vector2(w, h);
         r.anchoredPosition = new Vector2(ox, oy);
         return go;
@@ -229,7 +209,7 @@ public class BattleResultScreen : MonoBehaviour
         go.transform.SetParent(p, false);
         var r = go.AddComponent<RectTransform>();
         r.anchorMin = r.anchorMax = new Vector2(0.5f, 0.5f);
-        r.pivot     = new Vector2(0.5f, 0.5f);
+        r.pivot            = new Vector2(0.5f, 0.5f);
         r.sizeDelta        = new Vector2(w, h);
         r.anchoredPosition = new Vector2(ox, oy);
         go.AddComponent<Image>().color = color;
@@ -240,11 +220,11 @@ public class BattleResultScreen : MonoBehaviour
         lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one;
         lr.offsetMin = lr.offsetMax = Vector2.zero;
         var t = lbl.AddComponent<TextMeshProUGUI>();
-        t.text      = label;
-        t.fontSize  = 30f;
-        t.fontStyle = FontStyles.Bold;
-        t.alignment = TextAlignmentOptions.Center;
-        t.color     = Color.white;
+        t.text          = label;
+        t.fontSize      = 30f;
+        t.fontStyle     = FontStyles.Bold;
+        t.alignment     = TextAlignmentOptions.Center;
+        t.color         = Color.white;
         t.raycastTarget = false;
     }
 
