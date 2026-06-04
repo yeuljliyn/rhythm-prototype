@@ -380,15 +380,31 @@ public class BeatMapEditorWindow : EditorWindow
             EditorGUI.DrawRect(new Rect(startX, RULER_H, w, LANE_H * LANE_COUNT),
                 GroupBgColors[g % GroupBgColors.Length]);
 
-            // During recording, confirmed groups are locked — show red tint
-            if (_isRecording && grp.spaceBeat >= 0f)
+            if (grp.spaceBeat >= 0f)
             {
-                EditorGUI.DrawRect(new Rect(startX, RULER_H, w, LANE_H * LANE_COUNT),
-                    new Color(0.8f, 0.1f, 0.1f, 0.18f));
-                GUI.Label(new Rect(startX + 4f, RULER_H + LANE_H * LANE_COUNT - 16f, 60f, 14f),
-                    "LOCKED",
+                // Player input zone: same duration as the maker group, starts at spaceBeat
+                float groupDuration  = grp.spaceBeat - startBeat;
+                float playerZoneBeat = grp.spaceBeat + Mathf.Max(0f, groupDuration);
+                float spaceX         = (_pattern.introDelay + _pattern.BeatToTime(grp.spaceBeat)) * _zoom;
+                float playerEndX     = (_pattern.introDelay + _pattern.BeatToTime(playerZoneBeat)) * _zoom;
+                float playerW        = Mathf.Max(2f, playerEndX - spaceX);
+
+                // Green tint for player input zone (always visible)
+                EditorGUI.DrawRect(new Rect(spaceX, RULER_H, playerW, LANE_H * LANE_COUNT),
+                    new Color(0.1f, 0.55f, 0.35f, 0.18f));
+                GUI.Label(new Rect(spaceX + 4f, RULER_H + LANE_H * LANE_COUNT - 16f, 80f, 14f),
+                    "PLAYER",
                     new GUIStyle(EditorStyles.miniLabel)
-                        { normal = { textColor = new Color(1f, 0.4f, 0.4f, 0.8f) }, fontStyle = FontStyle.Bold });
+                        { normal = { textColor = new Color(0.4f, 1f, 0.7f, 0.8f) }, fontStyle = FontStyle.Bold });
+
+                // During recording: show red LOCKED tint on both zones
+                if (_isRecording)
+                {
+                    EditorGUI.DrawRect(new Rect(startX, RULER_H, w, LANE_H * LANE_COUNT),
+                        new Color(0.8f, 0.1f, 0.1f, 0.15f));
+                    EditorGUI.DrawRect(new Rect(spaceX, RULER_H, playerW, LANE_H * LANE_COUNT),
+                        new Color(0.8f, 0.1f, 0.1f, 0.15f));
+                }
             }
         }
 
@@ -643,7 +659,10 @@ public class BeatMapEditorWindow : EditorWindow
         foreach (var g in _pattern.groups)
         {
             if (g.inputs.Count == 0 || g.spaceBeat < 0f) continue;
-            if (beat >= g.inputs[0].beat && beat <= g.spaceBeat)
+            // Block: maker group range + following player input zone (same duration)
+            float groupDuration = g.spaceBeat - g.inputs[0].beat;
+            float blockEnd      = g.spaceBeat + Mathf.Max(0f, groupDuration);
+            if (beat >= g.inputs[0].beat && beat <= blockEnd)
                 return true;
         }
         return false;
