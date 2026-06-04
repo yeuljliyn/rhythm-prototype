@@ -245,7 +245,7 @@ public class BeatMapEditorWindow : EditorWindow
                 int pending = _pendingGroup?.inputs.Count ?? 0;
                 GUI.color = new Color(1f, 0.9f, 0.2f);
                 EditorGUILayout.LabelField(
-                    $"● REC  —  ↑↓←→ / WASD = direction input   Space = confirm group   Esc = stop   " +
+                    $"● REC  —  ↑↓←→ / WASD = direction   Space / Z = confirm group   Esc = stop   " +
                     $"Pending: {pending} input(s)",
                     EditorStyles.miniLabel);
                 GUI.color = Color.white;
@@ -365,7 +365,7 @@ public class BeatMapEditorWindow : EditorWindow
     {
         if (_pattern.groups == null) return;
 
-        // Group background shading
+        // Group background shading + locked-zone overlay during recording
         for (int g = 0; g < _pattern.groups.Count; g++)
         {
             var grp = _pattern.groups[g];
@@ -375,10 +375,21 @@ public class BeatMapEditorWindow : EditorWindow
             float endBeat   = grp.spaceBeat >= 0f ? grp.spaceBeat : startBeat;
             float startX    = (_pattern.introDelay + _pattern.BeatToTime(startBeat)) * _zoom;
             float endX      = (_pattern.introDelay + _pattern.BeatToTime(endBeat)) * _zoom;
+            float w         = Mathf.Max(2f, endX - startX);
 
-            EditorGUI.DrawRect(
-                new Rect(startX, RULER_H, Mathf.Max(2f, endX - startX), LANE_H * LANE_COUNT),
+            EditorGUI.DrawRect(new Rect(startX, RULER_H, w, LANE_H * LANE_COUNT),
                 GroupBgColors[g % GroupBgColors.Length]);
+
+            // During recording, confirmed groups are locked — show red tint
+            if (_isRecording && grp.spaceBeat >= 0f)
+            {
+                EditorGUI.DrawRect(new Rect(startX, RULER_H, w, LANE_H * LANE_COUNT),
+                    new Color(0.8f, 0.1f, 0.1f, 0.18f));
+                GUI.Label(new Rect(startX + 4f, RULER_H + LANE_H * LANE_COUNT - 16f, 60f, 14f),
+                    "LOCKED",
+                    new GUIStyle(EditorStyles.miniLabel)
+                        { normal = { textColor = new Color(1f, 0.4f, 0.4f, 0.8f) }, fontStyle = FontStyle.Bold });
+            }
         }
 
         // Confirmed groups: inputs + space markers
@@ -589,8 +600,8 @@ public class BeatMapEditorWindow : EditorWindow
 
         float beat = _pattern.TimeToBeat(_currentSongTime);
 
-        // Space confirms the current pending group
-        if (e.keyCode == KeyCode.Space)
+        // Space or Z confirms the current pending group
+        if (e.keyCode == KeyCode.Space || e.keyCode == KeyCode.Z)
         {
             if (_pendingGroup != null && _pendingGroup.inputs.Count > 0)
             {
@@ -599,13 +610,12 @@ public class BeatMapEditorWindow : EditorWindow
                 _pattern.groups.Add(_pendingGroup);
                 EditorUtility.SetDirty(_pattern);
             }
-            // Always start fresh group after Space (even if pending was empty)
             _pendingGroup = new DirectionGroup();
             e.Use();
             return;
         }
 
-        // Arrow / WASD: add to pending group
+        // Arrow / WASD: add to pending group, blocked inside confirmed group ranges
         ArrowDir? dir = e.keyCode switch
         {
             KeyCode.UpArrow    or KeyCode.W => ArrowDir.Up,
@@ -617,10 +627,26 @@ public class BeatMapEditorWindow : EditorWindow
 
         if (dir.HasValue)
         {
-            if (_pendingGroup == null) _pendingGroup = new DirectionGroup();
-            _pendingGroup.inputs.Add(new DirectionInputEntry(dir.Value, beat));
+            // Confirmed group ranges are player input zones — block maker input there
+            if (!IsBeatInConfirmedGroup(beat))
+            {
+                if (_pendingGroup == null) _pendingGroup = new DirectionGroup();
+                _pendingGroup.inputs.Add(new DirectionInputEntry(dir.Value, beat));
+            }
             e.Use();
         }
+    }
+
+    bool IsBeatInConfirmedGroup(float beat)
+    {
+        if (_pattern.groups == null) return false;
+        foreach (var g in _pattern.groups)
+        {
+            if (g.inputs.Count == 0 || g.spaceBeat < 0f) continue;
+            if (beat >= g.inputs[0].beat && beat <= g.spaceBeat)
+                return true;
+        }
+        return false;
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────
