@@ -88,7 +88,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
     static readonly Vector3 ScaleInactive = new Vector3(0.93f, 0.93f, 1f);
 
     // ── UI refs ────────────────────────────────────────────────────────
-    RectTransform     _charARt, _charBRt;
+    RectTransform     _charARt;
     Image             _charAImg;
     TextMeshProUGUI   _speakerTxt, _dialogueTxt;
     GameObject        _promptGO;
@@ -129,7 +129,20 @@ public class TutorialIntroSceneManager : MonoBehaviour
 
     void Update()
     {
-        if (_inTutorial || _waitChoice) return;
+        if (_inTutorial) return;
+
+        if (_waitChoice)
+        {
+            var kb2 = Keyboard.current;
+            if (kb2 != null)
+            {
+                if (kb2.digit1Key.wasPressedThisFrame || kb2.numpad1Key.wasPressedThisFrame)
+                    SelectChoice(0);
+                else if (kb2.digit2Key.wasPressedThisFrame || kb2.numpad2Key.wasPressedThisFrame)
+                    SelectChoice(1);
+            }
+            return;
+        }
 
         bool advance = false;
         var kb = Keyboard.current;
@@ -183,7 +196,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
                 break;
 
             case NodeType.Choice:
-                _speakerTxt.text  = "신령님";
+                _speakerTxt.text  = "???";
                 _speakerTxt.color = new Color(0.85f, 0.80f, 0.30f);
                 _dialogueTxt.text = "";
                 if (_animCr != null) StopCoroutine(_animCr);
@@ -206,10 +219,12 @@ public class TutorialIntroSceneManager : MonoBehaviour
     void ShowChoices(string[] choices, int nextNode)
     {
         _waitChoice = true;
+        _promptGO.SetActive(false);
         _choicePanel.SetActive(true);
+        string[] prefixes = { "① ", "② " };
         for (int i = 0; i < _choiceBtns.Length && i < choices.Length; i++)
         {
-            _choiceTxts[i].text = choices[i];
+            _choiceTxts[i].text = prefixes[i] + choices[i];
             _choiceBtns[i].gameObject.SetActive(i < choices.Length);
             int n = nextNode;
             _choiceBtns[i].onClick.RemoveAllListeners();
@@ -220,6 +235,13 @@ public class TutorialIntroSceneManager : MonoBehaviour
                 PlayNode(n);
             });
         }
+    }
+
+    void SelectChoice(int idx)
+    {
+        if (!_waitChoice) return;
+        if (idx < _choiceBtns.Length && _choiceBtns[idx].gameObject.activeSelf)
+            _choiceBtns[idx].onClick.Invoke();
     }
 
     // ── Tutorial ───────────────────────────────────────────────────────
@@ -290,11 +312,9 @@ public class TutorialIntroSceneManager : MonoBehaviour
         const float dur = 0.20f;
         float elapsed = 0f;
         var aScaleFrom = _charARt.localScale;
-        var bScaleFrom = _charBRt.localScale;
         var aColFrom   = _charAImg.color;
 
         var aScaleTo = aActive ? ScaleActive   : ScaleInactive;
-        var bScaleTo = aActive ? ScaleInactive : ScaleActive;
         var aColTo   = aActive ? ColA_Active   : ColA_Inactive;
 
         while (elapsed < dur)
@@ -302,13 +322,11 @@ public class TutorialIntroSceneManager : MonoBehaviour
             elapsed += Time.unscaledDeltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / dur);
             _charARt.localScale = Vector3.Lerp(aScaleFrom, aScaleTo, t);
-            _charBRt.localScale = Vector3.Lerp(bScaleFrom, bScaleTo, t);
             _charAImg.color     = Color.Lerp(aColFrom, aColTo, t);
             yield return null;
         }
 
         _charARt.localScale = aScaleTo;
-        _charBRt.localScale = bScaleTo;
         _charAImg.color     = aColTo;
     }
 
@@ -396,9 +414,9 @@ public class TutorialIntroSceneManager : MonoBehaviour
             new Vector2(0.5f, 0.5f), new Vector2(0f, 2f), Vector2.zero);
         lineGO.AddComponent<Image>().color = new Color(0.40f, 0.30f, 0.60f, 0.60f);
 
-        // CharA — JACKDOO (left)
+        // CharA — JACKDOO (center)
         var aGO = Anchored(cGO.transform, "CharA",
-            new Vector2(0.06f, 0.20f), new Vector2(0.38f, 0.98f),
+            new Vector2(0.31f, 0.20f), new Vector2(0.69f, 0.98f),
             new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
         _charARt  = aGO.GetComponent<RectTransform>();
         _charAImg = aGO.AddComponent<Image>();
@@ -409,19 +427,6 @@ public class TutorialIntroSceneManager : MonoBehaviour
             new Vector2(0.5f, 1f), new Vector2(0f, 36f), new Vector2(0f, -4f));
         var aLbl = MakeTMP(aLblGO, "잭두", 18f, TextAlignmentOptions.Center);
         aLbl.color = new Color(0.55f, 1.00f, 0.65f, 0.80f);
-
-        // CharB — 신령님 / player (right, no sprite)
-        var bGO = Anchored(cGO.transform, "CharB",
-            new Vector2(0.62f, 0.20f), new Vector2(0.94f, 0.98f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        _charBRt = bGO.GetComponent<RectTransform>();
-        bGO.AddComponent<Image>().color = Color.clear;
-
-        var bLblGO = Anchored(bGO.transform, "NameB",
-            new Vector2(0f, 0f), new Vector2(1f, 0f),
-            new Vector2(0.5f, 1f), new Vector2(0f, 36f), new Vector2(0f, -4f));
-        var bLbl = MakeTMP(bLblGO, "신령님", 18f, TextAlignmentOptions.Center);
-        bLbl.color = new Color(1.00f, 0.90f, 0.40f, 0.80f);
 
         // Dialogue box
         var dlgBox = Anchored(cGO.transform, "DialogueBox",
@@ -455,39 +460,47 @@ public class TutorialIntroSceneManager : MonoBehaviour
         var skipTxt = MakeTMP(skipGO, "CLICK  /  SPACE  to continue", 13f, TextAlignmentOptions.BottomLeft);
         skipTxt.color = new Color(0.45f, 0.45f, 0.65f, 0.80f);
 
-        // Choice panel
-        _choicePanel = Anchored(cGO.transform, "ChoicePanel",
-            new Vector2(0.25f, 0.23f), new Vector2(0.75f, 0.46f),
+        // Choice panel — inside dialogue box, replaces the text area
+        _choicePanel = Anchored(dlgBox.transform, "ChoicePanel",
+            new Vector2(0.02f, 0.04f), new Vector2(0.98f, 0.60f),
             new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        _choicePanel.AddComponent<Image>().color = new Color(0.04f, 0.03f, 0.10f, 0.92f);
 
         _choiceBtns = new Button[2];
         _choiceTxts = new TextMeshProUGUI[2];
         for (int i = 0; i < 2; i++)
         {
-            float yMin = i == 0 ? 0.55f : 0.05f;
-            float yMax = i == 0 ? 0.95f : 0.45f;
+            float yMin = i == 0 ? 0.52f : 0.02f;
+            float yMax = i == 0 ? 0.98f : 0.48f;
             var btnGO = Anchored(_choicePanel.transform, $"Choice{i}",
-                new Vector2(0.04f, yMin), new Vector2(0.96f, yMax),
+                new Vector2(0.00f, yMin), new Vector2(1.00f, yMax),
                 new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             var btnImg = btnGO.AddComponent<Image>();
-            btnImg.color = new Color(0.12f, 0.08f, 0.20f, 0.90f);
+            btnImg.color = new Color(0.14f, 0.09f, 0.24f, 0.90f);
             var btn = btnGO.AddComponent<Button>();
             var colors = btn.colors;
-            colors.normalColor      = new Color(0.12f, 0.08f, 0.20f, 0.90f);
-            colors.highlightedColor = new Color(0.30f, 0.20f, 0.50f, 1.00f);
-            colors.pressedColor     = new Color(0.50f, 0.30f, 0.80f, 1.00f);
-            btn.colors       = colors;
+            colors.normalColor      = new Color(0.14f, 0.09f, 0.24f, 0.90f);
+            colors.highlightedColor = new Color(0.32f, 0.22f, 0.52f, 1.00f);
+            colors.pressedColor     = new Color(0.52f, 0.32f, 0.82f, 1.00f);
+            btn.colors        = colors;
             btn.targetGraphic = btnImg;
 
             var txtGO = Stretch(btnGO.transform, "BtnText");
-            var txt   = MakeTMP(txtGO, "", 20f, TextAlignmentOptions.Center);
-            txt.color = new Color(0.92f, 0.92f, 1.00f);
+            var txt   = MakeTMP(txtGO, "", 19f, TextAlignmentOptions.MiddleLeft);
+            txt.margin = new Vector4(10f, 0f, 4f, 0f);
+            txt.color  = new Color(0.92f, 0.92f, 1.00f);
 
             _choiceBtns[i] = btn;
             _choiceTxts[i] = txt;
         }
         _choicePanel.SetActive(false);
+
+        // EventSystem for mouse clicks on choice buttons
+        if (UnityEngine.EventSystems.EventSystem.current == null)
+        {
+            var esGO = new GameObject("EventSystem");
+            esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            esGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+        }
 
         // Tutorial panel
         _tutorialPanel = Anchored(cGO.transform, "TutorialPanel",
