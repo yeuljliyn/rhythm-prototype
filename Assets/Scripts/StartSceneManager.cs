@@ -99,6 +99,7 @@ public class StartSceneManager : MonoBehaviour
             img.preserveAspect = true;
         }
         img.color = Color.white;
+        img.alphaHitTestMinimumThreshold = 0.1f;
 
         var btn = go.AddComponent<Button>();
         var cb  = btn.colors;
