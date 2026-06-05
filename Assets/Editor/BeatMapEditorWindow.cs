@@ -466,14 +466,26 @@ public class BeatMapEditorWindow : EditorWindow
 
     void DrawSpaceMarker(float beat, int groupIdx)
     {
-        float x   = (_pattern.introDelay + _pattern.BeatToTime(beat)) * _zoom;
-        bool  sel = (groupIdx == _selGroupIdx && _selInputIdx == -1);
+        bool  sel      = (groupIdx == _selGroupIdx && _selInputIdx == -1);
+        bool  dragging = sel && _isDragging;
+        float drawBeat = dragging ? _dragOriginBeat + _dragBeatDelta : beat;
 
+        float x       = (_pattern.introDelay + _pattern.BeatToTime(drawBeat)) * _zoom;
         Color lineCol = sel ? new Color(1f, 1f, 0.1f) : new Color(1f, 1f, 0.3f, 0.75f);
+
         EditorGUI.DrawRect(new Rect(x - 1f, RULER_H, 2f, LANE_H * LANE_COUNT), lineCol);
         GUI.Label(new Rect(x + 3f, RULER_H + 2f, 28f, 14f), "SPC",
             new GUIStyle(EditorStyles.miniLabel)
                 { normal = { textColor = lineCol }, fontStyle = FontStyle.Bold });
+
+        if (dragging)
+            GUI.Label(new Rect(x + 3f, RULER_H + 18f, 54f, 14f), $"B {drawBeat:F2}",
+                new GUIStyle(EditorStyles.miniLabel)
+                    { normal = { textColor = new Color(1f, 0.9f, 0.1f) }, fontStyle = FontStyle.Bold });
+
+        if (!_isRecording && !_isDragging)
+            EditorGUIUtility.AddCursorRect(
+                new Rect(x - 6f, RULER_H, 14f, LANE_H * LANE_COUNT), MouseCursor.MoveArrow);
     }
 
     void DrawPlayhead(float contentH)
@@ -518,8 +530,13 @@ public class BeatMapEditorWindow : EditorWindow
                     int sg = FindSpaceMarkerNearPixel(mp.x, 8f);
                     if (sg >= 0)
                     {
-                        _selGroupIdx = sg;
-                        _selInputIdx = -1;
+                        _selGroupIdx      = sg;
+                        _selInputIdx      = -1;
+                        _isDragging       = true;
+                        _dragOriginMouseX = mp.x;
+                        _dragOriginBeat   = _pattern.groups[sg].spaceBeat;
+                        _dragBeatDelta    = 0f;
+                        GUIUtility.hotControl = GUIUtility.GetControlID(FocusType.Passive);
                     }
                     else
                     {
@@ -552,7 +569,7 @@ public class BeatMapEditorWindow : EditorWindow
             Repaint();
         }
 
-        else if (e.type == EventType.MouseDrag && _isDragging && _selGroupIdx >= 0 && _selInputIdx >= 0)
+        else if (e.type == EventType.MouseDrag && _isDragging && _selGroupIdx >= 0)
         {
             float deltaPixels = e.mousePosition.x - _dragOriginMouseX;
             float deltaBeat   = deltaPixels / (_zoom * _pattern.BeatInterval);
@@ -575,6 +592,14 @@ public class BeatMapEditorWindow : EditorWindow
                 grp.inputs.Sort((a, b) => a.beat.CompareTo(b.beat));
                 _selInputIdx = grp.inputs.FindIndex(
                     x => x.direction == orig.direction && Mathf.Abs(x.beat - fin) < 0.001f);
+                EditorUtility.SetDirty(_pattern);
+            }
+            else if (_selGroupIdx >= 0 && _selInputIdx == -1 &&
+                     _selGroupIdx < _pattern.groups.Count)
+            {
+                float fin = Mathf.Max(0f, _dragOriginBeat + _dragBeatDelta);
+                Undo.RecordObject(_pattern, "Move Space Marker");
+                _pattern.groups[_selGroupIdx].spaceBeat = fin;
                 EditorUtility.SetDirty(_pattern);
             }
 
@@ -600,6 +625,18 @@ public class BeatMapEditorWindow : EditorWindow
 
             _selGroupIdx = -1;
             _selInputIdx = -1;
+            e.Use();
+            Repaint();
+        }
+        else if (_selInputIdx == -1 &&
+                 (e.keyCode == KeyCode.LeftArrow || e.keyCode == KeyCode.RightArrow))
+        {
+            float grid  = 1f / SnapDivs[_snapIndex];
+            float delta = (e.keyCode == KeyCode.RightArrow ? 1f : -1f) * grid;
+            var   grp   = _pattern.groups[_selGroupIdx];
+            Undo.RecordObject(_pattern, "Nudge Space Marker");
+            grp.spaceBeat = Mathf.Max(0f, grp.spaceBeat + delta);
+            EditorUtility.SetDirty(_pattern);
             e.Use();
             Repaint();
         }
