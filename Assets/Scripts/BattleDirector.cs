@@ -28,6 +28,8 @@ public class BattleDirector : MonoBehaviour
 
         if (FindObjectOfType<BattleTurnUI>() == null)
             gameObject.AddComponent<BattleTurnUI>();
+        if (FindObjectOfType<TurnSpotlightEffect>() == null)
+            gameObject.AddComponent<TurnSpotlightEffect>();
 
         StartCoroutine(RunDirector());
     }

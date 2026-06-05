@@ -6,9 +6,8 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 보스/플레이어 턴 전환을 화면에 명확히 표시.
-/// BattleDirector가 static 메서드(Fire*)를 호출하면 UI가 반응함.
-/// BattleDirector.Start()에서 자동으로 AddComponent됨.
+/// 플레이어 턴 화살표 시퀀스 UI.
+/// 보스 턴 시각 연출은 TurnSpotlightEffect가 담당.
 /// </summary>
 public class BattleTurnUI : MonoBehaviour
 {
@@ -19,11 +18,8 @@ public class BattleTurnUI : MonoBehaviour
     // ArrowDir: Left=0, Right=1, Up=2, Down=3
     static readonly string[] DirChar = { "←", "→", "↑", "↓" };
 
-    TextMeshProUGUI   _bannerText;
-    Image             _bannerBG;
     TextMeshProUGUI[] _arrowLabels;
     GameObject        _arrowRow;
-    Coroutine         _bannerCr;
 
     void Awake()
     {
@@ -64,30 +60,6 @@ public class BattleTurnUI : MonoBehaviour
             parent = go.transform;
         }
 
-        // 배너 배경
-        var bgGO = new GameObject("TurnBannerBG");
-        bgGO.transform.SetParent(parent, false);
-        var bgRT = bgGO.AddComponent<RectTransform>();
-        bgRT.anchorMin = bgRT.anchorMax = new Vector2(0.5f, 0.5f);
-        bgRT.anchoredPosition = new Vector2(0f, 270f);
-        bgRT.sizeDelta = new Vector2(600f, 110f);
-        _bannerBG = bgGO.AddComponent<Image>();
-        _bannerBG.color = Color.clear;
-
-        // 배너 텍스트
-        var textGO = new GameObject("TurnBannerText");
-        textGO.transform.SetParent(bgGO.transform, false);
-        var textRT = textGO.AddComponent<RectTransform>();
-        textRT.anchorMin = Vector2.zero;
-        textRT.anchorMax = Vector2.one;
-        textRT.offsetMin = textRT.offsetMax = Vector2.zero;
-        _bannerText = textGO.AddComponent<TextMeshProUGUI>();
-        _bannerText.fontSize   = 82f;
-        _bannerText.fontStyle  = FontStyles.Bold;
-        _bannerText.alignment  = TextAlignmentOptions.Center;
-        _bannerText.text       = "";
-        _bannerText.raycastTarget = false;
-
         // 방향키 시퀀스 행
         _arrowRow = new GameObject("ArrowRow");
         _arrowRow.transform.SetParent(parent, false);
@@ -104,14 +76,10 @@ public class BattleTurnUI : MonoBehaviour
     void HandleBossTurn()
     {
         _arrowRow.SetActive(false);
-        if (_bannerCr != null) StopCoroutine(_bannerCr);
-        _bannerCr = StartCoroutine(ShowBanner("BOSS TURN", new Color(1f, 0.22f, 0.12f), new Color(0.5f, 0.05f, 0.05f, 0.75f)));
     }
 
     void HandlePlayerTurn(List<DirectionInputEntry> inputs)
     {
-        if (_bannerCr != null) StopCoroutine(_bannerCr);
-        _bannerCr = StartCoroutine(ShowBanner("YOUR TURN!", new Color(0.25f, 1f, 0.45f), new Color(0.05f, 0.35f, 0.12f, 0.75f)));
         RebuildArrows(inputs);
         _arrowRow.SetActive(true);
     }
@@ -171,40 +139,6 @@ public class BattleTurnUI : MonoBehaviour
         if (idx >= _arrowLabels.Length) return;
         _arrowLabels[idx].color    = new Color(1f, 0.95f, 0.15f);
         _arrowLabels[idx].fontSize = 74f;
-    }
-
-    IEnumerator ShowBanner(string text, Color textCol, Color bgCol)
-    {
-        _bannerText.text  = text;
-        _bannerText.color = textCol;
-        _bannerBG.color   = bgCol;
-        _bannerBG.transform.localScale = Vector3.one * 1.4f;
-
-        // 팝인
-        float t = 0f;
-        while (t < 1f)
-        {
-            t += Time.deltaTime / 0.15f;
-            float s = Mathf.Lerp(1.4f, 1f, Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t)));
-            _bannerBG.transform.localScale = Vector3.one * s;
-            yield return null;
-        }
-        _bannerBG.transform.localScale = Vector3.one;
-
-        yield return new WaitForSeconds(0.7f);
-
-        // 페이드 아웃
-        t = 0f;
-        while (t < 1f)
-        {
-            t += Time.deltaTime / 0.3f;
-            float a = 1f - Mathf.Clamp01(t);
-            _bannerText.color = new Color(textCol.r, textCol.g, textCol.b, a);
-            _bannerBG.color   = new Color(bgCol.r,   bgCol.g,   bgCol.b,   bgCol.a * a);
-            yield return null;
-        }
-        _bannerText.text = "";
-        _bannerBG.color  = Color.clear;
     }
 
     IEnumerator HideArrowRowDelayed(float delay)
