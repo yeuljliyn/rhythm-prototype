@@ -68,6 +68,8 @@ public class RhythmManager : MonoBehaviour
     {
         if (_instance == null) Instance = this;
         else if (_instance != this) Destroy(gameObject);
+
+        Time.timeScale = 1f;  // 이전 플레이 세션에서 timeScale=0이 남아있을 경우 초기화
     }
 
     void Start()
