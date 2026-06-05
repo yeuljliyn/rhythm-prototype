@@ -87,7 +87,7 @@ public class BossController : MonoBehaviour
 
     IEnumerator HitShake(JudgementType j)
     {
-        float intensity = j == JudgementType.Perfect ? 0.18f : 0.10f;
+        float intensity = 0.15f;
         float duration  = 0.30f, elapsed = 0f;
         if (_sr != null) _sr.color = ColHit;
         while (elapsed < duration)

@@ -1,6 +1,5 @@
 public enum JudgementType
 {
-    Perfect,
-    Good,
+    Hit,
     Miss
 }

@@ -5,8 +5,7 @@ public enum NoteType { Normal, ArrowLeft, ArrowDown, ArrowUp, ArrowRight }
 
 public class Note : MonoBehaviour
 {
-    public const float PerfectWindow = 0.08f;
-    public const float GoodWindow    = 0.15f;
+    public const float HitWindow = 0.15f;
 
     public float HitTime { get; private set; }
     public bool  IsHit   { get; private set; }
@@ -62,11 +61,11 @@ public class Note : MonoBehaviour
         float diff = RhythmManager.Instance.SongTime - HitTime;
 
         // Note color based on timing
-        if (Mathf.Abs(diff) <= GoodWindow)
+        if (Mathf.Abs(diff) <= HitWindow)
             _sr.color = diff >= 0f
-                ? Color.Lerp(ColNear, ColLate, diff / GoodWindow)
-                : Color.Lerp(ColDefault, ColNear, 1f - Mathf.Abs(diff) / GoodWindow);
-        else if (diff < -GoodWindow)
+                ? Color.Lerp(ColNear, ColLate, diff / HitWindow)
+                : Color.Lerp(ColDefault, ColNear, 1f - Mathf.Abs(diff) / HitWindow);
+        else if (diff < -HitWindow)
             _sr.color = ColDefault;
 
         // Approach ring shrinks based on remaining time to hit
@@ -77,14 +76,13 @@ public class Note : MonoBehaviour
             float ringScale     = Mathf.Lerp(RingStartScale, 1f, progress);
             _ringsr.transform.localScale = Vector3.one * ringScale;
 
-            // Ring color shifts when near hit zone
             float alpha = Mathf.Lerp(0.7f, 0.2f, progress);
-            _ringsr.color = Mathf.Abs(diff) <= GoodWindow
+            _ringsr.color = Mathf.Abs(diff) <= HitWindow
                 ? new Color(1f, 0.85f, 0f, alpha)
                 : new Color(1f, 1f, 1f, alpha);
         }
 
-        if (diff > GoodWindow)
+        if (diff > HitWindow)
             AutoMiss();
     }
 
@@ -99,11 +97,8 @@ public class Note : MonoBehaviour
             : rawSongTime;
 
         float diff = Mathf.Abs((float)adjustedInputTime - HitTime);
-        JudgementType j;
-        if      (diff <= PerfectWindow) j = JudgementType.Perfect;
-        else if (diff <= GoodWindow)    j = JudgementType.Good;
-        else                            return;
-        Resolve(j);
+        if (diff > HitWindow) return;
+        Resolve(JudgementType.Hit);
     }
 
     void AutoMiss() => Resolve(JudgementType.Miss);
@@ -127,9 +122,7 @@ public class Note : MonoBehaviour
         fx.transform.position = new Vector3(_hitZoneX, transform.position.y, 0f);
         var sr = fx.AddComponent<SpriteRenderer>();
         sr.sprite       = CircleSprites.GetCircle();
-        sr.color        = j == JudgementType.Perfect
-            ? new Color(1f, 0.92f, 0.10f)
-            : new Color(0.25f, 1f, 0.45f);
+        sr.color        = new Color(1f, 0.92f, 0.10f);
         sr.sortingOrder = 10;
         fx.AddComponent<HitFX>();
     }

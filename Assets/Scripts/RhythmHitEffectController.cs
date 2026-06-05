@@ -96,9 +96,7 @@ public class RhythmHitEffectController : MonoBehaviour
 
     public void PlayHitEffect(ArrowDir dir, JudgementType j)
     {
-        var cfg = j == JudgementType.Perfect ? _perfect
-                : j == JudgementType.Good    ? _good
-                                             : _miss;
+        var cfg = j == JudgementType.Hit ? _perfect : _miss;
         EmitStream(dir, cfg);
         EmitSparks(cfg);
         if (cfg.showRing && cfg.ringCount > 0) EmitRing(cfg);

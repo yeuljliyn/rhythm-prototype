@@ -41,11 +41,10 @@ public class UIManager : MonoBehaviour
     {
         if (judgementText == null) return;
 
-        string txt;
-        Color  col;
-        if      (type == JudgementType.Perfect) { txt = "PERFECT"; col = new Color(1f, 0.92f, 0.10f); }
-        else if (type == JudgementType.Good)    { txt = "GOOD";    col = new Color(0.20f, 1f, 0.50f); }
-        else                                    { txt = "MISS";    col = new Color(1f, 0.22f, 0.18f); }
+        string txt = type == JudgementType.Hit ? "HIT"  : "MISS";
+        Color  col = type == JudgementType.Hit
+            ? new Color(1f, 0.92f, 0.10f)
+            : new Color(1f, 0.22f, 0.18f);
 
         judgementText.text  = txt;
         judgementText.color = col;

@@ -13,11 +13,10 @@ public class GameManager : MonoBehaviour
     public int Combo    { get; private set; }
     public int MaxCombo { get; private set; }
 
-    public int Perfects { get; private set; }
-    public int Goods    { get; private set; }
-    public int Misses   { get; private set; }
-    public int Total    => Perfects + Goods + Misses;
-    public float Accuracy => Total > 0 ? (float)(Perfects + Goods) / Total : 0f;
+    public int Hits   { get; private set; }
+    public int Misses { get; private set; }
+    public int Total  => Hits + Misses;
+    public float Accuracy => Total > 0 ? (float)Hits / Total : 0f;
 
     public string GetRank()
     {
@@ -42,15 +41,10 @@ public class GameManager : MonoBehaviour
     {
         switch (type)
         {
-            case JudgementType.Perfect:
-                Perfects++;
+            case JudgementType.Hit:
+                Hits++;
                 Combo++;
-                Score += 300 + Combo * 10;
-                break;
-            case JudgementType.Good:
-                Goods++;
-                Combo++;
-                Score += 100 + Combo * 5;
+                Score += 200 + Combo * 10;
                 break;
             case JudgementType.Miss:
                 Misses++;
@@ -66,7 +60,7 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame()
     {
-        Score = Combo = MaxCombo = Perfects = Goods = Misses = 0;
+        Score = Combo = MaxCombo = Hits = Misses = 0;
         OnScoreChanged?.Invoke(Score, Combo);
     }
 }

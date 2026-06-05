@@ -12,8 +12,7 @@ public class BattleDirector : MonoBehaviour
 {
     [SerializeField] PatternData pattern;
 
-    const float PerfectWindow = 0.10f;
-    const float GoodWindow    = 0.20f;
+    const float HitWindow = 0.20f;
 
     List<DirectionInputEntry> _playerExpected;
     List<float>               _playerTimes;
@@ -92,7 +91,7 @@ public class BattleDirector : MonoBehaviour
         if (rm == null) return;
 
         // 타임아웃된 입력 자동 MISS 처리
-        while (_playerIdx < _playerTimes.Count && rm.SongTime > _playerTimes[_playerIdx] + GoodWindow)
+        while (_playerIdx < _playerTimes.Count && rm.SongTime > _playerTimes[_playerIdx] + HitWindow)
         {
             gm?.RegisterJudgement(JudgementType.Miss);
             PlayerDanceAnimator.Instance?.PlayFalldown();
@@ -115,17 +114,10 @@ public class BattleDirector : MonoBehaviour
         float delta        = rm.SongTime - expectedTime;
 
         // 너무 이른 입력은 무시
-        if (delta < -GoodWindow) return;
+        if (delta < -HitWindow) return;
 
         ArrowDir      expectedDir = _playerExpected[_playerIdx].direction;
-        JudgementType j;
-
-        if (dir.Value != expectedDir)
-            j = JudgementType.Miss;
-        else if (Mathf.Abs(delta) <= PerfectWindow)
-            j = JudgementType.Perfect;
-        else
-            j = JudgementType.Good;
+        JudgementType j = (dir.Value == expectedDir) ? JudgementType.Hit : JudgementType.Miss;
 
         gm?.RegisterJudgement(j);
         if (j == JudgementType.Miss)
