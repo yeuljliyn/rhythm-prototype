@@ -25,7 +25,8 @@ public class TurnSpotlightEffect : MonoBehaviour
 
     const float CrossFade       = 0.40f;
     const float PeakAlpha       = 0.72f;
-    const float PeakLightIntens = 1.20f;
+    const float AmbientDim      = 0.35f;  // 스포트라이트 대비용 전체 어둠
+    const float PeakLightIntens = 1.00f;
     const float ConeH           = 5.5f;
     const float ConeW           = 5.0f;
     const float GlowW           = 4.5f;
@@ -34,6 +35,7 @@ public class TurnSpotlightEffect : MonoBehaviour
 
     Spot             _bossSpot;
     Spot             _playerSpot;
+    Light2D          _ambientLight;
     PlayerController _playerCtrl;
     Texture2D        _coneTex;
     Texture2D        _glowTex;
@@ -44,6 +46,14 @@ public class TurnSpotlightEffect : MonoBehaviour
         _glowTex    = BuildGlowTex(128);
         _bossSpot   = CreateSpot("BossSpot",   ColBoss);
         _playerSpot = CreateSpot("PlayerSpot", ColPlayer);
+
+        // 전체 씬 어둠 기반 - 없으면 Light2D 있는 곳만 렌더링됨
+        var ambGO = new GameObject("SpotlightAmbient");
+        ambGO.transform.SetParent(transform);
+        _ambientLight           = ambGO.AddComponent<Light2D>();
+        _ambientLight.lightType = Light2D.LightType.Global;
+        _ambientLight.color     = Color.white;
+        _ambientLight.intensity = AmbientDim;
 
         BattleTurnUI.OnBossTurnBegin   += HandleBoss;
         BattleTurnUI.OnPlayerTurnBegin += HandlePlayer;
@@ -85,7 +95,7 @@ public class TurnSpotlightEffect : MonoBehaviour
         spot.cone.transform.position  = new Vector3(cx, cy + 0.5f + ConeH * 0.5f, 0f);
         spot.glow.transform.position  = new Vector3(cx, cy - 0.7f, 0f);
         if (spot.light != null)
-            spot.light.transform.position = new Vector3(cx, cy + 5f, 0f);
+            spot.light.transform.position = new Vector3(cx, cy + 2.5f, 0f);
     }
 
     void FadeTo(Spot spot, float target, float duration)
