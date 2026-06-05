@@ -343,6 +343,8 @@ public class TutorialIntroSceneManager : MonoBehaviour
 
     IEnumerator LoadLobby()
     {
+        PlayerPrefs.SetInt("tutorial_complete", 1);
+        PlayerPrefs.Save();
         yield return new WaitForSecondsRealtime(0.6f);
         SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
     }
