@@ -1,32 +1,50 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// 보스/플레이어 턴 전환 시 해당 캐릭터 위에 스포트라이트 빛줄기 연출.
+/// 보스/플레이어 턴 동안 해당 캐릭터 위에 스포트라이트 유지.
+/// 턴 전환 시 크로스페이드로 스위치됨.
 /// BattleDirector.Start()에서 AddComponent로 생성됨.
 /// </summary>
 public class TurnSpotlightEffect : MonoBehaviour
 {
+    class Spot
+    {
+        public SpriteRenderer cone;
+        public SpriteRenderer glow;
+        public Light2D        light;
+        public Color          col;
+        public float          currentT;  // 0..1 normalized
+        public Coroutine      cr;
+    }
+
     static readonly Color ColBoss   = new Color(1.00f, 0.80f, 0.30f);
     static readonly Color ColPlayer = new Color(0.30f, 0.80f, 1.00f);
 
-    const float FadeIn    = 0.30f;
-    const float Hold      = 1.50f;
-    const float FadeOut   = 0.80f;
-    const float PeakAlpha = 0.70f;
+    const float CrossFade       = 0.40f;
+    const float PeakAlpha       = 0.72f;
+    const float PeakLightIntens = 1.20f;
+    const float ConeH           = 5.5f;
+    const float ConeW           = 5.0f;
+    const float GlowW           = 4.5f;
+    const float GlowH           = 0.7f;
+    const float LightRadius     = 4.5f;
 
-    SpriteRenderer _cone;
-    SpriteRenderer _glow;
-    Coroutine      _cr;
-    Texture2D      _coneTex;
-    Texture2D      _glowTex;
-
+    Spot             _bossSpot;
+    Spot             _playerSpot;
     PlayerController _playerCtrl;
+    Texture2D        _coneTex;
+    Texture2D        _glowTex;
 
     void Awake()
     {
-        BuildSprites();
+        _coneTex    = BuildConeTex(128, 256);
+        _glowTex    = BuildGlowTex(128);
+        _bossSpot   = CreateSpot("BossSpot",   ColBoss);
+        _playerSpot = CreateSpot("PlayerSpot", ColPlayer);
+
         BattleTurnUI.OnBossTurnBegin   += HandleBoss;
         BattleTurnUI.OnPlayerTurnBegin += HandlePlayer;
     }
@@ -34,6 +52,8 @@ public class TurnSpotlightEffect : MonoBehaviour
     void Start()
     {
         _playerCtrl = FindObjectOfType<PlayerController>();
+        PositionSpot(_bossSpot,   BossController.Instance?.transform);
+        PositionSpot(_playerSpot, _playerCtrl?.transform);
     }
 
     void OnDestroy()
@@ -46,71 +66,89 @@ public class TurnSpotlightEffect : MonoBehaviour
 
     void HandleBoss()
     {
-        var t = BossController.Instance?.transform;
-        if (t != null) Show(t.position, ColBoss);
+        PositionSpot(_bossSpot, BossController.Instance?.transform);
+        FadeTo(_bossSpot,   1f, CrossFade);
+        FadeTo(_playerSpot, 0f, CrossFade);
     }
 
     void HandlePlayer(List<DirectionInputEntry> _)
     {
-        if (_playerCtrl != null) Show(_playerCtrl.transform.position, ColPlayer);
+        PositionSpot(_playerSpot, _playerCtrl?.transform);
+        FadeTo(_playerSpot, 1f, CrossFade);
+        FadeTo(_bossSpot,   0f, CrossFade);
     }
 
-    void Show(Vector3 worldPos, Color col)
+    void PositionSpot(Spot spot, Transform anchor)
     {
-        if (_cr != null) StopCoroutine(_cr);
-        _cr = StartCoroutine(SpotlightRoutine(worldPos, col));
+        if (spot == null || anchor == null) return;
+        float cx = anchor.position.x, cy = anchor.position.y;
+        spot.cone.transform.position  = new Vector3(cx, cy + 0.5f + ConeH * 0.5f, 0f);
+        spot.glow.transform.position  = new Vector3(cx, cy - 0.7f, 0f);
+        if (spot.light != null)
+            spot.light.transform.position = new Vector3(cx, cy + 5f, 0f);
     }
 
-    IEnumerator SpotlightRoutine(Vector3 pos, Color col)
+    void FadeTo(Spot spot, float target, float duration)
     {
-        const float ConeH = 5.0f, ConeW = 3.0f;
-        const float GlowW = 3.5f, GlowH = 0.6f;
+        if (spot.cr != null) StopCoroutine(spot.cr);
+        spot.cr = StartCoroutine(FadeRoutine(spot, target, duration));
+    }
 
-        _cone.transform.position   = new Vector3(pos.x, pos.y + 0.5f + ConeH * 0.5f, 0f);
-        _cone.transform.localScale = new Vector3(ConeW, ConeH, 1f);
-        _glow.transform.position   = new Vector3(pos.x, pos.y - 0.7f, 0f);
-        _glow.transform.localScale = new Vector3(GlowW, GlowH, 1f);
-
-        for (float t = 0f; t < FadeIn; t += Time.deltaTime)
+    IEnumerator FadeRoutine(Spot spot, float target, float duration)
+    {
+        float start = spot.currentT;
+        for (float t = 0f; t < duration; t += Time.deltaTime)
         {
-            SetAlpha(col, t / FadeIn);
+            Apply(spot, Mathf.Lerp(start, target, t / duration));
             yield return null;
         }
-        SetAlpha(col, 1f);
-
-        yield return new WaitForSeconds(Hold);
-
-        for (float t = 0f; t < FadeOut; t += Time.deltaTime)
-        {
-            SetAlpha(col, 1f - t / FadeOut);
-            yield return null;
-        }
-        SetAlpha(col, 0f);
-        _cr = null;
+        Apply(spot, target);
+        spot.cr = null;
     }
 
-    void SetAlpha(Color col, float t)
+    void Apply(Spot spot, float t)
     {
-        float a = t * PeakAlpha;
-        _cone.color = new Color(col.r, col.g, col.b, a);
-        _glow.color = new Color(col.r, col.g, col.b, a * 0.55f);
+        spot.currentT = t;
+        var c = spot.col;
+        spot.cone.color = new Color(c.r, c.g, c.b, t * PeakAlpha);
+        spot.glow.color = new Color(c.r, c.g, c.b, t * PeakAlpha * 0.55f);
+        if (spot.light != null)
+            spot.light.intensity = t * PeakLightIntens;
     }
 
-    // ── 스프라이트 빌드 ──────────────────────────────────────────────────────
+    // ── Spot 생성 ────────────────────────────────────────────────────────────
 
-    void BuildSprites()
+    Spot CreateSpot(string name, Color col)
     {
-        _coneTex = BuildConeTex(128, 256);
-        _glowTex = BuildGlowTex(128);
-        _cone    = MakeSR("SpotlightCone", _coneTex, 1);
-        _glow    = MakeSR("SpotlightGlow", _glowTex, 1);
-        SetAlpha(Color.white, 0f);
+        var root = new GameObject(name);
+        root.transform.SetParent(transform);
+
+        var spot = new Spot { col = col };
+
+        spot.cone = MakeSR(root, "Cone", _coneTex, 1);
+        spot.cone.transform.localScale = new Vector3(ConeW, ConeH, 1f);
+
+        spot.glow = MakeSR(root, "Glow", _glowTex, 1);
+        spot.glow.transform.localScale = new Vector3(GlowW, GlowH, 1f);
+
+        var lightGO = new GameObject("Light2D");
+        lightGO.transform.SetParent(root.transform);
+        var l2d = lightGO.AddComponent<Light2D>();
+        l2d.lightType             = Light2D.LightType.Point;
+        l2d.pointLightInnerRadius = 0f;
+        l2d.pointLightOuterRadius = LightRadius;
+        l2d.color                 = col;
+        l2d.intensity             = 0f;
+        spot.light = l2d;
+
+        Apply(spot, 0f);
+        return spot;
     }
 
-    SpriteRenderer MakeSR(string goName, Texture2D tex, int order)
+    SpriteRenderer MakeSR(GameObject parent, string goName, Texture2D tex, int order)
     {
         var go    = new GameObject(goName);
-        go.transform.SetParent(transform);
+        go.transform.SetParent(parent.transform);
         var sr    = go.AddComponent<SpriteRenderer>();
         sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height),
                                   new Vector2(0.5f, 0.5f), tex.width);
@@ -119,7 +157,9 @@ public class TurnSpotlightEffect : MonoBehaviour
         return sr;
     }
 
-    // 아래가 넓고 위로 좁아지는 빛줄기 콘 텍스처
+    // ── 텍스처 빌드 ──────────────────────────────────────────────────────────
+
+    // 아래(캐릭터)가 넓고 위(하늘)로 갈수록 좁아지는 빛줄기
     static Texture2D BuildConeTex(int w, int h)
     {
         var tex  = new Texture2D(w, h, TextureFormat.RGBA32, false);
@@ -131,22 +171,22 @@ public class TurnSpotlightEffect : MonoBehaviour
             float nx = x * iw;
             float ny = y * ih;  // 0=하단(캐릭터), 1=상단(하늘)
 
-            float halfW = (1f - ny) * 0.44f;
+            float halfW = (1f - ny) * 0.47f;
             if (halfW < 0.001f) { tex.SetPixel(x, y, Color.clear); continue; }
 
             float dx = Mathf.Abs(nx - 0.5f);
             if (dx > halfW) { tex.SetPixel(x, y, Color.clear); continue; }
 
             float edgeT   = 1f - dx / halfW;
-            float heightF = Mathf.Pow(1f - ny, 0.4f);
-            float alpha   = Mathf.Pow(edgeT, 1.5f) * heightF;
+            float heightF = Mathf.Pow(1f - ny, 0.35f);
+            float alpha   = Mathf.Pow(edgeT, 1.3f) * heightF;
             tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
         }
         tex.Apply();
         return tex;
     }
 
-    // 타원형 발밑 글로우 텍스처
+    // 타원형 발밑 글로우
     static Texture2D BuildGlowTex(int size)
     {
         var tex  = new Texture2D(size, size, TextureFormat.RGBA32, false);
