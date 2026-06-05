@@ -121,7 +121,7 @@ public class BattleTurnUI : MonoBehaviour
         if (_arrowLabels == null || idx >= _arrowLabels.Length) return;
 
         Color doneCol = j == JudgementType.Hit
-            ? new Color(1f, 0.90f, 0.10f, 0.65f)
+            ? new Color(0.10f, 0.60f, 1.00f, 0.65f)
             : new Color(1f, 0.18f, 0.12f, 0.65f);
         _arrowLabels[idx].color    = doneCol;
         _arrowLabels[idx].fontSize = 48f;

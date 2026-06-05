@@ -38,16 +38,16 @@ public class RhythmHitEffectController : MonoBehaviour
     [SerializeField] Transform      _playerTransform;
     [SerializeField] SpriteRenderer _playerRenderer;
 
-    [Header("Perfect — 금색 + 청록 영력")]
+    [Header("Hit — 사이버펑크 블루")]
     [SerializeField] HitJudgementConfig _perfect = new HitJudgementConfig
     {
-        streamColor       = new Color(1.00f, 0.85f, 0.10f),
+        streamColor       = new Color(0.10f, 0.60f, 1.00f),
         streamCount       = 30, streamSpeed = 10f, streamSize = 0.22f,
-        sparksColor       = new Color(0.15f, 1.00f, 0.90f),
+        sparksColor       = new Color(0.40f, 0.85f, 1.00f),
         sparksCount       = 20, sparksSpeed = 4f,  sparksSize = 0.14f,
-        ringColor         = new Color(1.00f, 0.92f, 0.35f),
+        ringColor         = new Color(0.05f, 0.50f, 1.00f),
         ringCount         = 22, ringSpeed   = 8f,  ringSize   = 0.42f, showRing = true,
-        charFlashColor    = new Color(1.00f, 0.92f, 0.40f), charFlashDuration = 0.20f,
+        charFlashColor    = new Color(0.30f, 0.70f, 1.00f), charFlashDuration = 0.20f,
         popScale = 1.55f, popDuration = 0.14f
     };
 

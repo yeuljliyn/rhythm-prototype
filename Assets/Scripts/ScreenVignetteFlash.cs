@@ -14,7 +14,7 @@ public class ScreenVignetteFlash : MonoBehaviour
     [SerializeField] float _fadeIn    = 0.05f;
     [SerializeField] float _fadeOut   = 0.18f;
 
-    static readonly Color ColHit  = new Color(1.00f, 0.85f, 0.10f);
+    static readonly Color ColHit  = new Color(0.10f, 0.60f, 1.00f);
     static readonly Color ColMiss = new Color(1.00f, 0.08f, 0.08f);
 
     Image     _img;

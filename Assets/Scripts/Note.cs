@@ -122,7 +122,7 @@ public class Note : MonoBehaviour
         fx.transform.position = new Vector3(_hitZoneX, transform.position.y, 0f);
         var sr = fx.AddComponent<SpriteRenderer>();
         sr.sprite       = CircleSprites.GetCircle();
-        sr.color        = new Color(1f, 0.92f, 0.10f);
+        sr.color        = new Color(0.10f, 0.60f, 1.00f);
         sr.sortingOrder = 10;
         fx.AddComponent<HitFX>();
     }
