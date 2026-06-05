@@ -26,6 +26,10 @@ public class BattleDirector : MonoBehaviour
         if (pattern == null)
             pattern = RhythmManager.Instance != null ? RhythmManager.Instance.Pattern : null;
         if (pattern == null || pattern.groups == null || pattern.groups.Count == 0) return;
+
+        if (FindObjectOfType<BattleTurnUI>() == null)
+            gameObject.AddComponent<BattleTurnUI>();
+
         StartCoroutine(RunDirector());
     }
 
@@ -47,6 +51,7 @@ public class BattleDirector : MonoBehaviour
 
             // ── 보스 턴 ──────────────────────────────────
             StockChartBackground.SetTurn(false);
+            BattleTurnUI.FireBossTurn();
 
             foreach (var input in group.inputs)
             {
@@ -72,6 +77,8 @@ public class BattleDirector : MonoBehaviour
             _playerTurnDone = false;
             _playerTurn     = true;
 
+            BattleTurnUI.FirePlayerTurn(_playerExpected);
+
             while (!_playerTurnDone) yield return null;
         }
     }
@@ -86,6 +93,7 @@ public class BattleDirector : MonoBehaviour
         while (_playerIdx < _playerTimes.Count && rm.SongTime > _playerTimes[_playerIdx] + GoodWindow)
         {
             gm?.RegisterJudgement(JudgementType.Miss);
+            BattleTurnUI.FirePlayerStep(_playerIdx, JudgementType.Miss);
             _playerIdx++;
         }
 
@@ -118,6 +126,7 @@ public class BattleDirector : MonoBehaviour
         gm?.RegisterJudgement(j);
         if (j != JudgementType.Miss)
             BossController.Instance?.TakeDamage(j);
+        BattleTurnUI.FirePlayerStep(_playerIdx, j);
 
         _playerIdx++;
         if (_playerIdx >= _playerTimes.Count)
