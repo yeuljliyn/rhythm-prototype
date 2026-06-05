@@ -45,6 +45,7 @@ public class SceneTransitionManager : MonoBehaviour
     public void LoadSceneWithFade(string sceneName)
     {
         if (_isTransitioning) return;
+        Time.timeScale = 1f;
         StartCoroutine(FadeOutThenLoad(sceneName));
     }
 
