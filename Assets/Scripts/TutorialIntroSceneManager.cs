@@ -112,7 +112,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
     AudioClip   _blipClip;
 
     // ── Lifecycle ──────────────────────────────────────────────────────
-    void Start()
+    IEnumerator Start()
     {
         Time.timeScale = 1f;
         BuildUI();
@@ -122,6 +122,12 @@ public class TutorialIntroSceneManager : MonoBehaviour
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; _charAImg.color = ColA_Inactive; }
 
         _charARt.localScale = ScaleInactive;
+
+        var tm = SceneTransitionManager.Instance;
+        if (tm != null)
+            while (tm.IsTransitioning)
+                yield return null;
+        yield return null;
 
         PlayNode(0);
     }

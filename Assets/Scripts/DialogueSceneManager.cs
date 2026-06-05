@@ -83,6 +83,7 @@ public class DialogueSceneManager : MonoBehaviour
         if (tm != null)
             while (tm.IsTransitioning)
                 yield return null;
+        yield return null;
 
         PlayLine(0);
     }
