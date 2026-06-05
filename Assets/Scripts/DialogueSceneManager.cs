@@ -78,13 +78,18 @@ public class DialogueSceneManager : MonoBehaviour
         _charAImg.color     = ColA_Inactive;
         _charBImg.color     = ColB_Inactive;
 
-        // 페이드 인이 끝난 후 대사 시작
+        // 페이드 중에 TMP 폰트 아틀라스 선제 빌드 (페이드 완료 후 첫 글자 stutter 방지)
+        _speakerTxt.text  = Script[0].Speaker == Speaker.A ? NameA : NameB;
+        _dialogueTxt.text = Script[0].Text;
+        Canvas.ForceUpdateCanvases();
+
         var tm = SceneTransitionManager.Instance;
         if (tm != null)
             while (tm.IsTransitioning)
                 yield return null;
-        yield return null;
 
+        _speakerTxt.text  = "";
+        _dialogueTxt.text = "";
         PlayLine(0);
     }
 

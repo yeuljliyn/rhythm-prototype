@@ -123,12 +123,18 @@ public class TutorialIntroSceneManager : MonoBehaviour
 
         _charARt.localScale = ScaleInactive;
 
+        // 페이드 중에 TMP 폰트 아틀라스 선제 빌드 (페이드 완료 후 첫 글자 stutter 방지)
+        _speakerTxt.text  = Nodes[0].Speaker;
+        _dialogueTxt.text = Nodes[0].Text;
+        Canvas.ForceUpdateCanvases();
+
         var tm = SceneTransitionManager.Instance;
         if (tm != null)
             while (tm.IsTransitioning)
                 yield return null;
-        yield return null;
 
+        _speakerTxt.text  = "";
+        _dialogueTxt.text = "";
         PlayNode(0);
     }
 
