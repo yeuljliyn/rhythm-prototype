@@ -10,7 +10,7 @@ public class ScreenVignetteFlash : MonoBehaviour
 {
     public static ScreenVignetteFlash Instance { get; private set; }
 
-    [SerializeField] float _peakAlpha = 0.58f;
+    [SerializeField] float _peakAlpha = 0.80f;
     [SerializeField] float _fadeIn    = 0.05f;
     [SerializeField] float _fadeOut   = 0.42f;
 
@@ -112,7 +112,7 @@ public class ScreenVignetteFlash : MonoBehaviour
                 float nx       = x * inv;
                 float ny       = y * inv;
                 float edgeDist = Mathf.Min(Mathf.Min(nx, 1f - nx), Mathf.Min(ny, 1f - ny));
-                float alpha    = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(edgeDist / 0.22f));
+                float alpha    = Mathf.Exp(-edgeDist / 0.045f);
                 tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
             }
         }
