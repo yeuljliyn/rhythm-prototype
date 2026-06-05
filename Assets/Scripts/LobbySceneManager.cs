@@ -48,8 +48,9 @@ public class LobbySceneManager : MonoBehaviour
     [SerializeField] Sprite _leftArrowSprite;
     [SerializeField] Sprite _rightArrowSprite;
     [SerializeField] Sprite _notPlayedSprite;
-    [SerializeField] Sprite[] _stageIconSprites;  // index 0-4 (stage 1-5)
-    [SerializeField] Sprite[] _stageBossSprites;  // index 0-4 (stage 1-5)
+    [SerializeField] Sprite[] _stageIconSprites;   // index 0-4 (stage 1-5)
+    [SerializeField] Sprite[] _stageBossSprites;   // index 0-4 (stage 1-5)
+    [SerializeField] Sprite[] _stageLockedSprites; // index 0-4 (stage 2-5만 사용, index 1=지박령, 2=총각귀신, 3=처녀귀신, 4=달걀귀신)
     [SerializeField] Sprite _rankS;
     [SerializeField] Sprite _rankA;
     [SerializeField] Sprite _rankB;
@@ -69,6 +70,7 @@ public class LobbySceneManager : MonoBehaviour
     Image           _rankStatusImgSmall;  // 고정 크기 (S/A/B/C 랭크)
     Image           _bossImgFull;         // 풀스크린 오버레이 (모든 스테이지)
     GameObject      _lockedOverlayFull;
+    Image           _lockedImg;           // 스테이지별 잠금 이미지
     CanvasGroup     _leftArrowCG;
     CanvasGroup     _rightArrowCG;
 
@@ -187,7 +189,23 @@ public class LobbySceneManager : MonoBehaviour
         }
 
         // Lock
-        _lockedOverlayFull.SetActive(idx >= _unlockedCount);
+        bool locked = idx >= _unlockedCount;
+        _lockedOverlayFull.SetActive(locked);
+        if (locked)
+        {
+            var lockedSpr = (_stageLockedSprites != null && idx < _stageLockedSprites.Length)
+                            ? _stageLockedSprites[idx] : null;
+            if (lockedSpr != null)
+            {
+                _lockedImg.sprite = lockedSpr;
+                _lockedImg.color  = Color.white;
+            }
+            else
+            {
+                _lockedImg.sprite = null;
+                _lockedImg.color  = new Color(0f, 0f, 0f, 0.78f);
+            }
+        }
 
         // Arrow fade
         if (_leftArrowCG  != null) { _leftArrowCG.alpha  = idx > 0                    ? 1f : 0.25f; _leftArrowCG.interactable  = idx > 0; }
@@ -277,8 +295,10 @@ public class LobbySceneManager : MonoBehaviour
         bossBtnFull.onClick.AddListener(() => TryStart(_selectedIdx));
 
         _lockedOverlayFull = MakeStretch(bossFullGO.transform, "LockedOverlayFull");
-        _lockedOverlayFull.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.78f);
-        AddLockLabel(_lockedOverlayFull.transform);
+        _lockedImg               = _lockedOverlayFull.AddComponent<Image>();
+        _lockedImg.type          = Image.Type.Simple;
+        _lockedImg.preserveAspect = false;
+        _lockedImg.raycastTarget = false;
 
         // Left arrow
         var leftGO  = MakeAnchored(cGO.transform, "LeftArrow",
@@ -525,22 +545,6 @@ public class LobbySceneManager : MonoBehaviour
         rect.sizeDelta        = sizeDelta;
         rect.anchoredPosition = anchoredPos;
         return go;
-    }
-
-    static void AddLockLabel(Transform parent)
-    {
-        var go   = new GameObject("LockLabel");
-        go.transform.SetParent(parent, false);
-        var rect = go.AddComponent<RectTransform>();
-        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
-        rect.offsetMin = rect.offsetMax = Vector2.zero;
-        var txt = go.AddComponent<TextMeshProUGUI>();
-        txt.text          = "LOCKED";
-        txt.fontSize      = 46f;
-        txt.fontStyle     = FontStyles.Bold;
-        txt.alignment     = TextAlignmentOptions.Center;
-        txt.color         = new Color(0.85f, 0.85f, 0.85f, 0.90f);
-        txt.raycastTarget = false;
     }
 
     static void AddLabel(Transform parent, string text, float fontSize, Color color)
