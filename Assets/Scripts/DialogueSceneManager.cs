@@ -70,7 +70,7 @@ public class DialogueSceneManager : MonoBehaviour
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; }
 
-        var spriteB = Resources.Load<Sprite>("물귀신_배경제거");
+        var spriteB = Resources.Load<Sprite>("광대물귀신_배경제거");
         if (spriteB != null) { _charBImg.sprite = spriteB; _charBImg.preserveAspect = true; }
 
         // Set initial state: both characters at inactive scale/color
