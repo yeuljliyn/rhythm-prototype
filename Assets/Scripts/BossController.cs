@@ -10,11 +10,12 @@ public class BossController : MonoBehaviour
         private set { _instance = value; }
     }
 
-    SpriteRenderer _sr;
-    Sprite[]       _dirSprites;   // 상(0) 하(1) 좌(2) 우(3)
-    Vector3        _basePos;
-    Coroutine      _shakeRoutine;
-    Coroutine      _beatCycleCr;
+    SpriteRenderer     _sr;
+    Sprite[]           _dirSprites;   // 상(0) 하(1) 좌(2) 우(3)
+    Vector3            _basePos;
+    Coroutine          _shakeRoutine;
+    Coroutine          _beatCycleCr;
+    BossDirectionEffect _dirEffect;
 
     static readonly Color ColHit = new Color(1.00f, 0.25f, 0.10f);
 
@@ -24,7 +25,8 @@ public class BossController : MonoBehaviour
 
     void Start()
     {
-        _basePos = transform.position;
+        _basePos   = transform.position;
+        _dirEffect = GetComponent<BossDirectionEffect>();
         _sr = GetComponent<SpriteRenderer>() ?? gameObject.AddComponent<SpriteRenderer>();
         _sr.sortingOrder = 3;
 
@@ -58,6 +60,7 @@ public class BossController : MonoBehaviour
         if (_dirSprites == null || _dirSprites.Length < 4) return;
         int idx = dir == ArrowDir.Up ? 0 : dir == ArrowDir.Down ? 1 : dir == ArrowDir.Left ? 2 : 3;
         if (_sr != null && _dirSprites[idx] != null) _sr.sprite = _dirSprites[idx];
+        _dirEffect?.PlayEffect(dir);
     }
 
     IEnumerator BeatCycleDirections()
