@@ -95,6 +95,7 @@ public class BattleDirector : MonoBehaviour
         while (_playerIdx < _playerTimes.Count && rm.SongTime > _playerTimes[_playerIdx] + GoodWindow)
         {
             gm?.RegisterJudgement(JudgementType.Miss);
+            PlayerDanceAnimator.Instance?.PlayFalldown();
             BattleTurnUI.FirePlayerStep(_playerIdx, JudgementType.Miss);
             _playerIdx++;
         }
@@ -127,7 +128,7 @@ public class BattleDirector : MonoBehaviour
 
         gm?.RegisterJudgement(j);
         if (j == JudgementType.Miss)
-            BossController.Instance?.PlayFalldown();
+            PlayerDanceAnimator.Instance?.PlayFalldown();
         else
             BossController.Instance?.TakeDamage(j);
         BattleTurnUI.FirePlayerStep(_playerIdx, j);

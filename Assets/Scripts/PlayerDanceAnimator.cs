@@ -4,33 +4,64 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class PlayerDanceAnimator : MonoBehaviour
 {
+    public static PlayerDanceAnimator Instance { get; private set; }
+
     SpriteRenderer _sr;
     Sprite[]       _idleFrames;
-    Sprite[]       _dirFrames;   // 상(0) 하(1) 좌(2) 우(3)
+    Sprite[]       _dirFrames;      // 상(0) 하(1) 좌(2) 우(3)
+    Sprite[]       _falldownFrames; // 0: 쓰러지는 중, 1: 완전히 넘어짐
 
     const float IdleFps = 6f;
 
     Coroutine _idleCr;
     Coroutine _dirCr;
+    Coroutine _falldownCr;
 
     void Awake()
     {
+        Instance = this;
         _sr = GetComponent<SpriteRenderer>();
     }
+
+    void OnDestroy() { if (Instance == this) Instance = null; }
 
     void Start()
     {
         var anim = GetComponent<Animator>();
         if (anim != null) anim.enabled = false;
 
-        _idleFrames = Resources.LoadAll<Sprite>("잭두_춤1");
-        _dirFrames  = Resources.LoadAll<Sprite>("잭두_상하좌우");
+        _idleFrames     = Resources.LoadAll<Sprite>("잭두_춤1");
+        _dirFrames      = Resources.LoadAll<Sprite>("잭두_상하좌우");
+        _falldownFrames = Resources.LoadAll<Sprite>("JACKDO_falldown");
 
         if (_idleFrames != null && _idleFrames.Length > 0)
         {
             _sr.sprite = _idleFrames[0];
             _idleCr    = StartCoroutine(IdleLoop());
         }
+    }
+
+    public void PlayFalldown()
+    {
+        if (_falldownCr != null) return;
+        if (_idleCr  != null) { StopCoroutine(_idleCr);  _idleCr  = null; }
+        if (_dirCr   != null) { StopCoroutine(_dirCr);   _dirCr   = null; }
+        _falldownCr = StartCoroutine(FalldownRoutine());
+    }
+
+    IEnumerator FalldownRoutine()
+    {
+        if (_falldownFrames != null && _falldownFrames.Length >= 2)
+        {
+            _sr.sprite = _falldownFrames[0];
+            yield return new WaitForSeconds(0.15f);
+            _sr.sprite = _falldownFrames[1];
+            yield return new WaitForSeconds(0.6f);
+        }
+
+        _falldownCr = null;
+        if (_idleFrames != null && _idleFrames.Length > 0)
+            _idleCr = StartCoroutine(IdleLoop());
     }
 
     // 상=0, 하=1, 좌=2, 우=3
