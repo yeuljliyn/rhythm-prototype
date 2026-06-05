@@ -122,7 +122,6 @@ public class TutorialIntroSceneManager : MonoBehaviour
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; _charAImg.color = ColA_Inactive; }
 
         _charARt.localScale = ScaleInactive;
-        _charBRt.localScale = ScaleInactive;
 
         PlayNode(0);
     }
@@ -485,7 +484,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
             btn.targetGraphic = btnImg;
 
             var txtGO = Stretch(btnGO.transform, "BtnText");
-            var txt   = MakeTMP(txtGO, "", 19f, TextAlignmentOptions.MiddleLeft);
+            var txt   = MakeTMP(txtGO, "", 19f, TextAlignmentOptions.MidlineLeft);
             txt.margin = new Vector4(10f, 0f, 4f, 0f);
             txt.color  = new Color(0.92f, 0.92f, 1.00f);
 
