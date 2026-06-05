@@ -101,10 +101,11 @@ public class TutorialIntroSceneManager : MonoBehaviour
 
     // ── State ──────────────────────────────────────────────────────────
     int       _nodeIdx    = 0;
-    bool      _typing     = false;
-    bool      _skipReq    = false;
-    bool      _waitChoice = false;
-    bool      _inTutorial = false;
+    bool      _typing       = false;
+    bool      _skipReq      = false;
+    bool      _waitChoice   = false;
+    bool      _inTutorial   = false;
+    bool      _nameRevealed = false;
     Coroutine _typeCr;
     Coroutine _animCr;
     Coroutine _tutCr;
@@ -168,6 +169,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
     // ── Node logic ─────────────────────────────────────────────────────
     void PlayNode(int idx)
     {
+        if (idx > 8) _nameRevealed = true;
         _nodeIdx = idx;
         var node = Nodes[idx];
 
@@ -195,7 +197,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
                 break;
 
             case NodeType.Choice:
-                _speakerTxt.text  = "???";
+                _speakerTxt.text  = _nameRevealed ? "신령님" : "???";
                 _speakerTxt.color = new Color(0.85f, 0.80f, 0.30f);
                 _dialogueTxt.text = "";
                 if (_animCr != null) StopCoroutine(_animCr);
