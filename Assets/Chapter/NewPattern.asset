@@ -17,59 +17,33 @@ MonoBehaviour:
   bpm: 128
   introDelay: 2
   groups:
-  - spaceBeat: 4.51821
+  - spaceBeat: 13.017007
     inputs:
     - direction: 0
-      beat: 1.6903208
+      beat: 4.9210196
     - direction: 2
-      beat: 2.104777
+      beat: 6.915698
     - direction: 1
-      beat: 2.616305
+      beat: 9.011197
     - direction: 3
-      beat: 3.3047354
-    - direction: 0
-      beat: 4.0104547
-  - spaceBeat: 11.96858
+      beat: 11.124182
+  - spaceBeat: 32.96262
     inputs:
     - direction: 0
-      beat: 9.318539
+      beat: 25.046562
     - direction: 2
-      beat: 9.687212
+      beat: 26.91736
     - direction: 1
-      beat: 10.200987
+      beat: 29.014957
     - direction: 3
-      beat: 10.824451
-    - direction: 0
-      beat: 11.289443
-  - spaceBeat: 20.966679
+      beat: 30.87054
+  - spaceBeat: 52.902798
     inputs:
     - direction: 0
-      beat: 17.368143
+      beat: 45.113846
     - direction: 2
-      beat: 17.801525
+      beat: 46.970173
     - direction: 1
-      beat: 18.37667
+      beat: 48.978886
     - direction: 3
-      beat: 19.733662
-  - spaceBeat: 32.185646
-    inputs:
-    - direction: 0
-      beat: 27.22802
-    - direction: 2
-      beat: 28.056149
-    - direction: 1
-      beat: 29.094767
-    - direction: 3
-      beat: 30.08831
-    - direction: 0
-      beat: 31.077604
-  - spaceBeat: 41.046524
-    inputs:
-    - direction: 0
-      beat: 37.45139
-    - direction: 2
-      beat: 38.12046
-    - direction: 1
-      beat: 39.04902
-    - direction: 3
-      beat: 40.03973
+      beat: 50.96747
