@@ -96,6 +96,7 @@ public class BattleDirector : MonoBehaviour
         {
             gm?.RegisterJudgement(JudgementType.Miss);
             PlayerDanceAnimator.Instance?.PlayFalldown();
+            RhythmHitEffectController.Instance?.PlayHitEffect(_playerExpected[_playerIdx].direction, JudgementType.Miss);
             BattleTurnUI.FirePlayerStep(_playerIdx, JudgementType.Miss);
             _playerIdx++;
         }
@@ -131,6 +132,7 @@ public class BattleDirector : MonoBehaviour
             PlayerDanceAnimator.Instance?.PlayFalldown();
         else
             BossController.Instance?.TakeDamage(j);
+        RhythmHitEffectController.Instance?.PlayHitEffect(dir.Value, j);
         BattleTurnUI.FirePlayerStep(_playerIdx, j);
 
         _playerIdx++;
