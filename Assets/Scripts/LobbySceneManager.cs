@@ -175,21 +175,29 @@ public class LobbySceneManager : MonoBehaviour
             _rankStatusImgSmall.color  = Color.white;
         }
 
-        // Boss — 모든 스테이지 풀스크린
+        // Lock 먼저 계산
+        bool locked = idx >= _unlockedCount;
+
+        // Boss — 해금된 스테이지만 표시, 잠긴 스테이지는 숨김
         var bossSpr = (_stageBossSprites != null && idx < _stageBossSprites.Length) ? _stageBossSprites[idx] : null;
-        if (bossSpr != null)
+        if (!locked)
         {
-            _bossImgFull.sprite = bossSpr;
-            _bossImgFull.color  = Color.white;
+            if (bossSpr != null)
+            {
+                _bossImgFull.sprite = bossSpr;
+                _bossImgFull.color  = Color.white;
+            }
+            else
+            {
+                _bossImgFull.sprite = null;
+                _bossImgFull.color  = StageCharColors[idx];
+            }
         }
         else
         {
             _bossImgFull.sprite = null;
-            _bossImgFull.color  = StageCharColors[idx];
+            _bossImgFull.color  = Color.clear;
         }
-
-        // Lock
-        bool locked = idx >= _unlockedCount;
         _lockedOverlayFull.SetActive(locked);
         if (locked)
         {
