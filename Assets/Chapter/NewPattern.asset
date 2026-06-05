@@ -17,7 +17,7 @@ MonoBehaviour:
   bpm: 128
   introDelay: 2
   groups:
-  - spaceBeat: 13.017007
+  - spaceBeat: 13.25
     inputs:
     - direction: 0
       beat: 4.9210196
@@ -26,7 +26,7 @@ MonoBehaviour:
     - direction: 1
       beat: 9.011197
     - direction: 3
-      beat: 11.124182
+      beat: 10.75
   - spaceBeat: 32.96262
     inputs:
     - direction: 0

@@ -298,7 +298,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d5dd28bb4aeb6b04d9fb639fc1ebb710, type: 3}
   - {fileID: 21300000, guid: ac43bc9fdef761d4981cd8e136e6eb0d, type: 3}
   _stageBossSprites:
-  - {fileID: 21300000, guid: 99c930db4090138448c677a81995cc7a, type: 3}
+  - {fileID: 21300000, guid: 75f77de1c0715264ea7343c46628c8ce, type: 3}
   - {fileID: 21300000, guid: 78e90bb581a93eb4189dca086ad3eb2d, type: 3}
   - {fileID: 21300000, guid: 479972f3127d5054e96ffa11249f238c, type: 3}
   - {fileID: 21300000, guid: cac9a84bb1a0d764b85c14d9e4e79d19, type: 3}
