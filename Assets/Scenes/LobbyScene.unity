@@ -303,6 +303,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 479972f3127d5054e96ffa11249f238c, type: 3}
   - {fileID: 21300000, guid: cac9a84bb1a0d764b85c14d9e4e79d19, type: 3}
   - {fileID: 21300000, guid: 3a24c8439797fee46bd42b1e45a6230d, type: 3}
+  _stageLockedSprites:
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 2eca0468afb42ac4eab217827e65806c, type: 3}
+  - {fileID: 21300000, guid: a337169eaae021948b0031dd5b6dcb14, type: 3}
+  - {fileID: 21300000, guid: 12168f8994ab24a4c89c2b8450ea51f9, type: 3}
+  - {fileID: 21300000, guid: c32549701d071294890926df096614ce, type: 3}
   _rankS: {fileID: 21300000, guid: 92dd17bc6b5d2ca41b8fa89b2496392d, type: 3}
   _rankA: {fileID: 21300000, guid: 748ca698e44b5674f8b9a2742071ad40, type: 3}
   _rankB: {fileID: 21300000, guid: 51feae6e55c699147b61ad240eafd7f0, type: 3}
