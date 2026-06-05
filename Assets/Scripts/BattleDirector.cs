@@ -126,7 +126,9 @@ public class BattleDirector : MonoBehaviour
             j = JudgementType.Good;
 
         gm?.RegisterJudgement(j);
-        if (j != JudgementType.Miss)
+        if (j == JudgementType.Miss)
+            BossController.Instance?.PlayFalldown();
+        else
             BossController.Instance?.TakeDamage(j);
         BattleTurnUI.FirePlayerStep(_playerIdx, j);
 
