@@ -112,7 +112,7 @@ public class StartSceneManager : MonoBehaviour
     void OnStart()
     {
         SettingsManager.Instance?.Close();
-        SceneManager.LoadScene("LobbyScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
     }
     void OnBonus()    => SettingsManager.Instance?.Open(1);
     void OnSettings() => SettingsManager.Instance?.Open();

@@ -206,8 +206,8 @@ public class DialogueSceneManager : MonoBehaviour
 
     IEnumerator FinishDialogue()
     {
-        yield return new WaitForSeconds(0.6f);
-        SceneManager.LoadScene("BattleScene");
+        yield return new WaitForSecondsRealtime(0.6f);
+        SceneTransitionManager.Instance.LoadSceneWithFade("BattleScene");
     }
 
     // ── Voice (Animal Crossing-style gibberish) ───────────────────────────

@@ -137,7 +137,7 @@ public class LobbySceneManager : MonoBehaviour
         PlayerPrefs.SetInt("current_stage", idx);
         PlayerPrefs.Save();
         SettingsManager.Instance?.Close();
-        SceneManager.LoadScene("DialogueScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("DialogueScene");
     }
 
     // ── Stage view refresh ────────────────────────────────────────────────
@@ -369,7 +369,7 @@ public class LobbySceneManager : MonoBehaviour
         backCols.highlightedColor = new Color(1f, 1f, 1f, 0.6f);
         backCols.pressedColor     = new Color(0.7f, 0.7f, 0.7f);
         backBtn.colors = backCols;
-        backBtn.onClick.AddListener(() => { SFXManager.PlayBack(); SceneManager.LoadScene("StartScene"); });
+        backBtn.onClick.AddListener(() => { SFXManager.PlayBack(); SceneTransitionManager.Instance.LoadSceneWithFade("StartScene"); });
 
         // Mugu button (bottom-right)
         var muguGO  = MakeAnchored(cGO.transform, "MuguButton",

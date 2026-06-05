@@ -122,13 +122,13 @@ public class PauseMenuManager : MonoBehaviour
     void OnRetry()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("BattleScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("BattleScene");
     }
 
     void OnLobby()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("LobbyScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

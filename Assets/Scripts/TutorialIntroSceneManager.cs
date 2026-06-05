@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
@@ -345,7 +344,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
     IEnumerator LoadLobby()
     {
         yield return new WaitForSecondsRealtime(0.6f);
-        SceneManager.LoadScene("LobbyScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
     }
 
     // ── Voice ──────────────────────────────────────────────────────────

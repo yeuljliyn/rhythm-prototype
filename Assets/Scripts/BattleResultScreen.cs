@@ -122,7 +122,7 @@ public class BattleResultScreen : MonoBehaviour
         {
             SFXManager.PlayConfirm();
             Time.timeScale = 1f;
-            SceneManager.LoadScene("LobbyScene");
+            SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
         });
 
         yield return null;
