@@ -14,6 +14,7 @@ public class BossController : MonoBehaviour
     Sprite[]       _dirSprites;   // 상(0) 하(1) 좌(2) 우(3)
     Vector3        _basePos;
     Coroutine      _shakeRoutine;
+    Coroutine      _beatCycleCr;
 
     static readonly Color ColHit = new Color(1.00f, 0.25f, 0.10f);
 
@@ -35,12 +36,12 @@ public class BossController : MonoBehaviour
         }
 
         transform.localScale = Vector3.one * 2.5f;
-        StartCoroutine(BeatCycleDirections());
+        _beatCycleCr = StartCoroutine(BeatCycleDirections());
     }
 
-    // Called by BattleDirector to show a specific direction during boss turn
     public void ShowDirection(ArrowDir dir)
     {
+        if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
         if (_dirSprites == null || _dirSprites.Length < 4) return;
         int idx = dir == ArrowDir.Up ? 0 : dir == ArrowDir.Down ? 1 : dir == ArrowDir.Left ? 2 : 3;
         if (_sr != null && _dirSprites[idx] != null) _sr.sprite = _dirSprites[idx];
