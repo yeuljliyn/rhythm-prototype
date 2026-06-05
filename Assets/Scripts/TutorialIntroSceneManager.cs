@@ -114,6 +114,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
     // ── Lifecycle ──────────────────────────────────────────────────────
     void Start()
     {
+        Time.timeScale = 1f;
         BuildUI();
         BuildVoice();
 
@@ -235,7 +236,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
         _ddalText.text   = "";
         _tutHintTxt.text = "";
 
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSecondsRealtime(0.8f);
 
         _ddalText.text   = "딱!";
         _tutHintTxt.text = "Space를 누르세요!";
@@ -246,7 +247,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
 
         while (elapsed < window)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             var kb = Keyboard.current;
             if (kb != null && kb.spaceKey.wasPressedThisFrame)
             {
@@ -259,7 +260,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
         _tutorialPanel.SetActive(false);
         _inTutorial = false;
 
-        yield return new WaitForSeconds(0.15f);
+        yield return new WaitForSecondsRealtime(0.15f);
         PlayNode(hit ? onSuccess : onFail);
     }
 
@@ -276,7 +277,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
             _dialogueTxt.text += c;
             if (c != ' ' && c != '.' && c != ',' && c != '!' && c != '?' && c != '\n' && c != '\'')
                 PlayBlip(c, isA);
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSecondsRealtime(delay);
         }
 
         _typing = false;
@@ -298,7 +299,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
 
         while (elapsed < dur)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / dur);
             _charARt.localScale = Vector3.Lerp(aScaleFrom, aScaleTo, t);
             _charBRt.localScale = Vector3.Lerp(bScaleFrom, bScaleTo, t);
@@ -316,7 +317,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
         var txt = _promptGO.GetComponent<TextMeshProUGUI>();
         while (_promptGO.activeSelf)
         {
-            float a = 0.4f + 0.6f * Mathf.Abs(Mathf.Sin(Time.time * 3.5f));
+            float a = 0.4f + 0.6f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 3.5f));
             if (txt != null) txt.color = new Color(0.75f, 0.75f, 1f, a);
             yield return null;
         }
@@ -324,7 +325,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
 
     IEnumerator LoadLobby()
     {
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSecondsRealtime(0.6f);
         SceneManager.LoadScene("LobbyScene");
     }
 
