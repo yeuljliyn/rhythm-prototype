@@ -10,9 +10,9 @@ public class ScreenVignetteFlash : MonoBehaviour
 {
     public static ScreenVignetteFlash Instance { get; private set; }
 
-    [SerializeField] float _peakAlpha = 0.80f;
+    [SerializeField] float _peakAlpha = 0.40f;
     [SerializeField] float _fadeIn    = 0.05f;
-    [SerializeField] float _fadeOut   = 0.42f;
+    [SerializeField] float _fadeOut   = 0.18f;
 
     static readonly Color ColHit  = new Color(1.00f, 0.85f, 0.10f);
     static readonly Color ColMiss = new Color(1.00f, 0.08f, 0.08f);
