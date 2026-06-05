@@ -30,7 +30,7 @@ public class GaugeManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    void Start() => BuildSegmentedBar();
+    void Start() { }  // Gauge bar removed
 
     /// <summary>Called by CommandSystem on a successful command.</summary>
     public void FillFromCommand()

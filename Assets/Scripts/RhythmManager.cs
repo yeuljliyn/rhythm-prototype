@@ -121,7 +121,6 @@ public class RhythmManager : MonoBehaviour
 
     void SpawnNote(float hitTime)
     {
-        var go = new GameObject("Note");
-        go.AddComponent<Note>().Initialize(hitTime, spawnX, hitZoneX, noteY, spawnAheadTime);
+        // Note spawning disabled — game uses direction-pattern mode
     }
 }

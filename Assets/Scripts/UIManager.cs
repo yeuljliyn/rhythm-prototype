@@ -23,7 +23,7 @@ public class UIManager : MonoBehaviour
             _judgementOrigin = judgementText.transform.localPosition;
 
         if (hintText != null)
-            hintText.text = "Any key / click → HIT  |  ← ↓ ↑ → → follow BONUS COMMAND";
+            hintText.text = "";
     }
 
     void RefreshComboUI(int score, int combo)

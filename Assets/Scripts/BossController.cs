@@ -6,60 +6,59 @@ public class BossController : MonoBehaviour
     static BossController _instance;
     public static BossController Instance
     {
-        get
-        {
-            if (_instance == null) _instance = FindObjectOfType<BossController>();
-            return _instance;
-        }
+        get { if (_instance == null) _instance = FindObjectOfType<BossController>(); return _instance; }
         private set { _instance = value; }
     }
 
-    [Header("Sprite Animation")]
-    public Sprite[] attackFrames;
-    [Range(1, 30)] public float animFPS = 10f;
-
     SpriteRenderer _sr;
+    Sprite[]       _dirSprites;   // 상(0) 하(1) 좌(2) 우(3)
     Vector3        _basePos;
     Coroutine      _shakeRoutine;
-    Coroutine      _animRoutine;
 
     static readonly Color ColHit = new Color(1.00f, 0.25f, 0.10f);
 
-    void Awake()
-    {
-        Instance = this;
-    }
+    void Awake() { Instance = this; }
 
-    void OnDestroy()
-    {
-        if (_instance == this) _instance = null;
-    }
+    void OnDestroy() { if (_instance == this) _instance = null; }
 
     void Start()
     {
         _basePos = transform.position;
-
-        _sr = GetComponent<SpriteRenderer>();
-        if (_sr == null) _sr = gameObject.AddComponent<SpriteRenderer>();
+        _sr = GetComponent<SpriteRenderer>() ?? gameObject.AddComponent<SpriteRenderer>();
         _sr.sortingOrder = 3;
 
-        var loaded = Resources.LoadAll<Sprite>("물귀신_공격");
-        if (loaded != null && loaded.Length > 0)
-            attackFrames = loaded;
-
-        if (attackFrames != null && attackFrames.Length > 0)
+        _dirSprites = Resources.LoadAll<Sprite>("잭두_상하좌우");
+        if (_dirSprites != null && _dirSprites.Length >= 4)
         {
-            _sr.sprite   = attackFrames[0];
-            _sr.color    = Color.white;
-            _animRoutine = StartCoroutine(AnimateLoop());
-        }
-        else
-        {
-            _sr.sprite = BuildFallbackSprite();
-            _sr.color  = new Color(0.60f, 0.05f, 0.75f);
+            _sr.sprite = _dirSprites[0];
+            _sr.color  = Color.white;
         }
 
         transform.localScale = Vector3.one * 2.5f;
+        StartCoroutine(BeatCycleDirections());
+    }
+
+    // Called by BattleDirector to show a specific direction during boss turn
+    public void ShowDirection(ArrowDir dir)
+    {
+        if (_dirSprites == null || _dirSprites.Length < 4) return;
+        int idx = dir == ArrowDir.Up ? 0 : dir == ArrowDir.Down ? 1 : dir == ArrowDir.Left ? 2 : 3;
+        if (_sr != null && _dirSprites[idx] != null) _sr.sprite = _dirSprites[idx];
+    }
+
+    IEnumerator BeatCycleDirections()
+    {
+        int i = 0;
+        while (true)
+        {
+            float beat = RhythmManager.Instance != null
+                ? RhythmManager.Instance.BeatInterval
+                : 0.469f;  // 128 BPM fallback
+            if (_dirSprites != null && _dirSprites.Length >= 4 && _sr != null)
+                _sr.sprite = _dirSprites[i % 4];
+            i++;
+            yield return new WaitForSeconds(beat);
+        }
     }
 
     public void TakeDamage(JudgementType j)
@@ -69,26 +68,11 @@ public class BossController : MonoBehaviour
         _shakeRoutine = StartCoroutine(HitShake(j));
     }
 
-    IEnumerator AnimateLoop()
-    {
-        float interval = 1f / Mathf.Max(1f, animFPS);
-        int   i        = 0;
-        while (true)
-        {
-            if (_sr != null && attackFrames[i] != null)
-                _sr.sprite = attackFrames[i];
-            i = (i + 1) % attackFrames.Length;
-            yield return new WaitForSeconds(interval);
-        }
-    }
-
     IEnumerator HitShake(JudgementType j)
     {
         float intensity = j == JudgementType.Perfect ? 0.18f : 0.10f;
         float duration  = 0.30f, elapsed = 0f;
-
         if (_sr != null) _sr.color = ColHit;
-
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
@@ -99,23 +83,5 @@ public class BossController : MonoBehaviour
         }
         transform.position = _basePos;
         if (_sr != null) _sr.color = Color.white;
-    }
-
-    static Sprite BuildFallbackSprite()
-    {
-        const int S = 32;
-        var tex = new Texture2D(S, S, TextureFormat.RGBA32, false);
-        tex.filterMode = FilterMode.Point;
-        var pixels = new Color[S * S];
-        var center = new Vector2((S - 1) / 2f, (S - 1) / 2f);
-        for (int y = 0; y < S; y++)
-        for (int x = 0; x < S; x++)
-        {
-            float d = Vector2.Distance(new Vector2(x, y), center) / (S / 2f);
-            pixels[y * S + x] = d < 0.9f ? new Color(0.6f, 0.05f, 0.75f, 1f - d * 0.5f) : Color.clear;
-        }
-        tex.SetPixels(pixels);
-        tex.Apply();
-        return Sprite.Create(tex, new Rect(0, 0, S, S), new Vector2(0.5f, 0.5f), S);
     }
 }

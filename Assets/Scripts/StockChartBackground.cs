@@ -2,58 +2,78 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// 상승장/하락장 이미지를 순서대로 반복 재생해 배경 애니메이션을 만든다.
-/// 빌딩 뒤, 구름 앞에 반투명하게 표시된다.
+/// 보스 차례: 하락장 프레임 애니메이션
+/// 플레이어 차례: 상승장 프레임 애니메이션
+/// BattleDirector가 없을 때는 beatsPerTurn 주기로 자동 교대.
 /// </summary>
 public class StockChartBackground : MonoBehaviour
 {
-    static readonly string[] FrameNames =
-    {
-        "상승장1","상승장2","상승장3","상승장4","상승장5",
-        "하락장1","하락장2","하락장3","하락장4","하락장5",
-    };
+    static readonly string[] RisingNames  = { "상승장1","상승장2","상승장3","상승장4","상승장5" };
+    static readonly string[] FallingNames = { "하락장1","하락장2","하락장3","하락장4","하락장5" };
 
-    const float Fps         = 3f;    // 프레임 속도 (낮을수록 드라마틱)
-    const float Alpha       = 0.35f; // 반투명도
-    const int   SortOrder   = -9;    // 구름(-9)과 같은 깊이 — 빌딩 앞단 뒤
+    [Tooltip("BattleDirector 없을 때 자동 교대할 박자 수")]
+    public int beatsPerTurn = 4;
+
+    const float Fps       = 3f;
+    const float Alpha     = 0.35f;
+    const int   SortOrder = -9;
+
+    // false = 보스 차례 → 하락장 / true = 플레이어 차례 → 상승장
+    static bool _isPlayerTurn       = false;
+    static bool _externallyControlled = false;
+
+    public static void SetTurn(bool isPlayerTurn)
+    {
+        _externallyControlled = true;
+        _isPlayerTurn = isPlayerTurn;
+    }
 
     SpriteRenderer _sr;
-    Sprite[]       _frames;
+    Sprite[]       _risingFrames;
+    Sprite[]       _fallingFrames;
 
     void Start()
     {
-        _frames = new Sprite[FrameNames.Length];
-        for (int i = 0; i < FrameNames.Length; i++)
-        {
-            _frames[i] = Resources.Load<Sprite>(FrameNames[i]);
-            if (_frames[i] == null)
-                Debug.LogWarning($"[StockChart] 로드 실패: {FrameNames[i]}");
-        }
+        _isPlayerTurn        = false;
+        _externallyControlled = false;
+
+        _risingFrames  = LoadFrames(RisingNames);
+        _fallingFrames = LoadFrames(FallingNames);
 
         var cam = Camera.main;
         var go  = new GameObject("StockChartAnim");
         go.transform.SetParent(transform);
-        go.transform.position = new Vector3(
-            cam != null ? cam.transform.position.x : 0f, 0f, 0f);
+        go.transform.position = new Vector3(cam != null ? cam.transform.position.x : 0f, 0f, 0f);
 
-        _sr             = go.AddComponent<SpriteRenderer>();
+        _sr              = go.AddComponent<SpriteRenderer>();
         _sr.sortingOrder = SortOrder;
         _sr.color        = new Color(1f, 1f, 1f, Alpha);
 
-        // 카메라 화면 전체를 덮도록 스케일 조정
-        if (cam != null && _frames[0] != null)
+        var refFrames = (_fallingFrames != null && _fallingFrames.Length > 0) ? _fallingFrames : _risingFrames;
+        if (cam != null && refFrames != null && refFrames.Length > 0 && refFrames[0] != null)
         {
-            float camH    = cam.orthographicSize * 2f;
-            float camW    = camH * cam.aspect;
-            float sprH    = _frames[0].bounds.size.y;
-            float sprW    = _frames[0].bounds.size.x;
-            float scaleH  = camH / sprH;
-            float scaleW  = camW / sprW;
-            float scale   = Mathf.Max(scaleH, scaleW); // 꽉 채움
+            float camH  = cam.orthographicSize * 2f;
+            float camW  = camH * cam.aspect;
+            float sprH  = refFrames[0].bounds.size.y;
+            float sprW  = refFrames[0].bounds.size.x;
+            float scale = Mathf.Max(camH / sprH, camW / sprW);
             go.transform.localScale = Vector3.one * scale;
         }
 
         StartCoroutine(Animate());
+        StartCoroutine(AutoSwitchTurns());
+    }
+
+    Sprite[] LoadFrames(string[] names)
+    {
+        var frames = new Sprite[names.Length];
+        for (int i = 0; i < names.Length; i++)
+        {
+            frames[i] = Resources.Load<Sprite>(names[i]);
+            if (frames[i] == null)
+                Debug.LogWarning($"[StockChart] 로드 실패: {names[i]}");
+        }
+        return frames;
     }
 
     IEnumerator Animate()
@@ -62,10 +82,29 @@ public class StockChartBackground : MonoBehaviour
         float wait = 1f / Fps;
         while (true)
         {
-            if (_frames[i] != null)
-                _sr.sprite = _frames[i];
-            i = (i + 1) % _frames.Length;
+            var frames = _isPlayerTurn ? _risingFrames : _fallingFrames;
+            if (frames != null && _sr != null)
+            {
+                int fi = i % frames.Length;
+                if (frames[fi] != null) _sr.sprite = frames[fi];
+            }
+            i++;
             yield return new WaitForSeconds(wait);
+        }
+    }
+
+    IEnumerator AutoSwitchTurns()
+    {
+        while (RhythmManager.Instance == null) yield return null;
+        float beat         = RhythmManager.Instance.BeatInterval;
+        float turnDuration = beat * Mathf.Max(1, beatsPerTurn);
+
+        while (true)
+        {
+            if (!_externallyControlled) _isPlayerTurn = false;  // 보스 차례 → 하락장
+            yield return new WaitForSeconds(turnDuration);
+            if (!_externallyControlled) _isPlayerTurn = true;   // 플레이어 차례 → 상승장
+            yield return new WaitForSeconds(turnDuration);
         }
     }
 }
