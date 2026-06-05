@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
     void TryHitNote()
     {
         var note = NoteManager.Instance.GetNearest(
-            RhythmManager.Instance.SongTime, Note.GoodWindow);
+            RhythmManager.Instance.SongTime, Note.HitWindow);
 
         if (note != null)
         {
