@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
+using System.Collections;
 
 public class StartSceneManager : MonoBehaviour
 {
@@ -107,6 +109,14 @@ public class StartSceneManager : MonoBehaviour
         cb.pressedColor     = new Color(0.75f, 0.75f, 0.75f, 1f);
         btn.colors = cb;
         btn.onClick.AddListener(() => { SFXManager.PlayClick(); onClick(); });
+    }
+
+    [ContextMenu("튜토리얼 초기화")]
+    void ResetTutorial()
+    {
+        PlayerPrefs.DeleteKey("tutorial_complete");
+        PlayerPrefs.Save();
+        Debug.Log("튜토리얼 초기화 완료 — 다음 시작 시 튜토리얼 진행");
     }
 
     void OnStart()
