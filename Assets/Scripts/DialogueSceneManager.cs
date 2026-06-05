@@ -63,6 +63,7 @@ public class DialogueSceneManager : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1f;
         BuildUI();
         BuildVoice();
 
@@ -149,7 +150,7 @@ public class DialogueSceneManager : MonoBehaviour
 
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
             _charARt.localScale = Vector3.Lerp(aScaleFrom, aScaleTo, t);
             _charBRt.localScale = Vector3.Lerp(bScaleFrom, bScaleTo, t);
@@ -185,7 +186,7 @@ public class DialogueSceneManager : MonoBehaviour
             if (c != ' ' && c != '.' && c != ',' && c != '!' && c != '?' && c != '\n')
                 PlayBlip(c, isA);
 
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSecondsRealtime(delay);
         }
 
         _typing = false;
@@ -198,7 +199,7 @@ public class DialogueSceneManager : MonoBehaviour
         var txt = _promptGO.GetComponent<TextMeshProUGUI>();
         while (_promptGO.activeSelf)
         {
-            float a = 0.4f + 0.6f * Mathf.Abs(Mathf.Sin(Time.time * 3.5f));
+            float a = 0.4f + 0.6f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 3.5f));
             if (txt != null) txt.color = new Color(0.75f, 0.75f, 1f, a);
             yield return null;
         }
