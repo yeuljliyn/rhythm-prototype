@@ -51,6 +51,7 @@ public class BattleDirector : MonoBehaviour
 
             // ── 보스 턴 ──────────────────────────────────
             StockChartBackground.SetTurn(false);
+            BossController.Instance?.StopBeatCycle();
             BattleTurnUI.FireBossTurn();
 
             foreach (var input in group.inputs)
@@ -66,6 +67,7 @@ public class BattleDirector : MonoBehaviour
 
             // ── 플레이어 턴 ──────────────────────────────
             StockChartBackground.SetTurn(true);
+            BossController.Instance?.StartBeatCycle();
 
             float firstInputTime = pattern.BeatToTime(group.inputs[0].beat);
             _playerExpected = new List<DirectionInputEntry>(group.inputs);

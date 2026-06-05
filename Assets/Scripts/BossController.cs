@@ -36,7 +36,20 @@ public class BossController : MonoBehaviour
         }
 
         transform.localScale = Vector3.one * 2.5f;
+        // 인트로 구간에는 정지 상태 유지 — BattleDirector가 보스 턴 시작 시 StartBeatCycle() 호출
+    }
+
+    public void StartBeatCycle()
+    {
+        if (_beatCycleCr != null) return;
         _beatCycleCr = StartCoroutine(BeatCycleDirections());
+    }
+
+    public void StopBeatCycle()
+    {
+        if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
+        if (_dirSprites != null && _dirSprites.Length >= 4 && _sr != null)
+            _sr.sprite = _dirSprites[0];
     }
 
     public void ShowDirection(ArrowDir dir)
