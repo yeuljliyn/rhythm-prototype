@@ -12,26 +12,30 @@ public class TurnSpotlightEffect : MonoBehaviour
 {
     class Spot
     {
+        public Transform      root;
         public SpriteRenderer cone;
         public SpriteRenderer glow;
         public Light2D        light;
         public Color          col;
-        public float          currentT;  // 0..1 normalized
+        public float          currentT;
         public Coroutine      cr;
     }
 
-    static readonly Color ColBoss   = new Color(1.00f, 0.80f, 0.30f);
-    static readonly Color ColPlayer = new Color(0.30f, 0.80f, 1.00f);
+    // 플레이모드에서 조정한 warm cream 색상 (#FFEEC2)
+    static readonly Color ColSpot = new Color(1.000f, 0.933f, 0.761f);
 
     const float CrossFade       = 0.40f;
     const float PeakAlpha       = 0.72f;
-    const float AmbientDim      = 0.35f;  // 스포트라이트 대비용 전체 어둠
+    const float AmbientDim      = 0.35f;
     const float PeakLightIntens = 1.00f;
     const float ConeH           = 5.5f;
     const float ConeW           = 5.0f;
     const float GlowW           = 4.5f;
     const float GlowH           = 0.7f;
-    const float LightRadius     = 4.5f;
+    const float LightInner      = 2.00f;
+    const float LightOuter      = 4.93f;
+    // 플레이모드에서 조정한 root Y 오프셋
+    const float RootYOffset     = -3.1f;
 
     Spot             _bossSpot;
     Spot             _playerSpot;
@@ -44,8 +48,8 @@ public class TurnSpotlightEffect : MonoBehaviour
     {
         _coneTex    = BuildConeTex(128, 256);
         _glowTex    = BuildGlowTex(128);
-        _bossSpot   = CreateSpot("BossSpot",   ColBoss);
-        _playerSpot = CreateSpot("PlayerSpot", ColPlayer);
+        _bossSpot   = CreateSpot("BossSpot");
+        _playerSpot = CreateSpot("PlayerSpot");
 
         // 전체 씬 어둠 기반 - 없으면 Light2D 있는 곳만 렌더링됨
         var ambGO = new GameObject("SpotlightAmbient");
@@ -92,10 +96,15 @@ public class TurnSpotlightEffect : MonoBehaviour
     {
         if (spot == null || anchor == null) return;
         float cx = anchor.position.x, cy = anchor.position.y;
-        spot.cone.transform.position  = new Vector3(cx, cy + 0.5f + ConeH * 0.5f, 0f);
-        spot.glow.transform.position  = new Vector3(cx, cy - 0.7f, 0f);
+
+        // root를 캐릭터 위치 + 조정된 오프셋으로 배치
+        spot.root.position = new Vector3(cx, cy + RootYOffset, 0f);
+
+        // children은 root 기준 local 좌표
+        spot.cone.transform.localPosition  = new Vector3(0f, 0.5f + ConeH * 0.5f, 0f);
+        spot.glow.transform.localPosition  = new Vector3(0f, -0.7f, 0f);
         if (spot.light != null)
-            spot.light.transform.position = new Vector3(cx, cy + 2.5f, 0f);
+            spot.light.transform.localPosition = new Vector3(0f, 2.5f, 0f);
     }
 
     void FadeTo(Spot spot, float target, float duration)
@@ -128,26 +137,26 @@ public class TurnSpotlightEffect : MonoBehaviour
 
     // ── Spot 생성 ────────────────────────────────────────────────────────────
 
-    Spot CreateSpot(string name, Color col)
+    Spot CreateSpot(string name)
     {
-        var root = new GameObject(name);
-        root.transform.SetParent(transform);
+        var rootGO = new GameObject(name);
+        rootGO.transform.SetParent(transform);
 
-        var spot = new Spot { col = col };
+        var spot = new Spot { col = ColSpot, root = rootGO.transform };
 
-        spot.cone = MakeSR(root, "Cone", _coneTex, 1);
+        spot.cone = MakeSR(rootGO, "Cone", _coneTex, 1);
         spot.cone.transform.localScale = new Vector3(ConeW, ConeH, 1f);
 
-        spot.glow = MakeSR(root, "Glow", _glowTex, 1);
+        spot.glow = MakeSR(rootGO, "Glow", _glowTex, 1);
         spot.glow.transform.localScale = new Vector3(GlowW, GlowH, 1f);
 
         var lightGO = new GameObject("Light2D");
-        lightGO.transform.SetParent(root.transform);
+        lightGO.transform.SetParent(rootGO.transform);
         var l2d = lightGO.AddComponent<Light2D>();
         l2d.lightType             = Light2D.LightType.Point;
-        l2d.pointLightInnerRadius = 0f;
-        l2d.pointLightOuterRadius = LightRadius;
-        l2d.color                 = col;
+        l2d.pointLightInnerRadius = LightInner;
+        l2d.pointLightOuterRadius = LightOuter;
+        l2d.color                 = Color.white;
         l2d.intensity             = 0f;
         spot.light = l2d;
 
@@ -169,7 +178,6 @@ public class TurnSpotlightEffect : MonoBehaviour
 
     // ── 텍스처 빌드 ──────────────────────────────────────────────────────────
 
-    // 아래(캐릭터)가 넓고 위(하늘)로 갈수록 좁아지는 빛줄기
     static Texture2D BuildConeTex(int w, int h)
     {
         var tex  = new Texture2D(w, h, TextureFormat.RGBA32, false);
@@ -196,7 +204,6 @@ public class TurnSpotlightEffect : MonoBehaviour
         return tex;
     }
 
-    // 타원형 발밑 글로우
     static Texture2D BuildGlowTex(int size)
     {
         var tex  = new Texture2D(size, size, TextureFormat.RGBA32, false);
