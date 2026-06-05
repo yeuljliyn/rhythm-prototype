@@ -37,6 +37,17 @@ public class RhythmManager : MonoBehaviour
     public float BeatInterval   { get; private set; }
     public bool  IsScheduleDone => _nextIdx >= _schedule.Count;
 
+    // 음악 클립이 끝까지 재생됐는지 여부
+    public bool IsMusicDone
+    {
+        get
+        {
+            if (!_isRunning) return false;
+            if (_audio == null || _audio.clip == null) return IsScheduleDone;
+            return SongTime >= _audio.clip.length;
+        }
+    }
+
     int    _nextIdx;
     bool   _isRunning;
     double _scheduledMusicStartDsp;

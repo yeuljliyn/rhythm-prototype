@@ -33,12 +33,9 @@ public class BattleResultScreen : MonoBehaviour
             return;
         }
 
-        if (RhythmManager.Instance == null || NoteManager.Instance == null) return;
+        if (RhythmManager.Instance == null) return;
 
-        bool done = RhythmManager.Instance.IsScheduleDone
-                 && NoteManager.Instance.Count == 0
-                 && RhythmManager.Instance.SongTime > 0f;
-        if (done) Trigger(devRank: null);
+        if (RhythmManager.Instance.IsMusicDone) Trigger(devRank: null);
     }
 
     void Trigger(string devRank)
