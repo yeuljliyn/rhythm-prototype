@@ -56,6 +56,9 @@ public class GameManager : MonoBehaviour
 
         OnScoreChanged?.Invoke(Score, Combo);
         OnJudgement?.Invoke(type);
+
+        if (type == JudgementType.Hit) BattleSFXController.Instance?.PlayHit();
+        else                           BattleSFXController.Instance?.PlayMiss();
     }
 
     public void ResetGame()

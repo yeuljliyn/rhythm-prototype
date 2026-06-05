@@ -10335,6 +10335,7 @@ GameObject:
   - component: {fileID: 813884134}
   - component: {fileID: 813884133}
   - component: {fileID: 813884135}
+  - component: {fileID: 813884136}
   m_Layer: 0
   m_Name: RhythmManager
   m_TagString: Untagged
@@ -10389,6 +10390,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleDirector
   pattern: {fileID: 11400000, guid: 3e81c9ebd6222564b8701212db0c8bd1, type: 2}
+--- !u!114 &813884136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813884132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c6deee8e84be24c979f06c15787569, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BattleSFXController
+  _bossUp: {fileID: 8300000, guid: a12e6b0f44a48194381162bcadf4d95c, type: 3}
+  _bossDown: {fileID: 8300000, guid: 541d76d038bdf3842a8145f7af20a117, type: 3}
+  _bossLeft: {fileID: 8300000, guid: 4128cc3f03a883a4485b6eb7a7c87ed0, type: 3}
+  _bossRight: {fileID: 8300000, guid: 608023534dd11bc42afe1789e22007f9, type: 3}
+  _playerUp: {fileID: 8300000, guid: 9d204657ca931ef44b34794f178f1705, type: 3}
+  _playerDown: {fileID: 8300000, guid: 0a41a70e5a489a84597b6b5c69549ba6, type: 3}
+  _playerLeft: {fileID: 8300000, guid: 8df35c5467640dd468858f6806c979c2, type: 3}
+  _playerRight: {fileID: 8300000, guid: 3835f8ed1c2b317419f1e3cacf9c1d9f, type: 3}
+  _hit: {fileID: 8300000, guid: 690317bdce25f7c48b443bff0b7da6d3, type: 3}
+  _miss: {fileID: 8300000, guid: 805ba68480e62ab43b8a5fab502f4a5a, type: 3}
 --- !u!1 &908136285
 GameObject:
   m_ObjectHideFlags: 0

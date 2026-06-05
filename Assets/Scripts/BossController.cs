@@ -61,6 +61,7 @@ public class BossController : MonoBehaviour
         int idx = dir == ArrowDir.Up ? 0 : dir == ArrowDir.Down ? 1 : dir == ArrowDir.Left ? 2 : 3;
         if (_sr != null && _dirSprites[idx] != null) _sr.sprite = _dirSprites[idx];
         _dirEffect?.PlayEffect(dir);
+        BattleSFXController.Instance?.PlayBossDir(dir);
     }
 
     IEnumerator BeatCycleDirections()
