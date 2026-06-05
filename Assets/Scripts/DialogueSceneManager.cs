@@ -61,24 +61,28 @@ public class DialogueSceneManager : MonoBehaviour
 
     // ── Lifecycle ─────────────────────────────────────────────────────────
 
-    void Start()
+    IEnumerator Start()
     {
         Time.timeScale = 1f;
         BuildUI();
         BuildVoice();
 
-        // 캐릭터 이미지 로드
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; }
 
         var spriteB = Resources.Load<Sprite>("광대물귀신_배경제거");
         if (spriteB != null) { _charBImg.sprite = spriteB; _charBImg.preserveAspect = true; }
 
-        // Set initial state: both characters at inactive scale/color
         _charARt.localScale = ScaleInactive;
         _charBRt.localScale = ScaleInactive;
         _charAImg.color     = ColA_Inactive;
         _charBImg.color     = ColB_Inactive;
+
+        // 페이드 인이 끝난 후 대사 시작
+        var tm = SceneTransitionManager.Instance;
+        if (tm != null)
+            while (tm.IsTransitioning)
+                yield return null;
 
         PlayLine(0);
     }

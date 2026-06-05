@@ -12,6 +12,8 @@ public class SceneTransitionManager : MonoBehaviour
     Image _overlay;
     bool  _isTransitioning;
 
+    public bool IsTransitioning => _isTransitioning;
+
     // ── Bootstrap ──────────────────────────────────────────────────────────
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Bootstrap()
