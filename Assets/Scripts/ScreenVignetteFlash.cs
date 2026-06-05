@@ -112,7 +112,7 @@ public class ScreenVignetteFlash : MonoBehaviour
                 float nx       = x * inv;
                 float ny       = y * inv;
                 float edgeDist = Mathf.Min(Mathf.Min(nx, 1f - nx), Mathf.Min(ny, 1f - ny));
-                float alpha    = 1f - Mathf.Clamp01(edgeDist / 0.36f);
+                float alpha    = 1f - Mathf.Clamp01(edgeDist / 0.11f);
                 tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
             }
         }
