@@ -14,18 +14,20 @@ public class RhythmManager : MonoBehaviour
         private set { _instance = value; }
     }
 
-    [Header("Chapter (overrides built-in beatmap when assigned)")]
-    public ChapterData chapter;
+    [Header("Pattern (direction-pattern chart)")]
+    public PatternData chapter;   // field name kept so scene reference survives
 
-    [Header("Fallback timing — used only when no Chapter assigned")]
+    [Header("Fallback timing — used only when no Pattern assigned")]
     public float bpm        = 128f;
     public float introDelay = 2f;
 
-    [Header("Note Lane")]
+    [Header("Note Lane (unused — direction-pattern mode)")]
     public float spawnAheadTime = 2.2f;
     public float spawnX         =  8.0f;
     public float hitZoneX       = -5.0f;
     public float noteY          = -2.5f;
+
+    public PatternData Pattern => chapter;
 
     // SongTime == 0 when music starts; negative during intro
     public float  SongTime  => _isRunning ? (float)(AudioSettings.dspTime - _scheduledMusicStartDsp) : 0f;
@@ -91,20 +93,7 @@ public class RhythmManager : MonoBehaviour
 
     void BuildSchedule()
     {
-        _schedule = new List<ScheduledNote>();
-
-        if (chapter != null && chapter.notes != null && chapter.notes.Count > 0)
-        {
-            foreach (NoteEntry e in chapter.notes)
-                _schedule.Add(new ScheduledNote { hitTime = chapter.BeatToTime(e.beat) });
-        }
-        else
-        {
-            foreach (int beat in BuiltInBeats)
-                _schedule.Add(new ScheduledNote { hitTime = beat * BeatInterval });
-        }
-
-        _schedule.Sort((a, b) => a.hitTime.CompareTo(b.hitTime));
+        _schedule = new List<ScheduledNote>(); // notes disabled — direction-pattern mode
     }
 
     void PlayMusic(float delay)

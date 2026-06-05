@@ -12,6 +12,8 @@ public class BattleDirector : MonoBehaviour
 
     void Start()
     {
+        if (pattern == null)
+            pattern = RhythmManager.Instance != null ? RhythmManager.Instance.Pattern : null;
         if (pattern == null || pattern.groups == null || pattern.groups.Count == 0) return;
         StartCoroutine(RunDirector());
     }
