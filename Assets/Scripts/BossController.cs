@@ -30,7 +30,7 @@ public class BossController : MonoBehaviour
         _sr = GetComponent<SpriteRenderer>() ?? gameObject.AddComponent<SpriteRenderer>();
         _sr.sortingOrder = 3;
 
-        _dirSprites = Resources.LoadAll<Sprite>("잭두_상하좌우");
+        _dirSprites = Resources.LoadAll<Sprite>("물귀신_상하좌우");
         if (_dirSprites != null && _dirSprites.Length >= 4)
         {
             _sr.sprite = _dirSprites[0];
