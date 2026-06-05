@@ -13,15 +13,6 @@ public class LobbySceneManager : MonoBehaviour
         "물귀신", "지박령", "총각귀신", "처녀귀신", "달걀귀신"
     };
 
-    static readonly string[] BossSprites =
-    {
-        "물귀신_배경제거",
-        "지박령_배경제거",
-        "총각귀신_배경제거",
-        "처녀귀신_배경제거",
-        "달걀귀신_배경제거",
-    };
-
     static readonly Color[] StageCharColors =
     {
         new Color(0.25f, 0.75f, 0.40f),
@@ -57,8 +48,8 @@ public class LobbySceneManager : MonoBehaviour
     [SerializeField] Sprite _leftArrowSprite;
     [SerializeField] Sprite _rightArrowSprite;
     [SerializeField] Sprite _notPlayedSprite;
-    [SerializeField] Sprite _stage1IconSprite;
-    [SerializeField] Sprite _stage1BossSprite;
+    [SerializeField] Sprite[] _stageIconSprites;  // index 0-4 (stage 1-5)
+    [SerializeField] Sprite[] _stageBossSprites;  // index 0-4 (stage 1-5)
     [SerializeField] Sprite _rankS;
     [SerializeField] Sprite _rankA;
     [SerializeField] Sprite _rankB;
@@ -76,10 +67,8 @@ public class LobbySceneManager : MonoBehaviour
     TextMeshProUGUI _stageTitleTxt;
     Image           _rankStatusImgFull;   // 1920x1080 오버레이 (플레이하지않음)
     Image           _rankStatusImgSmall;  // 고정 크기 (S/A/B/C 랭크)
-    Image           _bossImgFull;      // 풀스크린 오버레이 (stage 1)
-    Image           _bossImgSmall;     // 컨테이너 방식 (stage 2-5)
+    Image           _bossImgFull;         // 풀스크린 오버레이 (모든 스테이지)
     GameObject      _lockedOverlayFull;
-    GameObject      _lockedOverlaySmall;
     CanvasGroup     _leftArrowCG;
     CanvasGroup     _rightArrowCG;
 
@@ -153,10 +142,11 @@ public class LobbySceneManager : MonoBehaviour
 
     void RefreshStageView(int idx)
     {
-        // Title
-        if (idx == 0 && _stage1IconSprite != null)
+        // Title icon
+        var iconSpr = (_stageIconSprites != null && idx < _stageIconSprites.Length) ? _stageIconSprites[idx] : null;
+        if (iconSpr != null)
         {
-            _stageTitleImg.sprite = _stage1IconSprite;
+            _stageTitleImg.sprite = iconSpr;
             _stageTitleImg.color  = Color.white;
             _stageTitleTxt.gameObject.SetActive(false);
         }
@@ -183,27 +173,21 @@ public class LobbySceneManager : MonoBehaviour
             _rankStatusImgSmall.color  = Color.white;
         }
 
-        // Boss — stage 1: 풀스크린 오버레이, 나머지: 컨테이너
-        bool isStage1Boss = (idx == 0 && _stage1BossSprite != null);
-        _bossImgFull.gameObject.SetActive(isStage1Boss);
-        _bossImgSmall.gameObject.SetActive(!isStage1Boss);
-
-        if (isStage1Boss)
+        // Boss — 모든 스테이지 풀스크린
+        var bossSpr = (_stageBossSprites != null && idx < _stageBossSprites.Length) ? _stageBossSprites[idx] : null;
+        if (bossSpr != null)
         {
-            _bossImgFull.sprite = _stage1BossSprite;
+            _bossImgFull.sprite = bossSpr;
             _bossImgFull.color  = Color.white;
         }
         else
         {
-            var bossSpr = Resources.Load<Sprite>(BossSprites[idx]);
-            if (bossSpr != null) { _bossImgSmall.sprite = bossSpr; _bossImgSmall.color = Color.white; }
-            else                 { _bossImgSmall.sprite = null;    _bossImgSmall.color = StageCharColors[idx]; }
+            _bossImgFull.sprite = null;
+            _bossImgFull.color  = StageCharColors[idx];
         }
 
         // Lock
-        bool locked = idx >= _unlockedCount;
-        _lockedOverlayFull.SetActive(isStage1Boss && locked);
-        _lockedOverlaySmall.SetActive(!isStage1Boss && locked);
+        _lockedOverlayFull.SetActive(idx >= _unlockedCount);
 
         // Arrow fade
         if (_leftArrowCG  != null) { _leftArrowCG.alpha  = idx > 0                    ? 1f : 0.25f; _leftArrowCG.interactable  = idx > 0; }
@@ -295,24 +279,6 @@ public class LobbySceneManager : MonoBehaviour
         _lockedOverlayFull = MakeStretch(bossFullGO.transform, "LockedOverlayFull");
         _lockedOverlayFull.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.78f);
         AddLockLabel(_lockedOverlayFull.transform);
-
-        // Boss (stage 2-5) — 컨테이너 방식
-        var bossSmallGO = MakeAnchored(cGO.transform, "BossCharacterSmall",
-                              new Vector2(0.5f,0f), new Vector2(0.5f,0f), new Vector2(0.5f,0f),
-                              new Vector2(900f, 900f), new Vector2(0f, 60f));
-        _bossImgSmall = bossSmallGO.AddComponent<Image>();
-        _bossImgSmall.preserveAspect = true;
-        _bossImgSmall.raycastTarget  = true;
-        _bossImgSmall.alphaHitTestMinimumThreshold = 0.1f;
-        var bossBtnSmall = bossSmallGO.AddComponent<Button>();
-        var bcs = bossBtnSmall.colors;
-        bcs.normalColor = Color.white; bcs.highlightedColor = new Color(1f,1f,1f,0.85f); bcs.pressedColor = new Color(0.8f,0.8f,0.8f);
-        bossBtnSmall.colors = bcs;
-        bossBtnSmall.onClick.AddListener(() => TryStart(_selectedIdx));
-
-        _lockedOverlaySmall = MakeStretch(bossSmallGO.transform, "LockedOverlaySmall");
-        _lockedOverlaySmall.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.78f);
-        AddLockLabel(_lockedOverlaySmall.transform);
 
         // Left arrow
         var leftGO  = MakeAnchored(cGO.transform, "LeftArrow",

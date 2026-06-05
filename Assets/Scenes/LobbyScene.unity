@@ -291,8 +291,18 @@ MonoBehaviour:
   _leftArrowSprite: {fileID: 21300000, guid: c83ce07111899d74bbc0cf093ba4fe8f, type: 3}
   _rightArrowSprite: {fileID: 21300000, guid: d2aa8bb364bdc4741855c167bbe8c895, type: 3}
   _notPlayedSprite: {fileID: 21300000, guid: 6a7e487fe1e2ab848b36c1b7733157b2, type: 3}
-  _stage1IconSprite: {fileID: 21300000, guid: 9c29d49e7973ed745aa48db9ede9407b, type: 3}
-  _stage1BossSprite: {fileID: 21300000, guid: 853186a1bc7049b4994b5e15fe401eee, type: 3}
+  _stageIconSprites:
+  - {fileID: 21300000, guid: 9c29d49e7973ed745aa48db9ede9407b, type: 3}
+  - {fileID: 21300000, guid: eac75b469c132a1459c49d4942c85f24, type: 3}
+  - {fileID: 21300000, guid: 6367e8cea13fd8b4c86b507c547b32b6, type: 3}
+  - {fileID: 21300000, guid: d5dd28bb4aeb6b04d9fb639fc1ebb710, type: 3}
+  - {fileID: 21300000, guid: ac43bc9fdef761d4981cd8e136e6eb0d, type: 3}
+  _stageBossSprites:
+  - {fileID: 7539695360148923559, guid: 99c930db4090138448c677a81995cc7a, type: 3}
+  - {fileID: -2761011885294730583, guid: 78e90bb581a93eb4189dca086ad3eb2d, type: 3}
+  - {fileID: -4577869577812925738, guid: 479972f3127d5054e96ffa11249f238c, type: 3}
+  - {fileID: -9154831356519556104, guid: cac9a84bb1a0d764b85c14d9e4e79d19, type: 3}
+  - {fileID: 3897801722386432774, guid: 3a24c8439797fee46bd42b1e45a6230d, type: 3}
   _rankS: {fileID: 21300000, guid: 92dd17bc6b5d2ca41b8fa89b2496392d, type: 3}
   _rankA: {fileID: 21300000, guid: 748ca698e44b5674f8b9a2742071ad40, type: 3}
   _rankB: {fileID: 21300000, guid: 51feae6e55c699147b61ad240eafd7f0, type: 3}
