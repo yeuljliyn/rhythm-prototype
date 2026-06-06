@@ -54,8 +54,9 @@ public class BattleResultScreen : MonoBehaviour
         _triggered = true;
         Time.timeScale = 0f;
 
-        var audioSrc = FindObjectOfType<AudioSource>();
-        if (audioSrc != null && audioSrc.isPlaying) audioSrc.Pause();
+        RhythmManager.Instance?.StopMusic();
+        foreach (var src in FindObjectsOfType<AudioSource>())
+            if (src.isPlaying) src.Pause();
 
         var    gm   = GameManager.Instance;
         string rank = devRank ?? (gm != null ? gm.GetRank() : "C");

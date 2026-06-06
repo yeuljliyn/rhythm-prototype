@@ -38,6 +38,12 @@ public class RhythmManager : MonoBehaviour
     public bool  IsScheduleDone => _nextIdx >= _schedule.Count;
 
     // 음악 클립이 끝까지 재생됐는지 여부
+    public void StopMusic()
+    {
+        _isRunning = false;
+        if (_audio != null && _audio.isPlaying) _audio.Pause();
+    }
+
     public bool IsMusicDone
     {
         get
