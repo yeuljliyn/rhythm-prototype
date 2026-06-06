@@ -6,15 +6,16 @@ public class PlayerDanceAnimator : MonoBehaviour
 {
     public static PlayerDanceAnimator Instance { get; private set; }
 
+    [SerializeField] float _idleScale     = 1f;
+    [SerializeField] float _dirScale      = 1f;
+    [SerializeField] float _falldownScale = 1f;
+
     SpriteRenderer _sr;
     Sprite[]       _idleFrames;
     Sprite[]       _dirFrames;      // 상(0) 하(1) 좌(2) 우(3)
     Sprite[]       _falldownFrames; // 0: 쓰러지는 중, 1: 완전히 넘어짐
 
     const float IdleBeat = 60f / 120f; // 120 BPM — 한 비트마다 프레임 전환
-
-    float _refWorldHeight; // 방향 스프라이트 높이 기준값 (스케일 보정용)
-    float _normalScale;   // idle/dir 스프라이트 마지막 스케일 (falldown용)
 
     Coroutine _idleCr;
     Coroutine _dirCr;
@@ -37,14 +38,9 @@ public class PlayerDanceAnimator : MonoBehaviour
         _dirFrames      = Resources.LoadAll<Sprite>("잭두_상하좌우");
         _falldownFrames = Resources.LoadAll<Sprite>("JACKDO_falldown");
 
-        // 방향 스프라이트 높이를 기준값으로 기록 (모든 스프라이트가 이 높이로 보정됨)
-        if (_dirFrames != null && _dirFrames.Length > 0)
-            _refWorldHeight = (_dirFrames[0].rect.height / _dirFrames[0].pixelsPerUnit)
-                              * transform.localScale.y;
-
         if (_idleFrames != null && _idleFrames.Length > 0)
         {
-            SetSprite(_idleFrames[0]);
+            SetSprite(_idleFrames[0], _idleScale);
             _idleCr = StartCoroutine(IdleLoop());
         }
     }
@@ -61,11 +57,9 @@ public class PlayerDanceAnimator : MonoBehaviour
     {
         if (_falldownFrames != null && _falldownFrames.Length >= 2)
         {
-            float s = _normalScale > 0f ? _normalScale : transform.localScale.x;
-            transform.localScale = new Vector3(s, s, transform.localScale.z);
-            _sr.sprite = _falldownFrames[0];
+            SetSprite(_falldownFrames[0], _falldownScale);
             yield return new WaitForSeconds(0.15f);
-            _sr.sprite = _falldownFrames[1];
+            SetSprite(_falldownFrames[1], _falldownScale);
             yield return new WaitForSeconds(0.6f);
         }
 
@@ -89,7 +83,7 @@ public class PlayerDanceAnimator : MonoBehaviour
                 : dir == ArrowDir.Left ? 2
                 :                        3;
         if (_idleCr != null) { StopCoroutine(_idleCr); _idleCr = null; }
-        SetSprite(_dirFrames[idx]);
+        SetSprite(_dirFrames[idx], _dirScale);
         yield return new WaitForSeconds(0.25f);
         _idleCr = StartCoroutine(IdleLoop());
     }
@@ -99,20 +93,15 @@ public class PlayerDanceAnimator : MonoBehaviour
         int i = 0;
         while (true)
         {
-            SetSprite(_idleFrames[i % _idleFrames.Length]);
+            SetSprite(_idleFrames[i % _idleFrames.Length], _idleScale);
             i++;
             yield return new WaitForSeconds(IdleBeat);
         }
     }
 
-    // 스프라이트를 교체하면서 높이를 방향 스프라이트 기준으로 스케일 보정
-    void SetSprite(Sprite s)
+    void SetSprite(Sprite s, float scale)
     {
         _sr.sprite = s;
-        if (s == null || _refWorldHeight <= 0f) return;
-        float spriteH = s.rect.height / s.pixelsPerUnit;
-        float newScale = _refWorldHeight / spriteH;
-        _normalScale = newScale;
-        transform.localScale = new Vector3(newScale, newScale, transform.localScale.z);
+        transform.localScale = new Vector3(scale, scale, transform.localScale.z);
     }
 }
