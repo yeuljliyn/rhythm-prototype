@@ -6,7 +6,7 @@ public class PlayerDanceAnimator : MonoBehaviour
 {
     public static PlayerDanceAnimator Instance { get; private set; }
 
-    [SerializeField] float _idleScale     = 1f;
+    [SerializeField] float _idleScale     = 0.75f;
     [SerializeField] float _dirScale      = 1f;
     [SerializeField] float _falldownScale = 1f;
 
