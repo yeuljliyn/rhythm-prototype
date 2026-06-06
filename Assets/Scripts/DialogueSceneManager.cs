@@ -291,7 +291,11 @@ public class DialogueSceneManager : MonoBehaviour
         cGO.AddComponent<GraphicRaycaster>();
 
         // ── Background ──
-        Stretch(cGO.transform, "BG").AddComponent<Image>().color = new Color(0.04f, 0.02f, 0.08f);
+        var bgGO     = Stretch(cGO.transform, "BG");
+        var bgImg    = bgGO.AddComponent<Image>();
+        var bgSprite = Resources.Load<Sprite>("스테1_폐허사이버증권거래소");
+        if (bgSprite != null) { bgImg.sprite = bgSprite; bgImg.color = Color.white; }
+        else bgImg.color = new Color(0.04f, 0.02f, 0.08f);
 
         // ── Separator line above dialogue box ──
         var lineGO   = Anchored(cGO.transform, "Line",
