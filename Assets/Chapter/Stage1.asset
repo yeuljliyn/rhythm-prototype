@@ -1,0 +1,539 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a94ed0d5acdbb1545b360cb6bcb42acd, type: 3}
+  m_Name: Stage1
+  m_EditorClassIdentifier: Assembly-CSharp::PatternData
+  chartName: Pattern 1
+  music: {fileID: 8300000, guid: f5aca78b247bbc946b9b6080b0fcb6da, type: 3}
+  bpm: 120
+  introDelay: 2
+  groups:
+  - spaceBeat: 8
+    inputs:
+    - direction: 2
+      beat: 4
+    - direction: 1
+      beat: 5
+    - direction: 0
+      beat: 6
+    - direction: 3
+      beat: 7
+  - spaceBeat: 16
+    inputs:
+    - direction: 2
+      beat: 12
+    - direction: 1
+      beat: 13
+    - direction: 2
+      beat: 14
+    - direction: 3
+      beat: 15
+  - spaceBeat: 24
+    inputs:
+    - direction: 1
+      beat: 20
+    - direction: 1
+      beat: 21
+    - direction: 1
+      beat: 22
+    - direction: 3
+      beat: 23
+  - spaceBeat: 32
+    inputs:
+    - direction: 2
+      beat: 28
+    - direction: 2
+      beat: 29
+    - direction: 1
+      beat: 30
+    - direction: 3
+      beat: 31
+  - spaceBeat: 40
+    inputs:
+    - direction: 1
+      beat: 36
+    - direction: 1
+      beat: 37
+    - direction: 0
+      beat: 38
+    - direction: 3
+      beat: 39
+  - spaceBeat: 48
+    inputs:
+    - direction: 2
+      beat: 44
+    - direction: 2
+      beat: 45
+    - direction: 2
+      beat: 46
+    - direction: 3
+      beat: 47
+  - spaceBeat: 56
+    inputs:
+    - direction: 2
+      beat: 52
+    - direction: 2
+      beat: 53
+    - direction: 2
+      beat: 54
+    - direction: 3
+      beat: 55
+  - spaceBeat: 64
+    inputs:
+    - direction: 2
+      beat: 60
+    - direction: 0
+      beat: 61
+    - direction: 1
+      beat: 62
+    - direction: 3
+      beat: 63
+  - spaceBeat: 70
+    inputs:
+    - direction: 2
+      beat: 68
+    - direction: 3
+      beat: 69
+  - spaceBeat: 74
+    inputs:
+    - direction: 2
+      beat: 72
+    - direction: 3
+      beat: 73
+  - spaceBeat: 78
+    inputs:
+    - direction: 2
+      beat: 76
+    - direction: 3
+      beat: 77
+  - spaceBeat: 82
+    inputs:
+    - direction: 2
+      beat: 80
+    - direction: 3
+      beat: 81
+  - spaceBeat: 88
+    inputs:
+    - direction: 2
+      beat: 84
+    - direction: 1
+      beat: 85
+    - direction: 0
+      beat: 86
+    - direction: 3
+      beat: 87
+  - spaceBeat: 96
+    inputs:
+    - direction: 2
+      beat: 92
+    - direction: 1
+      beat: 92.5
+    - direction: 0
+      beat: 93
+    - direction: 1
+      beat: 94
+    - direction: 3
+      beat: 95
+  - spaceBeat: 104
+    inputs:
+    - direction: 2
+      beat: 100
+    - direction: 0
+      beat: 100.5
+    - direction: 1
+      beat: 101
+    - direction: 2
+      beat: 102
+    - direction: 3
+      beat: 103
+  - spaceBeat: 112
+    inputs:
+    - direction: 2
+      beat: 108
+    - direction: 2
+      beat: 108.5
+    - direction: 1
+      beat: 109
+    - direction: 0
+      beat: 109.5
+    - direction: 2
+      beat: 110
+    - direction: 0
+      beat: 110.5
+    - direction: 3
+      beat: 111
+  - spaceBeat: 120
+    inputs:
+    - direction: 1
+      beat: 116
+    - direction: 0
+      beat: 116.5
+    - direction: 1
+      beat: 117
+    - direction: 0
+      beat: 117.5
+    - direction: 1
+      beat: 118
+    - direction: 0
+      beat: 118.5
+    - direction: 3
+      beat: 119
+  - spaceBeat: 132
+    inputs:
+    - direction: 0
+      beat: 124
+    - direction: 2
+      beat: 124.5
+    - direction: 0
+      beat: 125
+    - direction: 2
+      beat: 125.5
+    - direction: 0
+      beat: 126
+    - direction: 2
+      beat: 126.5
+    - direction: 0
+      beat: 127
+    - direction: 2
+      beat: 127.5
+    - direction: 0
+      beat: 128
+    - direction: 2
+      beat: 128.5
+    - direction: 0
+      beat: 129
+    - direction: 2
+      beat: 129.5
+    - direction: 0
+      beat: 130
+    - direction: 2
+      beat: 130.5
+    - direction: 3
+      beat: 131
+  - spaceBeat: 144
+    inputs:
+    - direction: 0
+      beat: 140
+    - direction: 2
+      beat: 141
+    - direction: 0
+      beat: 142
+    - direction: 3
+      beat: 143
+  - spaceBeat: 152
+    inputs:
+    - direction: 2
+      beat: 148
+    - direction: 1
+      beat: 148.5
+    - direction: 2
+      beat: 149
+    - direction: 1
+      beat: 149.5
+    - direction: 2
+      beat: 150
+    - direction: 1
+      beat: 150.5
+    - direction: 3
+      beat: 151
+  - spaceBeat: 160
+    inputs:
+    - direction: 0
+      beat: 156
+    - direction: 2
+      beat: 156.5
+    - direction: 1
+      beat: 157
+    - direction: 2
+      beat: 157.5
+    - direction: 0
+      beat: 158
+    - direction: 2
+      beat: 158.5
+    - direction: 3
+      beat: 159
+  - spaceBeat: 168
+    inputs:
+    - direction: 2
+      beat: 164
+    - direction: 1
+      beat: 164.5
+    - direction: 2
+      beat: 165
+    - direction: 1
+      beat: 165.5
+    - direction: 2
+      beat: 166
+    - direction: 0
+      beat: 166.5
+    - direction: 3
+      beat: 167
+  - spaceBeat: 176
+    inputs:
+    - direction: 0
+      beat: 172
+    - direction: 2
+      beat: 172.5
+    - direction: 0
+      beat: 173
+    - direction: 2
+      beat: 173.5
+    - direction: 0
+      beat: 174
+    - direction: 2
+      beat: 174.5
+    - direction: 3
+      beat: 175
+  - spaceBeat: 184
+    inputs:
+    - direction: 2
+      beat: 180
+    - direction: 0
+      beat: 180.5
+    - direction: 1
+      beat: 181
+    - direction: 0
+      beat: 181.5
+    - direction: 2
+      beat: 182
+    - direction: 1
+      beat: 182.5
+    - direction: 3
+      beat: 183
+  - spaceBeat: 196
+    inputs:
+    - direction: 0
+      beat: 188
+    - direction: 2
+      beat: 189
+    - direction: 1
+      beat: 190
+    - direction: 0
+      beat: 191
+    - direction: 2
+      beat: 192
+    - direction: 2
+      beat: 193
+    - direction: 1
+      beat: 194
+    - direction: 3
+      beat: 195
+  - spaceBeat: 206
+    inputs:
+    - direction: 0
+      beat: 204
+    - direction: 2
+      beat: 204.5
+    - direction: 3
+      beat: 205
+  - spaceBeat: 210
+    inputs:
+    - direction: 2
+      beat: 208
+    - direction: 0
+      beat: 208.5
+    - direction: 3
+      beat: 209
+  - spaceBeat: 214
+    inputs:
+    - direction: 0
+      beat: 212
+    - direction: 2
+      beat: 212.5
+    - direction: 3
+      beat: 213
+  - spaceBeat: 218
+    inputs:
+    - direction: 2
+      beat: 216
+    - direction: 1
+      beat: 216.75
+    - direction: 3
+      beat: 217
+  - spaceBeat: 222
+    inputs:
+    - direction: 1
+      beat: 220
+    - direction: 2
+      beat: 220.5
+    - direction: 3
+      beat: 221
+  - spaceBeat: 226
+    inputs:
+    - direction: 2
+      beat: 224
+    - direction: 1
+      beat: 224.5
+    - direction: 3
+      beat: 225
+  - spaceBeat: 230
+    inputs:
+    - direction: 1
+      beat: 228
+    - direction: 2
+      beat: 228.5
+    - direction: 3
+      beat: 229
+  - spaceBeat: 236
+    inputs:
+    - direction: 2
+      beat: 232
+    - direction: 1
+      beat: 232.5
+    - direction: 2
+      beat: 233
+    - direction: 1
+      beat: 233.5
+    - direction: 2
+      beat: 234
+    - direction: 1
+      beat: 234.5
+    - direction: 3
+      beat: 235
+  - spaceBeat: 244
+    inputs:
+    - direction: 2
+      beat: 240
+    - direction: 0
+      beat: 240.5
+    - direction: 2
+      beat: 241
+    - direction: 0
+      beat: 241.5
+    - direction: 2
+      beat: 242
+    - direction: 0
+      beat: 242.5
+    - direction: 3
+      beat: 243
+  - spaceBeat: 250
+    inputs:
+    - direction: 2
+      beat: 248
+    - direction: 2
+      beat: 248.5
+    - direction: 3
+      beat: 249
+  - spaceBeat: 254
+    inputs:
+    - direction: 2
+      beat: 252
+    - direction: 2
+      beat: 252.5
+    - direction: 3
+      beat: 253
+  - spaceBeat: 260
+    inputs:
+    - direction: 2
+      beat: 256
+    - direction: 2
+      beat: 256.5
+    - direction: 2
+      beat: 257
+    - direction: 2
+      beat: 257.5
+    - direction: 2
+      beat: 258
+    - direction: 2
+      beat: 258.5
+    - direction: 3
+      beat: 259
+  - spaceBeat: 268
+    inputs:
+    - direction: 1
+      beat: 264
+    - direction: 2
+      beat: 265
+    - direction: 0
+      beat: 266
+    - direction: 3
+      beat: 267
+  - spaceBeat: 280
+    inputs:
+    - direction: 2
+      beat: 272
+    - direction: 1
+      beat: 273
+    - direction: 2
+      beat: 274
+    - direction: 2
+      beat: 275
+    - direction: 1
+      beat: 276
+    - direction: 2
+      beat: 277
+    - direction: 1
+      beat: 278
+    - direction: 3
+      beat: 279
+  - spaceBeat: 292
+    inputs:
+    - direction: 1
+      beat: 288
+    - direction: 2
+      beat: 289
+    - direction: 0
+      beat: 290
+    - direction: 3
+      beat: 291
+  - spaceBeat: 300
+    inputs:
+    - direction: 1
+      beat: 296
+    - direction: 0
+      beat: 297
+    - direction: 1
+      beat: 297.5
+    - direction: 0
+      beat: 298
+    - direction: 2
+      beat: 298.5
+    - direction: 3
+      beat: 299
+  - spaceBeat: 308
+    inputs:
+    - direction: 0
+      beat: 304
+    - direction: 2
+      beat: 304.5
+    - direction: 1
+      beat: 305
+    - direction: 0
+      beat: 306
+    - direction: 3
+      beat: 307
+  - spaceBeat: 316
+    inputs:
+    - direction: 2
+      beat: 312
+    - direction: 1
+      beat: 313
+    - direction: 2
+      beat: 314
+    - direction: 3
+      beat: 315
+  - spaceBeat: 324
+    inputs:
+    - direction: 2
+      beat: 320
+    - direction: 2
+      beat: 320.5
+    - direction: 2
+      beat: 321
+    - direction: 2
+      beat: 321.5
+    - direction: 2
+      beat: 322
+    - direction: 2
+      beat: 322.5
+    - direction: 3
+      beat: 323

@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a94ed0d5acdbb1545b360cb6bcb42acd, type: 3}
+  m_Name: Tutorial
+  m_EditorClassIdentifier: Assembly-CSharp::PatternData
+  chartName: Pattern 1
+  music: {fileID: 8300000, guid: f3ef99ad58013db4492930a536a4f56b, type: 3}
+  bpm: 80
+  introDelay: 2
+  groups:
+  - spaceBeat: 9
+    inputs:
+    - direction: 2
+      beat: 6
+    - direction: 2
+      beat: 7
+    - direction: 3
+      beat: 8
+  - spaceBeat: 15
+    inputs:
+    - direction: 2
+      beat: 12
+    - direction: 2
+      beat: 13
+    - direction: 3
+      beat: 14
+  - spaceBeat: 21
+    inputs:
+    - direction: 2
+      beat: 18
+    - direction: 0
+      beat: 19
+    - direction: 3
+      beat: 20
+  - spaceBeat: 27
+    inputs:
+    - direction: 2
+      beat: 24
+    - direction: 1
+      beat: 25
+    - direction: 3
+      beat: 26
+  - spaceBeat: 33
+    inputs:
+    - direction: 0
+      beat: 30
+    - direction: 1
+      beat: 31
+    - direction: 3
+      beat: 32
+  - spaceBeat: 39
+    inputs:
+    - direction: 2
+      beat: 36
+    - direction: 2
+      beat: 37
+    - direction: 3
+      beat: 38
+  - spaceBeat: 44
+    inputs:
+    - direction: 2
+      beat: 42
+    - direction: 2
+      beat: 42.5
+    - direction: 3
+      beat: 43
+  - spaceBeat: 48
+    inputs:
+    - direction: 2
+      beat: 46
+    - direction: 2
+      beat: 46.5
+    - direction: 3
+      beat: 47
+  - spaceBeat: 53
+    inputs:
+    - direction: 1
+      beat: 50
+    - direction: 0
+      beat: 50.5
+    - direction: 1
+      beat: 51
+    - direction: 0
+      beat: 51.5
+    - direction: 3
+      beat: 52
+  - spaceBeat: 59
+    inputs:
+    - direction: 1
+      beat: 56
+    - direction: 0
+      beat: 56.5
+    - direction: 1
+      beat: 57
+    - direction: 0
+      beat: 57.5
+    - direction: 3
+      beat: 58
+  - spaceBeat: 66
+    inputs:
+    - direction: 2
+      beat: 62
+    - direction: 1
+      beat: 62.5
+    - direction: 2
+      beat: 63
+    - direction: 1
+      beat: 63.5
+    - direction: 2
+      beat: 64
+    - direction: 1
+      beat: 64.5
+    - direction: 3
+      beat: 65
+  - spaceBeat: 74
+    inputs:
+    - direction: 2
+      beat: 70
+    - direction: 0
+      beat: 70.5
+    - direction: 2
+      beat: 71
+    - direction: 0
+      beat: 71.5
+    - direction: 2
+      beat: 72
+    - direction: 0
+      beat: 72.5
+    - direction: 3
+      beat: 73

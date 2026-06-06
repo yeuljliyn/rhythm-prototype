@@ -10355,7 +10355,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12aee7e2c9f359e42b7e297d98cbc4be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RhythmManager
-  chapter: {fileID: 11400000, guid: 3e81c9ebd6222564b8701212db0c8bd1, type: 2}
+  chapter: {fileID: 11400000, guid: 387a341c943a19f47812b8f3bebb6907, type: 2}
   bpm: 120
   introDelay: 2
   spawnAheadTime: 2.2
@@ -10389,7 +10389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23865bf520a74a84d9dd3814ca6acdc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleDirector
-  pattern: {fileID: 11400000, guid: 3e81c9ebd6222564b8701212db0c8bd1, type: 2}
+  pattern: {fileID: 11400000, guid: 387a341c943a19f47812b8f3bebb6907, type: 2}
 --- !u!114 &813884136
 MonoBehaviour:
   m_ObjectHideFlags: 0
