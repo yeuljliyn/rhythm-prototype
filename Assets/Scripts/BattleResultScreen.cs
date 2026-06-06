@@ -66,18 +66,21 @@ public class BattleResultScreen : MonoBehaviour
         _unlockNext = rank == "S" || rank == "A" || rank == "B";
         _isTutorial = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "TutorialBattleScene";
 
-        string prev = PlayerPrefs.GetString($"stage_{_stageIdx}_rank", "");
-        if (IsBetterRank(rank, prev))
-            PlayerPrefs.SetString($"stage_{_stageIdx}_rank", rank);
-
-        if (_unlockNext)
+        if (!_isTutorial)
         {
-            int unlocked = PlayerPrefs.GetInt("unlocked_stages", 1);
-            if (_stageIdx + 1 >= unlocked)
-                PlayerPrefs.SetInt("unlocked_stages", _stageIdx + 2);
-            PlayerPrefs.SetInt($"mugu_stage_{_stageIdx}", 1);
+            string prev = PlayerPrefs.GetString($"stage_{_stageIdx}_rank", "");
+            if (IsBetterRank(rank, prev))
+                PlayerPrefs.SetString($"stage_{_stageIdx}_rank", rank);
+
+            if (_unlockNext)
+            {
+                int unlocked = PlayerPrefs.GetInt("unlocked_stages", 1);
+                if (_stageIdx + 1 >= unlocked)
+                    PlayerPrefs.SetInt("unlocked_stages", _stageIdx + 2);
+                PlayerPrefs.SetInt($"mugu_stage_{_stageIdx}", 1);
+            }
+            PlayerPrefs.Save();
         }
-        PlayerPrefs.Save();
 
         StartCoroutine(ShowResult(rank));
     }
