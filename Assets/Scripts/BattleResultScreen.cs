@@ -23,6 +23,7 @@ public class BattleResultScreen : MonoBehaviour
 
     bool        _triggered;
     bool        _unlockNext;
+    bool        _isTutorial;
     int         _stageIdx;
     Transform   _cvRoot;
     GameObject  _page1GO;
@@ -63,6 +64,7 @@ public class BattleResultScreen : MonoBehaviour
 
         _stageIdx   = PlayerPrefs.GetInt("current_stage", 0);
         _unlockNext = rank == "S" || rank == "A" || rank == "B";
+        _isTutorial = PlayerPrefs.GetInt("is_tutorial", 0) == 1;
 
         string prev = PlayerPrefs.GetString($"stage_{_stageIdx}_rank", "");
         if (IsBetterRank(rank, prev))
@@ -84,8 +86,17 @@ public class BattleResultScreen : MonoBehaviour
     {
         if (_currentPage == Page.Page1)
         {
-            if (_unlockNext) { _page1GO?.SetActive(false); ShowPage2(); }
-            else GoLobby();
+            if (_unlockNext)
+            {
+                _page1GO?.SetActive(false);
+                if (_isTutorial) GoTutorialClear();
+                else ShowPage2();
+            }
+            else
+            {
+                if (_isTutorial) GoRetry();
+                else GoLobby();
+            }
         }
         else if (_currentPage == Page.Page2)
         {
@@ -136,13 +147,14 @@ public class BattleResultScreen : MonoBehaviour
             MakeArrowBtn(_page1GO.transform, () =>
             {
                 _page1GO.SetActive(false);
-                ShowPage2();
+                if (_isTutorial) GoTutorialClear();
+                else ShowPage2();
             });
         }
         else
         {
             MakeImg(_page1GO.transform, "RetryText", _sprRetryText);
-            MakeArrowBtn(_page1GO.transform, GoLobby);
+            MakeArrowBtn(_page1GO.transform, _isTutorial ? (UnityEngine.Events.UnityAction)GoRetry : GoLobby);
         }
 
         _currentPage = Page.Page1;
@@ -171,6 +183,18 @@ public class BattleResultScreen : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
+    }
+
+    void GoRetry()
+    {
+        Time.timeScale = 1f;
+        SceneTransitionManager.Instance.LoadSceneWithFade("BattleScene");
+    }
+
+    void GoTutorialClear()
+    {
+        Time.timeScale = 1f;
+        SceneTransitionManager.Instance.LoadSceneWithFade("TutorialClearScene");
     }
 
     // 장식용 이미지 (클릭 불가)
