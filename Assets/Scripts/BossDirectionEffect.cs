@@ -4,20 +4,20 @@ using System.Collections;
 /// <summary>
 /// 보스가 방향을 보여줄 때 (ShowDirection) 두 가지 이펙트 재생:
 ///   A. 방향 파티클 버스트 — 보스 위치에서 해당 방향으로 파티클 발사
-///   B. 방향 팝 글로우    — 해당 방향 위치에 원형 글로우가 팝하고 페이드아웃
+///   B. 방향 아이콘 팝     — 해당 방향 위치에 아이콘이 팝하고 페이드아웃
 /// </summary>
 public class BossDirectionEffect : MonoBehaviour
 {
     [SerializeField] ParticleSystem _burstPS;
-    [SerializeField] float _popOffset   = 1.6f;   // 보스 중심에서 팝 스프라이트까지 거리
-    [SerializeField] float _popSize     = 0.9f;   // 팝 글로우 최대 크기 (world units)
+    [SerializeField] float _popOffset   = 1.6f;   // 보스 중심에서 아이콘까지 거리
+    [SerializeField] float _popSize     = 0.9f;   // 아이콘 최대 크기 (world units)
     [SerializeField] float _popDuration = 0.12f;  // 팝인 시간
     [SerializeField] float _fadeDuration = 0.28f; // 페이드아웃 시간
 
-    // ArrowDir: Left=0, Right=1, Up=2, Down=3  (DirAngles 순서와 동일)
+    // ArrowDir: Left=0, Right=1, Up=2, Down=3
     static readonly Color[] DirColors =
     {
-        new Color(0.30f, 0.60f, 1.00f),  // Left  - 파랑
+        new Color(0.30f, 0.60f, 1.00f),  // Left  - 파랑 (파티클용)
         new Color(1.00f, 0.35f, 0.35f),  // Right - 빨강
         new Color(1.00f, 0.90f, 0.20f),  // Up    - 노랑
         new Color(0.30f, 1.00f, 0.45f),  // Down  - 초록
@@ -34,14 +34,19 @@ public class BossDirectionEffect : MonoBehaviour
     // Cone이 local +Y 방향으로 emit → Z축 회전으로 방향 전환
     static readonly float[] BurstAngles = { 90f, -90f, 0f, 180f };
 
-    Sprite _circleSprite;
+    // Left=0, Right=1, Up=2, Down=3
+    static readonly string[] IconNames = { "좌_아이콘", "우_아이콘", "상_아이콘", "하_아이콘" };
 
-    void OnDestroy()
+    Sprite[] _dirIcons;
+
+    void Awake()
     {
-        if (_circleSprite != null)
+        _dirIcons = new Sprite[IconNames.Length];
+        for (int i = 0; i < IconNames.Length; i++)
         {
-            Destroy(_circleSprite.texture);
-            Destroy(_circleSprite);
+            _dirIcons[i] = Resources.Load<Sprite>(IconNames[i]);
+            if (_dirIcons[i] == null)
+                Debug.LogWarning($"아이콘 로드 실패: {IconNames[i]}");
         }
     }
 
@@ -49,7 +54,7 @@ public class BossDirectionEffect : MonoBehaviour
     {
         int idx = (int)dir;
         BurstParticle(idx);
-        StartCoroutine(PopGlow(idx));
+        StartCoroutine(PopIcon(idx));
     }
 
     // ── A. 파티클 버스트 ─────────────────────────────────────────────────────
@@ -65,19 +70,20 @@ public class BossDirectionEffect : MonoBehaviour
         _burstPS.Emit(18);
     }
 
-    // ── B. 팝 글로우 ─────────────────────────────────────────────────────────
+    // ── B. 아이콘 팝 ─────────────────────────────────────────────────────────
 
-    IEnumerator PopGlow(int idx)
+    IEnumerator PopIcon(int idx)
     {
-        if (_circleSprite == null) _circleSprite = BuildCircleSprite(64);
+        Sprite icon = (_dirIcons != null && idx < _dirIcons.Length) ? _dirIcons[idx] : null;
+        if (icon == null) yield break;
 
-        var go = new GameObject("BossPopGlow");
-        go.transform.position = transform.position + DirOffsets[idx] * _popOffset;
+        var go = new GameObject("BossPopIcon");
+        go.transform.position   = transform.position + DirOffsets[idx] * _popOffset;
         go.transform.localScale = Vector3.zero;
 
         var sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite       = _circleSprite;
-        sr.color        = DirColors[idx];
+        sr.sprite       = icon;
+        sr.color        = Color.white;
         sr.sortingOrder = 5;
 
         // Pop in
@@ -89,35 +95,12 @@ public class BossDirectionEffect : MonoBehaviour
         go.transform.localScale = Vector3.one * _popSize;
 
         // Fade out
-        Color c = DirColors[idx];
         for (float t = 0f; t < _fadeDuration; t += Time.deltaTime)
         {
-            sr.color = new Color(c.r, c.g, c.b, Mathf.Lerp(1f, 0f, t / _fadeDuration));
+            sr.color = new Color(1f, 1f, 1f, Mathf.Lerp(1f, 0f, t / _fadeDuration));
             yield return null;
         }
 
         Destroy(go);
-    }
-
-    // ── 원형 소프트 글로우 스프라이트 동적 생성 ─────────────────────────────
-
-    static Sprite BuildCircleSprite(int size)
-    {
-        var tex  = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        float half   = size * 0.5f;
-        float softW  = half * 0.30f;
-
-        for (int x = 0; x < size; x++)
-        {
-            for (int y = 0; y < size; y++)
-            {
-                float d     = Mathf.Sqrt((x - half + 0.5f) * (x - half + 0.5f) +
-                                         (y - half + 0.5f) * (y - half + 0.5f));
-                float alpha = Mathf.Clamp01((half - d) / softW);
-                tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
-            }
-        }
-        tex.Apply();
-        return Sprite.Create(tex, new Rect(0, 0, size, size), Vector2.one * 0.5f, size);
     }
 }
