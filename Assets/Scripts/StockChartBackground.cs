@@ -34,6 +34,8 @@ public class StockChartBackground : MonoBehaviour
 
     void Start()
     {
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "TutorialBattleScene") return;
+
         _isPlayerTurn        = false;
         _externallyControlled = false;
 
