@@ -123,7 +123,6 @@ public class TutorialIntroSceneManager : MonoBehaviour
         _font = Resources.Load<TMP_FontAsset>("Fonts/NeoDunggeunmoProSDF");
         BuildUI();
         BuildVoice();
-        PlayBGM();
 
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; _charAImg.color = ColInactive; }
