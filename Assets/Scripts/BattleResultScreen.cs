@@ -64,7 +64,7 @@ public class BattleResultScreen : MonoBehaviour
 
         _stageIdx   = PlayerPrefs.GetInt("current_stage", 0);
         _unlockNext = rank == "S" || rank == "A" || rank == "B";
-        _isTutorial = PlayerPrefs.GetInt("is_tutorial", 0) == 1;
+        _isTutorial = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "TutorialBattleScene";
 
         string prev = PlayerPrefs.GetString($"stage_{_stageIdx}_rank", "");
         if (IsBetterRank(rank, prev))

@@ -23,6 +23,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TutorialIntroScene.unity
     guid: ffb7ee3f54cf74d4eb4157a61050414a
+  - enabled: 1
+    path: Assets/Scenes/TutorialBattleScene.unity
+    guid: b631e0dc8c2454747bc04d8110e7a418
+  - enabled: 1
+    path: Assets/Scenes/TutorialClearScene.unity
+    guid: fb1042478a94e8141a5c8b8eaec269bf
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

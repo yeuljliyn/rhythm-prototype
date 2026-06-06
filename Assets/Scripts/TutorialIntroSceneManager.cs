@@ -257,9 +257,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
         }
         else
         {
-            PlayerPrefs.SetInt("is_tutorial", 1);
-            PlayerPrefs.Save();
-            SceneTransitionManager.Instance.LoadSceneWithFade("BattleScene");
+            SceneTransitionManager.Instance.LoadSceneWithFade("TutorialBattleScene");
         }
     }
 
