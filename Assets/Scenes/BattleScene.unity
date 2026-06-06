@@ -10957,7 +10957,7 @@ Transform:
   m_GameObject: {fileID: 1199042748}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.19, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10997,6 +10997,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f4de96fc08c6994e94cf2030e1768d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDanceAnimator
+  _idleScale: 0.75
+  _dirScale: 1
+  _falldownScale: 1
+  _falldownPosY: -1.42
 --- !u!1 &1233171084
 GameObject:
   m_ObjectHideFlags: 0
