@@ -372,7 +372,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
         src.clip        = clip;
         src.loop        = true;
         src.playOnAwake = false;
-        src.volume      = SettingsManager.Volume;
+        src.volume      = SettingsManager.Volume * 0.35f;
         src.Play();
     }
 
