@@ -67,7 +67,6 @@ public class BattleResultScreen : MonoBehaviour
 
     IEnumerator ShowResult(string rank, int stageIdx, bool unlockNext)
     {
-        // 캔버스 생성 (기준해상도 1672×941)
         var old = GameObject.Find("ResultCanvas");
         if (old != null) Destroy(old);
 
@@ -87,35 +86,37 @@ public class BattleResultScreen : MonoBehaviour
         MakeImg(cvGO.transform, "Dim", null, new Color(0f, 0f, 0f, 0.6f), false);
 
         // ── Page 1 ──────────────────────────────────────────────────────────
-        var page1 = new GameObject("Page1");
-        page1.transform.SetParent(cvGO.transform, false);
-        Stretch(page1);
+        // Image를 먼저 추가해야 Transform → RectTransform으로 변환됨
+        var page1GO = new GameObject("Page1");
+        page1GO.transform.SetParent(cvGO.transform, false);
+        var page1Img = page1GO.AddComponent<Image>();
+        page1Img.color = Color.clear;
+        page1Img.raycastTarget = false;
+        FullStretch((RectTransform)page1GO.transform);
 
-        MakeImg(page1.transform, "Popup",    _sprPopup,  Color.white, false);
-        MakeImg(page1.transform, "RankText", _sprRankText, Color.white, false);
+        MakeImg(page1GO.transform, "Popup",    _sprPopup,    Color.white, false);
+        MakeImg(page1GO.transform, "RankText", _sprRankText, Color.white, false);
 
         Sprite rankSpr = rank == "S" ? _sprRankS
                        : rank == "A" ? _sprRankA
                        : rank == "B" ? _sprRankB
                        :               _sprRankC;
-        MakeImg(page1.transform, "RankIcon", rankSpr, Color.white, false);
+        MakeImg(page1GO.transform, "RankIcon", rankSpr, Color.white, false);
 
         if (unlockNext)
         {
-            MakeImg(page1.transform, "UnlockText", _sprUnlockText, Color.white, false);
+            MakeImg(page1GO.transform, "UnlockText", _sprUnlockText, Color.white, false);
 
-            // 화살표 버튼 → Page 2로 전환
-            var arrowGO = MakeImg(page1.transform, "Arrow", _sprArrow, Color.white, true);
+            var arrowGO = MakeImg(page1GO.transform, "Arrow", _sprArrow, Color.white, true);
             arrowGO.AddComponent<Button>().onClick.AddListener(() =>
             {
-                page1.SetActive(false);
+                page1GO.SetActive(false);
                 ShowPage2(cvGO.transform, stageIdx);
             });
         }
         else
         {
-            // 재도전 버튼 → 현재 씬 재시작
-            var retryGO = MakeImg(page1.transform, "Retry", _sprRetryText, Color.white, true);
+            var retryGO = MakeImg(page1GO.transform, "Retry", _sprRetryText, Color.white, true);
             retryGO.AddComponent<Button>().onClick.AddListener(() =>
             {
                 Time.timeScale = 1f;
@@ -128,21 +129,25 @@ public class BattleResultScreen : MonoBehaviour
 
     void ShowPage2(Transform cvRoot, int stageIdx)
     {
-        var page2 = new GameObject("Page2");
-        page2.transform.SetParent(cvRoot, false);
-        Stretch(page2);
+        var page2GO = new GameObject("Page2");
+        page2GO.transform.SetParent(cvRoot, false);
+        var page2Img = page2GO.AddComponent<Image>();
+        page2Img.color = Color.clear;
+        page2Img.raycastTarget = false;
+        FullStretch((RectTransform)page2GO.transform);
 
-        MakeImg(page2.transform, "Popup",     _sprPopup,     Color.white, false);
-        MakeImg(page2.transform, "EquipTitle",_sprEquipTitle, Color.white, false);
-        MakeImg(page2.transform, "MuguText",  _sprMuguText,  Color.white, false);
-        MakeImg(page2.transform, "MuguItem",  _sprMuguItem,  Color.white, false);
+        MakeImg(page2GO.transform, "Popup",      _sprPopup,      Color.white, false);
+        MakeImg(page2GO.transform, "EquipTitle", _sprEquipTitle, Color.white, false);
+        MakeImg(page2GO.transform, "MuguText",   _sprMuguText,   Color.white, false);
+        MakeImg(page2GO.transform, "MuguItem",   _sprMuguItem,   Color.white, false);
 
-        // 전체 클릭 → 로비로
-        var hitGO = new GameObject("HitArea");
-        hitGO.transform.SetParent(page2.transform, false);
-        Stretch(hitGO);
+        // 화면 전체 클릭 → 로비로
+        var hitGO  = new GameObject("HitArea");
+        hitGO.transform.SetParent(page2GO.transform, false);
         var hitImg = hitGO.AddComponent<Image>();
         hitImg.color = Color.clear;
+        hitImg.raycastTarget = true;
+        FullStretch((RectTransform)hitGO.transform);
         hitGO.AddComponent<Button>().onClick.AddListener(() =>
         {
             Time.timeScale = 1f;
@@ -150,24 +155,22 @@ public class BattleResultScreen : MonoBehaviour
         });
     }
 
-    // ── 헬퍼 ────────────────────────────────────────────────────────────────
-
+    // Image를 먼저 추가해 RectTransform을 확보한 뒤 반환
     static GameObject MakeImg(Transform parent, string goName, Sprite sprite, Color color, bool raycast)
     {
-        var go = new GameObject(goName);
+        var go  = new GameObject(goName);
         go.transform.SetParent(parent, false);
-        Stretch(go);
-        var img = go.AddComponent<Image>();
-        img.sprite         = sprite;
-        img.color          = color;
-        img.raycastTarget  = raycast;
+        var img = go.AddComponent<Image>(); // Transform → RectTransform 자동 변환
+        FullStretch((RectTransform)go.transform);
+        img.sprite        = sprite;
+        img.color         = color;
+        img.raycastTarget = raycast;
         if (sprite != null) img.preserveAspect = false;
         return go;
     }
 
-    static void Stretch(GameObject go)
+    static void FullStretch(RectTransform r)
     {
-        var r = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>();
         r.anchorMin = Vector2.zero;
         r.anchorMax = Vector2.one;
         r.offsetMin = r.offsetMax = Vector2.zero;
