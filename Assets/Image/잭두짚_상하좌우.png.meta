@@ -33,7 +33,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -125,12 +125,12 @@ TextureImporter:
       name: "\uC7AD\uB450\uC9DA_\uC0C1\uD558\uC88C\uC6B0_0"
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 256
-        height: 768
+        x: 13
+        y: 356
+        width: 251
+        height: 412
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -147,12 +147,12 @@ TextureImporter:
       name: "\uC7AD\uB450\uC9DA_\uC0C1\uD558\uC88C\uC6B0_1"
       rect:
         serializedVersion: 2
-        x: 256
-        y: 0
-        width: 256
-        height: 768
+        x: 303
+        y: 383
+        width: 338
+        height: 366
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -169,12 +169,12 @@ TextureImporter:
       name: "\uC7AD\uB450\uC9DA_\uC0C1\uD558\uC88C\uC6B0_2"
       rect:
         serializedVersion: 2
-        x: 512
-        y: 0
-        width: 256
-        height: 768
+        x: 721
+        y: 394
+        width: 280
+        height: 310
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -191,12 +191,12 @@ TextureImporter:
       name: "\uC7AD\uB450\uC9DA_\uC0C1\uD558\uC88C\uC6B0_3"
       rect:
         serializedVersion: 2
-        x: 768
+        x: 392
         y: 0
-        width: 256
-        height: 768
+        width: 331
+        height: 367
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
