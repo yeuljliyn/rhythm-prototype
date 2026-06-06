@@ -10356,7 +10356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RhythmManager
   chapter: {fileID: 11400000, guid: 3e81c9ebd6222564b8701212db0c8bd1, type: 2}
-  bpm: 128
+  bpm: 120
   introDelay: 2
   spawnAheadTime: 2.2
   spawnX: 8
