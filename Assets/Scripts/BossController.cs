@@ -19,7 +19,7 @@ public class BossController : MonoBehaviour
     Coroutine          _idleCr;
     BossDirectionEffect _dirEffect;
 
-    const float IdleBeat = 60f / 80f; // 80 BPM — 한 비트마다 프레임 전환
+    const float IdleBeat = 60f / 120f; // 120 BPM — 한 비트마다 프레임 전환
 
     float _refWorldHeight; // 방향 스프라이트 높이 기준 (스케일 보정용)
 

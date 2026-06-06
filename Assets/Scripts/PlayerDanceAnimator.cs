@@ -11,7 +11,7 @@ public class PlayerDanceAnimator : MonoBehaviour
     Sprite[]       _dirFrames;      // 상(0) 하(1) 좌(2) 우(3)
     Sprite[]       _falldownFrames; // 0: 쓰러지는 중, 1: 완전히 넘어짐
 
-    const float IdleBeat = 60f / 80f; // 80 BPM — 한 비트마다 프레임 전환
+    const float IdleBeat = 60f / 120f; // 120 BPM — 한 비트마다 프레임 전환
 
     float _refWorldHeight; // 방향 스프라이트 높이 기준값 (스케일 보정용)
 
