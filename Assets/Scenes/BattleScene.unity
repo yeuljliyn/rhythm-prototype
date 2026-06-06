@@ -10403,7 +10403,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleSFXController
   _bossUp: {fileID: 8300000, guid: a12e6b0f44a48194381162bcadf4d95c, type: 3}
-  _bossDown: {fileID: 8300000, guid: 541d76d038bdf3842a8145f7af20a117, type: 3}
+  _bossDown: {fileID: 8300000, guid: 04b2625b559c78e44b93246613010bbc, type: 3}
   _bossLeft: {fileID: 8300000, guid: 4128cc3f03a883a4485b6eb7a7c87ed0, type: 3}
   _bossRight: {fileID: 8300000, guid: 608023534dd11bc42afe1789e22007f9, type: 3}
   _playerUp: {fileID: 8300000, guid: 9d204657ca931ef44b34794f178f1705, type: 3}
@@ -11474,6 +11474,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e50fbeb885297a46b6594fda217d677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossController
+  _dirSpritesOverride: []
+  _idleSpritesOverride: []
+  _idleBpm: 120
 --- !u!4 &1656085895
 Transform:
   m_ObjectHideFlags: 0

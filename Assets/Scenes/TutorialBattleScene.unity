@@ -11482,6 +11482,7 @@ MonoBehaviour:
   _idleSpritesOverride:
   - {fileID: 1616669454706363014, guid: 3def35e4dc90afb4ab3cee263b6cb0f5, type: 3}
   - {fileID: -4523775491345083377, guid: 3def35e4dc90afb4ab3cee263b6cb0f5, type: 3}
+  _idleBpm: 80
 --- !u!4 &1656085895
 Transform:
   m_ObjectHideFlags: 0
