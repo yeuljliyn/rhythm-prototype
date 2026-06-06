@@ -54,12 +54,8 @@ public class BattleResultScreen : MonoBehaviour
         _triggered = true;
         Time.timeScale = 0f;
 
-        // 개발자 단축키일 때는 음악 유지
-        if (!dev)
-        {
-            var audioSrc = FindObjectOfType<AudioSource>();
-            if (audioSrc != null && audioSrc.isPlaying) audioSrc.Pause();
-        }
+        var audioSrc = FindObjectOfType<AudioSource>();
+        if (audioSrc != null && audioSrc.isPlaying) audioSrc.Pause();
 
         var    gm   = GameManager.Instance;
         string rank = devRank ?? (gm != null ? gm.GetRank() : "C");
@@ -85,10 +81,10 @@ public class BattleResultScreen : MonoBehaviour
 
     void AdvancePage()
     {
-        if (_currentPage == Page.Page1 && _unlockNext)
+        if (_currentPage == Page.Page1)
         {
-            _page1GO?.SetActive(false);
-            ShowPage2();
+            if (_unlockNext) { _page1GO?.SetActive(false); ShowPage2(); }
+            else GoLobby();
         }
         else if (_currentPage == Page.Page2)
         {
@@ -145,6 +141,7 @@ public class BattleResultScreen : MonoBehaviour
         else
         {
             MakeImg(_page1GO.transform, "RetryText", _sprRetryText);
+            MakeArrowBtn(_page1GO.transform, GoLobby);
         }
 
         _currentPage = Page.Page1;
