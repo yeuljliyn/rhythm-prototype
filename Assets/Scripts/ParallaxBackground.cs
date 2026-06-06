@@ -16,17 +16,7 @@ public class ParallaxBackground : MonoBehaviour
         public float          phase;
     }
 
-    // (스프라이트 이름, 소팅오더, 진폭, 주파수, 높이비율, Y오프셋배율, 색상)
-    // heightFrac: 화면 높이 대비 스프라이트 높이 비율 (1=풀화면, 0.5=절반)
-    // yBias: -1=하단정렬, 0=중앙
-    static readonly (string name, int order, float amplitude, float frequency, float heightFrac, float yBias, Color color)[] LayerDefs =
-    {
-        ("sky-stars",       -10, 0.00f, 0.10f, 1.00f,  0.0f, new Color(0.585f, 0.585f, 0.585f, 1f)),
-        ("sky-clouds",       -9, 0.04f, 0.08f, 1.00f,  0.0f, Color.white),
-        ("sky-buildings-3",  -8, 0.10f, 0.10f, 0.50f, -1.0f, Color.white),
-        ("sky-buildings-2",  -7, 0.22f, 0.12f, 0.55f, -1.0f, Color.white),
-        ("sky-buildings-1",  -6, 0.40f, 0.14f, 0.60f, -1.0f, Color.white),
-    };
+    static readonly (string name, int order, float amplitude, float frequency, float heightFrac, float yBias, Color color)[] LayerDefs = { };
 
     Layer[] _layers;
     Camera  _cam;
