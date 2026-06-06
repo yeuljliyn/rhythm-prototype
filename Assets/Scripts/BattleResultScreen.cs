@@ -143,7 +143,8 @@ public class BattleResultScreen : MonoBehaviour
 
         if (_unlockNext)
         {
-            MakeImg(_page1GO.transform, "UnlockText", _sprUnlockText);
+            if (!_isTutorial)
+                MakeImg(_page1GO.transform, "UnlockText", _sprUnlockText);
             MakeArrowBtn(_page1GO.transform, () =>
             {
                 _page1GO.SetActive(false);
@@ -188,7 +189,7 @@ public class BattleResultScreen : MonoBehaviour
     void GoRetry()
     {
         Time.timeScale = 1f;
-        SceneTransitionManager.Instance.LoadSceneWithFade("BattleScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("TutorialBattleScene");
     }
 
     void GoTutorialClear()
