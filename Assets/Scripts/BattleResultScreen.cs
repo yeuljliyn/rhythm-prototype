@@ -21,51 +21,82 @@ public class BattleResultScreen : MonoBehaviour
     [SerializeField] Sprite _sprMuguText;
     [SerializeField] Sprite _sprMuguItem;
 
-    bool _triggered;
+    bool        _triggered;
+    bool        _unlockNext;
+    int         _stageIdx;
+    Transform   _cvRoot;
+    GameObject  _page1GO;
+
+    enum Page { None, Page1, Page2 }
+    Page _currentPage;
 
     void Update()
     {
-        if (_triggered) return;
-
         var kb = UnityEngine.InputSystem.Keyboard.current;
-        if (kb != null && kb.f1Key.wasPressedThisFrame) { Trigger("S"); return; }
+        if (kb == null) return;
 
-        if (RhythmManager.Instance == null) return;
-        if (RhythmManager.Instance.IsMusicDone) Trigger(null);
+        if (!_triggered)
+        {
+            if (kb.f1Key.wasPressedThisFrame) { Trigger("S", dev: true);  return; }
+            if (kb.f2Key.wasPressedThisFrame) { Trigger("C", dev: true);  return; }
+            if (RhythmManager.Instance != null && RhythmManager.Instance.IsMusicDone)
+                Trigger(null, dev: false);
+            return;
+        }
+
+        // 결과창 표시 중 Space → 다음 페이지
+        if (kb.spaceKey.wasPressedThisFrame) AdvancePage();
     }
 
-    void Trigger(string devRank)
+    void Trigger(string devRank, bool dev)
     {
         if (_triggered) return;
         _triggered = true;
         Time.timeScale = 0f;
 
-        var audioSrc = FindObjectOfType<AudioSource>();
-        if (audioSrc != null && audioSrc.isPlaying) audioSrc.Pause();
+        // 개발자 단축키일 때는 음악 유지
+        if (!dev)
+        {
+            var audioSrc = FindObjectOfType<AudioSource>();
+            if (audioSrc != null && audioSrc.isPlaying) audioSrc.Pause();
+        }
 
         var    gm   = GameManager.Instance;
         string rank = devRank ?? (gm != null ? gm.GetRank() : "C");
 
-        int  stageIdx   = PlayerPrefs.GetInt("current_stage", 0);
-        bool unlockNext = rank == "S" || rank == "A" || rank == "B";
+        _stageIdx   = PlayerPrefs.GetInt("current_stage", 0);
+        _unlockNext = rank == "S" || rank == "A" || rank == "B";
 
-        string prev = PlayerPrefs.GetString($"stage_{stageIdx}_rank", "");
+        string prev = PlayerPrefs.GetString($"stage_{_stageIdx}_rank", "");
         if (IsBetterRank(rank, prev))
-            PlayerPrefs.SetString($"stage_{stageIdx}_rank", rank);
+            PlayerPrefs.SetString($"stage_{_stageIdx}_rank", rank);
 
-        if (unlockNext)
+        if (_unlockNext)
         {
             int unlocked = PlayerPrefs.GetInt("unlocked_stages", 1);
-            if (stageIdx + 1 >= unlocked)
-                PlayerPrefs.SetInt("unlocked_stages", stageIdx + 2);
-            PlayerPrefs.SetInt($"mugu_stage_{stageIdx}", 1);
+            if (_stageIdx + 1 >= unlocked)
+                PlayerPrefs.SetInt("unlocked_stages", _stageIdx + 2);
+            PlayerPrefs.SetInt($"mugu_stage_{_stageIdx}", 1);
         }
         PlayerPrefs.Save();
 
-        StartCoroutine(ShowResult(rank, stageIdx, unlockNext));
+        StartCoroutine(ShowResult(rank));
     }
 
-    IEnumerator ShowResult(string rank, int stageIdx, bool unlockNext)
+    void AdvancePage()
+    {
+        if (_currentPage == Page.Page1 && _unlockNext)
+        {
+            _page1GO?.SetActive(false);
+            ShowPage2();
+        }
+        else if (_currentPage == Page.Page2)
+        {
+            GoLobby();
+        }
+    }
+
+    IEnumerator ShowResult(string rank)
     {
         var old = GameObject.Find("ResultCanvas");
         if (old != null) Destroy(old);
@@ -81,92 +112,96 @@ public class BattleResultScreen : MonoBehaviour
         sc.matchWidthOrHeight  = 0.5f;
 
         cvGO.AddComponent<GraphicRaycaster>();
+        _cvRoot = cvGO.transform;
 
-        // 어두운 오버레이
-        MakeImg(cvGO.transform, "Dim", null, new Color(0f, 0f, 0f, 0.6f), false);
+        MakeImg(_cvRoot, "Dim", null, new Color(0f, 0f, 0f, 0.6f));
 
-        // ── Page 1 ──────────────────────────────────────────────────────────
-        // Image를 먼저 추가해야 Transform → RectTransform으로 변환됨
-        var page1GO = new GameObject("Page1");
-        page1GO.transform.SetParent(cvGO.transform, false);
-        var page1Img = page1GO.AddComponent<Image>();
-        page1Img.color = Color.clear;
-        page1Img.raycastTarget = false;
-        FullStretch((RectTransform)page1GO.transform);
+        // Page 1
+        _page1GO = new GameObject("Page1");
+        _page1GO.transform.SetParent(_cvRoot, false);
+        var p1Bg = _page1GO.AddComponent<Image>();
+        p1Bg.color = Color.clear;
+        p1Bg.raycastTarget = false;
+        FullStretch((RectTransform)_page1GO.transform);
 
-        MakeImg(page1GO.transform, "Popup",    _sprPopup,    Color.white, false);
-        MakeImg(page1GO.transform, "RankText", _sprRankText, Color.white, false);
+        MakeImg(_page1GO.transform, "Popup",    _sprPopup);
+        MakeImg(_page1GO.transform, "RankText", _sprRankText);
 
         Sprite rankSpr = rank == "S" ? _sprRankS
                        : rank == "A" ? _sprRankA
                        : rank == "B" ? _sprRankB
                        :               _sprRankC;
-        MakeImg(page1GO.transform, "RankIcon", rankSpr, Color.white, false);
+        MakeImg(_page1GO.transform, "RankIcon", rankSpr);
 
-        if (unlockNext)
+        if (_unlockNext)
         {
-            MakeImg(page1GO.transform, "UnlockText", _sprUnlockText, Color.white, false);
-
-            var arrowGO = MakeImg(page1GO.transform, "Arrow", _sprArrow, Color.white, true);
-            arrowGO.AddComponent<Button>().onClick.AddListener(() =>
+            MakeImg(_page1GO.transform, "UnlockText", _sprUnlockText);
+            MakeArrowBtn(_page1GO.transform, () =>
             {
-                page1GO.SetActive(false);
-                ShowPage2(cvGO.transform, stageIdx);
+                _page1GO.SetActive(false);
+                ShowPage2();
             });
         }
         else
         {
-            var retryGO = MakeImg(page1GO.transform, "Retry", _sprRetryText, Color.white, true);
-            retryGO.AddComponent<Button>().onClick.AddListener(() =>
-            {
-                Time.timeScale = 1f;
-                SceneTransitionManager.Instance.LoadSceneWithFade(SceneManager.GetActiveScene().name);
-            });
+            MakeImg(_page1GO.transform, "RetryText", _sprRetryText);
         }
 
+        _currentPage = Page.Page1;
         yield return null;
     }
 
-    void ShowPage2(Transform cvRoot, int stageIdx)
+    void ShowPage2()
     {
         var page2GO = new GameObject("Page2");
-        page2GO.transform.SetParent(cvRoot, false);
-        var page2Img = page2GO.AddComponent<Image>();
-        page2Img.color = Color.clear;
-        page2Img.raycastTarget = false;
+        page2GO.transform.SetParent(_cvRoot, false);
+        var p2Bg = page2GO.AddComponent<Image>();
+        p2Bg.color = Color.clear;
+        p2Bg.raycastTarget = false;
         FullStretch((RectTransform)page2GO.transform);
 
-        MakeImg(page2GO.transform, "Popup",      _sprPopup,      Color.white, false);
-        MakeImg(page2GO.transform, "EquipTitle", _sprEquipTitle, Color.white, false);
-        MakeImg(page2GO.transform, "MuguText",   _sprMuguText,   Color.white, false);
-        MakeImg(page2GO.transform, "MuguItem",   _sprMuguItem,   Color.white, false);
+        MakeImg(page2GO.transform, "Popup",      _sprPopup);
+        MakeImg(page2GO.transform, "EquipTitle", _sprEquipTitle);
+        MakeImg(page2GO.transform, "MuguText",   _sprMuguText);
+        MakeImg(page2GO.transform, "MuguItem",   _sprMuguItem);
+        MakeArrowBtn(page2GO.transform, GoLobby);
 
-        // 화면 전체 클릭 → 로비로
-        var hitGO  = new GameObject("HitArea");
-        hitGO.transform.SetParent(page2GO.transform, false);
-        var hitImg = hitGO.AddComponent<Image>();
-        hitImg.color = Color.clear;
-        hitImg.raycastTarget = true;
-        FullStretch((RectTransform)hitGO.transform);
-        hitGO.AddComponent<Button>().onClick.AddListener(() =>
-        {
-            Time.timeScale = 1f;
-            SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
-        });
+        _currentPage = Page.Page2;
     }
 
-    // Image를 먼저 추가해 RectTransform을 확보한 뒤 반환
-    static GameObject MakeImg(Transform parent, string goName, Sprite sprite, Color color, bool raycast)
+    void GoLobby()
+    {
+        Time.timeScale = 1f;
+        SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
+    }
+
+    // 장식용 이미지 (클릭 불가)
+    static void MakeImg(Transform parent, string goName, Sprite sprite, Color? tint = null)
     {
         var go  = new GameObject(goName);
         go.transform.SetParent(parent, false);
-        var img = go.AddComponent<Image>(); // Transform → RectTransform 자동 변환
+        var img = go.AddComponent<Image>();
         FullStretch((RectTransform)go.transform);
         img.sprite        = sprite;
-        img.color         = color;
-        img.raycastTarget = raycast;
+        img.color         = tint ?? Color.white;
+        img.raycastTarget = false;
         if (sprite != null) img.preserveAspect = false;
-        return go;
+    }
+
+    // 화살표 버튼 — 투명 픽셀 클릭 안 되게 alphaHitTest 적용
+    void MakeArrowBtn(Transform parent, UnityEngine.Events.UnityAction onClick)
+    {
+        var go  = new GameObject("ArrowBtn");
+        go.transform.SetParent(parent, false);
+        var img = go.AddComponent<Image>();
+        FullStretch((RectTransform)go.transform);
+        img.sprite        = _sprArrow;
+        img.color         = Color.white;
+        img.raycastTarget = true;
+        img.preserveAspect = false;
+        img.alphaHitTestMinimumThreshold = 0.1f; // 투명 영역 클릭 차단
+
+        go.AddComponent<Button>().onClick.AddListener(onClick);
     }
 
     static void FullStretch(RectTransform r)
