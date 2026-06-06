@@ -117,6 +117,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
         Time.timeScale = 1f;
         BuildUI();
         BuildVoice();
+        PlayBGM();
 
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; _charAImg.color = ColA_Inactive; }
@@ -361,6 +362,20 @@ public class TutorialIntroSceneManager : MonoBehaviour
         SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
     }
 
+    // ── BGM ────────────────────────────────────────────────────────────
+    void PlayBGM()
+    {
+        var clip = Resources.Load<AudioClip>("Music/Tutorial");
+        if (clip == null) { Debug.LogWarning("Tutorial BGM 로드 실패"); return; }
+        var go  = new GameObject("BGM");
+        var src = go.AddComponent<AudioSource>();
+        src.clip        = clip;
+        src.loop        = true;
+        src.playOnAwake = false;
+        src.volume      = SettingsManager.Volume;
+        src.Play();
+    }
+
     // ── Voice ──────────────────────────────────────────────────────────
     void BuildVoice()
     {
@@ -421,7 +436,11 @@ public class TutorialIntroSceneManager : MonoBehaviour
         scaler.matchWidthOrHeight  = 0.5f;
         cGO.AddComponent<GraphicRaycaster>();
 
-        Stretch(cGO.transform, "BG").AddComponent<Image>().color = new Color(0.04f, 0.02f, 0.08f);
+        var bgGO  = Stretch(cGO.transform, "BG");
+        var bgImg = bgGO.AddComponent<Image>();
+        var bgSprite = Resources.Load<Sprite>("튜토_사이버신당");
+        if (bgSprite != null) { bgImg.sprite = bgSprite; bgImg.color = Color.white; }
+        else bgImg.color = new Color(0.04f, 0.02f, 0.08f);
 
         var lineGO = Anchored(cGO.transform, "Line",
             new Vector2(0f, 0.22f), new Vector2(1f, 0.22f),
