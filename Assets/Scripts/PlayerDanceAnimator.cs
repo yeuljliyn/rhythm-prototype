@@ -11,7 +11,7 @@ public class PlayerDanceAnimator : MonoBehaviour
     Sprite[]       _dirFrames;      // 상(0) 하(1) 좌(2) 우(3)
     Sprite[]       _falldownFrames; // 0: 쓰러지는 중, 1: 완전히 넘어짐
 
-    const float IdleFps = 6f;
+    const float IdleBeat = 60f / 80f; // 80 BPM — 한 비트마다 프레임 전환
 
     Coroutine _idleCr;
     Coroutine _dirCr;
@@ -30,7 +30,7 @@ public class PlayerDanceAnimator : MonoBehaviour
         var anim = GetComponent<Animator>();
         if (anim != null) anim.enabled = false;
 
-        _idleFrames     = Resources.LoadAll<Sprite>("잭두_춤1");
+        _idleFrames     = Resources.LoadAll<Sprite>("잭두둠칫");
         _dirFrames      = Resources.LoadAll<Sprite>("잭두_상하좌우");
         _falldownFrames = Resources.LoadAll<Sprite>("JACKDO_falldown");
 
@@ -91,7 +91,7 @@ public class PlayerDanceAnimator : MonoBehaviour
         {
             _sr.sprite = _idleFrames[i % _idleFrames.Length];
             i++;
-            yield return new WaitForSeconds(1f / IdleFps);
+            yield return new WaitForSeconds(IdleBeat);
         }
     }
 }

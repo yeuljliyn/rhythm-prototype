@@ -12,10 +12,14 @@ public class BossController : MonoBehaviour
 
     SpriteRenderer     _sr;
     Sprite[]           _dirSprites;   // 상(0) 하(1) 좌(2) 우(3)
+    Sprite[]           _idleSprites;  // 둠칫둠칫 2프레임
     Vector3            _basePos;
     Coroutine          _shakeRoutine;
     Coroutine          _beatCycleCr;
+    Coroutine          _idleCr;
     BossDirectionEffect _dirEffect;
+
+    const float IdleBeat = 60f / 80f; // 80 BPM — 한 비트마다 프레임 전환
 
     static readonly Color ColHit = new Color(1.00f, 0.25f, 0.10f);
 
@@ -30,32 +34,33 @@ public class BossController : MonoBehaviour
         _sr = GetComponent<SpriteRenderer>() ?? gameObject.AddComponent<SpriteRenderer>();
         _sr.sortingOrder = 3;
 
-        _dirSprites = Resources.LoadAll<Sprite>("물귀신_상하좌우");
-        if (_dirSprites != null && _dirSprites.Length >= 4)
-        {
-            _sr.sprite = _dirSprites[0];
-            _sr.color  = Color.white;
-        }
+        _dirSprites  = Resources.LoadAll<Sprite>("물귀신_상하좌우");
+        _idleSprites = Resources.LoadAll<Sprite>("광대물귀신_둠칫둠칫");
+        _sr.color    = Color.white;
 
         transform.localScale = Vector3.one * 2.5f;
-        // 인트로 구간에는 정지 상태 유지 — BattleDirector가 보스 턴 시작 시 StartBeatCycle() 호출
+        StartIdleLoop(); // 인트로부터 둠칫둠칫 재생
     }
 
     public void StartBeatCycle()
     {
-        if (_beatCycleCr != null) return;
-        _beatCycleCr = StartCoroutine(BeatCycleDirections());
+        // 플레이어 턴 — 보스는 둠칫둠칫 idle
+        if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
+        StartIdleLoop();
     }
 
     public void StopBeatCycle()
     {
+        // 보스 턴 시작 — idle 멈추고 ShowDirection 대기
         if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
-        if (_dirSprites != null && _dirSprites.Length >= 4 && _sr != null)
-            _sr.sprite = _dirSprites[0];
+        StopIdleLoop();
+        if (_idleSprites != null && _idleSprites.Length > 0 && _sr != null)
+            _sr.sprite = _idleSprites[0];
     }
 
     public void ShowDirection(ArrowDir dir)
     {
+        StopIdleLoop();
         if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
         if (_dirSprites == null || _dirSprites.Length < 4) return;
         int idx = dir == ArrowDir.Up ? 0 : dir == ArrowDir.Down ? 1 : dir == ArrowDir.Left ? 2 : 3;
@@ -64,18 +69,26 @@ public class BossController : MonoBehaviour
         BattleSFXController.Instance?.PlayBossDir(dir);
     }
 
-    IEnumerator BeatCycleDirections()
+    void StartIdleLoop()
+    {
+        if (_idleCr != null) return;
+        if (_idleSprites == null || _idleSprites.Length == 0) return;
+        _idleCr = StartCoroutine(IdleLoop());
+    }
+
+    void StopIdleLoop()
+    {
+        if (_idleCr != null) { StopCoroutine(_idleCr); _idleCr = null; }
+    }
+
+    IEnumerator IdleLoop()
     {
         int i = 0;
         while (true)
         {
-            float beat = RhythmManager.Instance != null
-                ? RhythmManager.Instance.BeatInterval
-                : 0.469f;  // 128 BPM fallback
-            if (_dirSprites != null && _dirSprites.Length >= 4 && _sr != null)
-                _sr.sprite = _dirSprites[i % 4];
+            _sr.sprite = _idleSprites[i % _idleSprites.Length];
             i++;
-            yield return new WaitForSeconds(beat);
+            yield return new WaitForSeconds(IdleBeat);
         }
     }
 
