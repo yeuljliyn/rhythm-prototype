@@ -14,6 +14,7 @@ public class PlayerDanceAnimator : MonoBehaviour
     const float IdleBeat = 60f / 120f; // 120 BPM — 한 비트마다 프레임 전환
 
     float _refWorldHeight; // 방향 스프라이트 높이 기준값 (스케일 보정용)
+    float _normalScale;   // idle/dir 스프라이트 마지막 스케일 (falldown용)
 
     Coroutine _idleCr;
     Coroutine _dirCr;
@@ -60,9 +61,11 @@ public class PlayerDanceAnimator : MonoBehaviour
     {
         if (_falldownFrames != null && _falldownFrames.Length >= 2)
         {
-            SetSprite(_falldownFrames[0]);
+            float s = _normalScale > 0f ? _normalScale : transform.localScale.x;
+            transform.localScale = new Vector3(s, s, transform.localScale.z);
+            _sr.sprite = _falldownFrames[0];
             yield return new WaitForSeconds(0.15f);
-            SetSprite(_falldownFrames[1]);
+            _sr.sprite = _falldownFrames[1];
             yield return new WaitForSeconds(0.6f);
         }
 
@@ -109,6 +112,7 @@ public class PlayerDanceAnimator : MonoBehaviour
         if (s == null || _refWorldHeight <= 0f) return;
         float spriteH = s.rect.height / s.pixelsPerUnit;
         float newScale = _refWorldHeight / spriteH;
+        _normalScale = newScale;
         transform.localScale = new Vector3(newScale, newScale, transform.localScale.z);
     }
 }

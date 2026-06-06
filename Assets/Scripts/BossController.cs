@@ -40,11 +40,11 @@ public class BossController : MonoBehaviour
         _idleSprites = Resources.LoadAll<Sprite>("광대물귀신_둠칫둠칫");
         _sr.color    = Color.white;
 
-        transform.localScale = Vector3.one * 2.5f;
+        transform.localScale = Vector3.one * 2.0f;
 
         // 방향 스프라이트 높이를 기준값으로 기록
         if (_dirSprites != null && _dirSprites.Length >= 4)
-            _refWorldHeight = (_dirSprites[0].rect.height / _dirSprites[0].pixelsPerUnit) * 2.5f;
+            _refWorldHeight = (_dirSprites[0].rect.height / _dirSprites[0].pixelsPerUnit) * 2.0f;
 
         StartIdleLoop(); // 인트로부터 둠칫둠칫 재생
     }
