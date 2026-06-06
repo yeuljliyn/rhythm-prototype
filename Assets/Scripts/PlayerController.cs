@@ -21,13 +21,13 @@ public class PlayerController : MonoBehaviour
         if (kb != null)
         {
             if      (kb.leftArrowKey.wasPressedThisFrame  || kb.aKey.wasPressedThisFrame)
-            { danceAnimator?.ShowDirection(ArrowDir.Left);  BattleSFXController.Instance?.PlayPlayerDir(ArrowDir.Left);  }
+                danceAnimator?.ShowDirection(ArrowDir.Left);
             else if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame)
-            { danceAnimator?.ShowDirection(ArrowDir.Right); BattleSFXController.Instance?.PlayPlayerDir(ArrowDir.Right); }
+                danceAnimator?.ShowDirection(ArrowDir.Right);
             else if (kb.upArrowKey.wasPressedThisFrame    || kb.wKey.wasPressedThisFrame)
-            { danceAnimator?.ShowDirection(ArrowDir.Up);    BattleSFXController.Instance?.PlayPlayerDir(ArrowDir.Up);    }
+                danceAnimator?.ShowDirection(ArrowDir.Up);
             else if (kb.downArrowKey.wasPressedThisFrame  || kb.sKey.wasPressedThisFrame)
-            { danceAnimator?.ShowDirection(ArrowDir.Down);  BattleSFXController.Instance?.PlayPlayerDir(ArrowDir.Down);  }
+                danceAnimator?.ShowDirection(ArrowDir.Down);
         }
 
         if (IsValidHitInput())
