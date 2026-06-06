@@ -10402,10 +10402,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c6deee8e84be24c979f06c15787569, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleSFXController
-  _bossUp: {fileID: 8300000, guid: a12e6b0f44a48194381162bcadf4d95c, type: 3}
-  _bossDown: {fileID: 8300000, guid: 541d76d038bdf3842a8145f7af20a117, type: 3}
-  _bossLeft: {fileID: 8300000, guid: 4128cc3f03a883a4485b6eb7a7c87ed0, type: 3}
-  _bossRight: {fileID: 8300000, guid: 608023534dd11bc42afe1789e22007f9, type: 3}
+  _bossUp: {fileID: 8300000, guid: 9d204657ca931ef44b34794f178f1705, type: 3}
+  _bossDown: {fileID: 8300000, guid: 3a3b56e3f3c91384f97d15fde13b55be, type: 3}
+  _bossLeft: {fileID: 8300000, guid: 8df35c5467640dd468858f6806c979c2, type: 3}
+  _bossRight: {fileID: 8300000, guid: 3835f8ed1c2b317419f1e3cacf9c1d9f, type: 3}
   _playerUp: {fileID: 8300000, guid: 9d204657ca931ef44b34794f178f1705, type: 3}
   _playerDown: {fileID: 8300000, guid: 0a41a70e5a489a84597b6b5c69549ba6, type: 3}
   _playerLeft: {fileID: 8300000, guid: 8df35c5467640dd468858f6806c979c2, type: 3}
@@ -10936,7 +10936,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -20
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 4b53d0b46518cab4284415d3a6d9c862, type: 3}
+  m_Sprite: {fileID: -2730374586519552025, guid: f3c2802ccfa165c408248af6c2b142e7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -11474,6 +11474,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e50fbeb885297a46b6594fda217d677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossController
+  _dirSpritesOverride:
+  - {fileID: 422795389187801504, guid: 77f6e89b28e270e47a657fe8fdae2c0a, type: 3}
+  - {fileID: -7101945512612861491, guid: 77f6e89b28e270e47a657fe8fdae2c0a, type: 3}
+  - {fileID: 3999038509870356231, guid: 77f6e89b28e270e47a657fe8fdae2c0a, type: 3}
+  - {fileID: -2022644627719071381, guid: 77f6e89b28e270e47a657fe8fdae2c0a, type: 3}
+  _idleSpritesOverride:
+  - {fileID: 1616669454706363014, guid: 3def35e4dc90afb4ab3cee263b6cb0f5, type: 3}
+  - {fileID: -4523775491345083377, guid: 3def35e4dc90afb4ab3cee263b6cb0f5, type: 3}
 --- !u!4 &1656085895
 Transform:
   m_ObjectHideFlags: 0

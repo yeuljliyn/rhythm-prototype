@@ -10,6 +10,10 @@ public class BossController : MonoBehaviour
         private set { _instance = value; }
     }
 
+    [Header("Override (TutorialBattleScene only — leave empty for BattleScene)")]
+    [SerializeField] Sprite[] _dirSpritesOverride;
+    [SerializeField] Sprite[] _idleSpritesOverride;
+
     SpriteRenderer     _sr;
     Sprite[]           _dirSprites;   // 상(0) 하(1) 좌(2) 우(3)
     Sprite[]           _idleSprites;  // 둠칫둠칫 2프레임
@@ -36,8 +40,12 @@ public class BossController : MonoBehaviour
         _sr = GetComponent<SpriteRenderer>() ?? gameObject.AddComponent<SpriteRenderer>();
         _sr.sortingOrder = 3;
 
-        _dirSprites  = Resources.LoadAll<Sprite>("물귀신_상하좌우");
-        _idleSprites = Resources.LoadAll<Sprite>("광대물귀신_둠칫둠칫");
+        _dirSprites  = (_dirSpritesOverride  != null && _dirSpritesOverride.Length  >= 4)
+            ? _dirSpritesOverride
+            : Resources.LoadAll<Sprite>("물귀신_상하좌우");
+        _idleSprites = (_idleSpritesOverride != null && _idleSpritesOverride.Length >= 2)
+            ? _idleSpritesOverride
+            : Resources.LoadAll<Sprite>("광대물귀신_둠칫둠칫");
         _sr.color    = Color.white;
 
         transform.localScale = Vector3.one * 2.0f;
