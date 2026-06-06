@@ -34,6 +34,11 @@ public class SettingsManager : MonoBehaviour
     Coroutine   _resumeRoutine;
     bool        _pausedBySettings;
 
+    // ── BGM ducking (calibration page) ───────────────────────────────────
+    AudioSource _bgmSource;
+    float       _bgmOriginalVolume;
+    bool        _bgmDucked;
+
     // ── Bootstrap ─────────────────────────────────────────────────────────
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -74,6 +79,9 @@ public class SettingsManager : MonoBehaviour
         _pausedBySettings = false;
         _panel?.SetActive(false);
         _gameAudio = null;
+        _bgmSource = null;
+        _bgmOriginalVolume = 0f;
+        _bgmDucked = false;
 
         if (_resumeRoutine != null) { StopCoroutine(_resumeRoutine); _resumeRoutine = null; }
         if (_countdownText != null) { _countdownText.text = ""; _countdownText.gameObject.SetActive(false); }
@@ -130,6 +138,7 @@ public class SettingsManager : MonoBehaviour
     {
         SFXManager.PlayBack();
         _calibUI?.Hide();
+        DuckBGM(false);
         _panel.SetActive(false);
         IsPanelOpen = false;
 
@@ -273,8 +282,30 @@ public class SettingsManager : MonoBehaviour
         SFXManager.PlayNavigate();
         _settingsPage?.SetActive(idx == 0);
         _calibrationPage?.SetActive(idx == 1);
-        if (idx == 1) _calibUI?.Show();
-        else          _calibUI?.Hide();
+        if (idx == 1) { _calibUI?.Show(); DuckBGM(true); }
+        else          { _calibUI?.Hide(); DuckBGM(false); }
+    }
+
+    void DuckBGM(bool duck)
+    {
+        if (_bgmSource == null)
+        {
+            var bgmGO = GameObject.Find("BGM");
+            if (bgmGO != null) _bgmSource = bgmGO.GetComponent<AudioSource>();
+        }
+        if (_bgmSource == null) return;
+
+        if (duck && !_bgmDucked)
+        {
+            _bgmOriginalVolume = _bgmSource.volume;
+            _bgmSource.volume  = _bgmOriginalVolume * 0.5f;
+            _bgmDucked = true;
+        }
+        else if (!duck && _bgmDucked)
+        {
+            _bgmSource.volume = _bgmOriginalVolume;
+            _bgmDucked = false;
+        }
     }
 
     // ── Settings page ─────────────────────────────────────────────────────
