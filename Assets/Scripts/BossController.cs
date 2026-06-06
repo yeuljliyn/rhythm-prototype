@@ -21,6 +21,8 @@ public class BossController : MonoBehaviour
 
     const float IdleBeat = 60f / 80f; // 80 BPM — 한 비트마다 프레임 전환
 
+    float _refWorldHeight; // 방향 스프라이트 높이 기준 (스케일 보정용)
+
     static readonly Color ColHit = new Color(1.00f, 0.25f, 0.10f);
 
     void Awake() { Instance = this; }
@@ -39,6 +41,11 @@ public class BossController : MonoBehaviour
         _sr.color    = Color.white;
 
         transform.localScale = Vector3.one * 2.5f;
+
+        // 방향 스프라이트 높이를 기준값으로 기록
+        if (_dirSprites != null && _dirSprites.Length >= 4)
+            _refWorldHeight = (_dirSprites[0].rect.height / _dirSprites[0].pixelsPerUnit) * 2.5f;
+
         StartIdleLoop(); // 인트로부터 둠칫둠칫 재생
     }
 
@@ -54,8 +61,8 @@ public class BossController : MonoBehaviour
         // 보스 턴 시작 — idle 멈추고 ShowDirection 대기
         if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
         StopIdleLoop();
-        if (_idleSprites != null && _idleSprites.Length > 0 && _sr != null)
-            _sr.sprite = _idleSprites[0];
+        if (_dirSprites != null && _dirSprites.Length >= 4)
+            SetSprite(_dirSprites[0]);
     }
 
     public void ShowDirection(ArrowDir dir)
@@ -64,7 +71,7 @@ public class BossController : MonoBehaviour
         if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
         if (_dirSprites == null || _dirSprites.Length < 4) return;
         int idx = dir == ArrowDir.Up ? 0 : dir == ArrowDir.Down ? 1 : dir == ArrowDir.Left ? 2 : 3;
-        if (_sr != null && _dirSprites[idx] != null) _sr.sprite = _dirSprites[idx];
+        SetSprite(_dirSprites[idx]);
         _dirEffect?.PlayEffect(dir);
         BattleSFXController.Instance?.PlayBossDir(dir);
     }
@@ -86,10 +93,21 @@ public class BossController : MonoBehaviour
         int i = 0;
         while (true)
         {
-            _sr.sprite = _idleSprites[i % _idleSprites.Length];
+            SetSprite(_idleSprites[i % _idleSprites.Length]);
             i++;
             yield return new WaitForSeconds(IdleBeat);
         }
+    }
+
+    // 스프라이트를 교체하면서 높이를 방향 스프라이트 기준으로 스케일 보정
+    void SetSprite(Sprite s)
+    {
+        if (s == null) return;
+        _sr.sprite = s;
+        if (_refWorldHeight <= 0f) return;
+        float spriteH = s.rect.height / s.pixelsPerUnit;
+        float newScale = _refWorldHeight / spriteH;
+        transform.localScale = new Vector3(newScale, newScale, 1f);
     }
 
     public void TakeDamage(JudgementType j)

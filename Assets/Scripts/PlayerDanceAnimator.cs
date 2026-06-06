@@ -13,6 +13,8 @@ public class PlayerDanceAnimator : MonoBehaviour
 
     const float IdleBeat = 60f / 80f; // 80 BPM — 한 비트마다 프레임 전환
 
+    float _refWorldHeight; // 방향 스프라이트 높이 기준값 (스케일 보정용)
+
     Coroutine _idleCr;
     Coroutine _dirCr;
     Coroutine _falldownCr;
@@ -34,10 +36,15 @@ public class PlayerDanceAnimator : MonoBehaviour
         _dirFrames      = Resources.LoadAll<Sprite>("잭두_상하좌우");
         _falldownFrames = Resources.LoadAll<Sprite>("JACKDO_falldown");
 
+        // 방향 스프라이트 높이를 기준값으로 기록 (모든 스프라이트가 이 높이로 보정됨)
+        if (_dirFrames != null && _dirFrames.Length > 0)
+            _refWorldHeight = (_dirFrames[0].rect.height / _dirFrames[0].pixelsPerUnit)
+                              * transform.localScale.y;
+
         if (_idleFrames != null && _idleFrames.Length > 0)
         {
-            _sr.sprite = _idleFrames[0];
-            _idleCr    = StartCoroutine(IdleLoop());
+            SetSprite(_idleFrames[0]);
+            _idleCr = StartCoroutine(IdleLoop());
         }
     }
 
@@ -53,9 +60,9 @@ public class PlayerDanceAnimator : MonoBehaviour
     {
         if (_falldownFrames != null && _falldownFrames.Length >= 2)
         {
-            _sr.sprite = _falldownFrames[0];
+            SetSprite(_falldownFrames[0]);
             yield return new WaitForSeconds(0.15f);
-            _sr.sprite = _falldownFrames[1];
+            SetSprite(_falldownFrames[1]);
             yield return new WaitForSeconds(0.6f);
         }
 
@@ -79,7 +86,7 @@ public class PlayerDanceAnimator : MonoBehaviour
                 : dir == ArrowDir.Left ? 2
                 :                        3;
         if (_idleCr != null) { StopCoroutine(_idleCr); _idleCr = null; }
-        _sr.sprite = _dirFrames[idx];
+        SetSprite(_dirFrames[idx]);
         yield return new WaitForSeconds(0.25f);
         _idleCr = StartCoroutine(IdleLoop());
     }
@@ -89,9 +96,19 @@ public class PlayerDanceAnimator : MonoBehaviour
         int i = 0;
         while (true)
         {
-            _sr.sprite = _idleFrames[i % _idleFrames.Length];
+            SetSprite(_idleFrames[i % _idleFrames.Length]);
             i++;
             yield return new WaitForSeconds(IdleBeat);
         }
+    }
+
+    // 스프라이트를 교체하면서 높이를 방향 스프라이트 기준으로 스케일 보정
+    void SetSprite(Sprite s)
+    {
+        _sr.sprite = s;
+        if (s == null || _refWorldHeight <= 0f) return;
+        float spriteH = s.rect.height / s.pixelsPerUnit;
+        float newScale = _refWorldHeight / spriteH;
+        transform.localScale = new Vector3(newScale, newScale, transform.localScale.z);
     }
 }
