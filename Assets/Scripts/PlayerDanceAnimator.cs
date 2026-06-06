@@ -9,8 +9,10 @@ public class PlayerDanceAnimator : MonoBehaviour
     [SerializeField] float _idleScale     = 0.75f;
     [SerializeField] float _dirScale      = 1f;
     [SerializeField] float _falldownScale = 1f;
+    [SerializeField] float _falldownPosY  = -0.78f;
 
     SpriteRenderer _sr;
+    Vector3        _basePos;
     Sprite[]       _idleFrames;
     Sprite[]       _dirFrames;      // 상(0) 하(1) 좌(2) 우(3)
     Sprite[]       _falldownFrames; // 0: 쓰러지는 중, 1: 완전히 넘어짐
@@ -38,6 +40,8 @@ public class PlayerDanceAnimator : MonoBehaviour
         _dirFrames      = Resources.LoadAll<Sprite>("잭두_상하좌우");
         _falldownFrames = Resources.LoadAll<Sprite>("JACKDO_falldown");
 
+        _basePos = transform.position;
+
         if (_idleFrames != null && _idleFrames.Length > 0)
         {
             SetSprite(_idleFrames[0], _idleScale);
@@ -57,12 +61,14 @@ public class PlayerDanceAnimator : MonoBehaviour
     {
         if (_falldownFrames != null && _falldownFrames.Length >= 2)
         {
+            transform.position = new Vector3(_basePos.x, _falldownPosY, _basePos.z);
             SetSprite(_falldownFrames[0], _falldownScale);
             yield return new WaitForSeconds(0.15f);
             SetSprite(_falldownFrames[1], _falldownScale);
             yield return new WaitForSeconds(0.6f);
         }
 
+        transform.position = _basePos;
         _falldownCr = null;
         if (_idleFrames != null && _idleFrames.Length > 0)
             _idleCr = StartCoroutine(IdleLoop());
