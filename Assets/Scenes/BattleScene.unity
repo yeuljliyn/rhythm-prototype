@@ -11539,7 +11539,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -5751906857861139926, guid: ad56d4eea3f8d5c41a9db0a161b4e341, type: 3}
+  m_Sprite: {fileID: -7487312613414722929, guid: abb98712cb0e26d47a0706e84db7991b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -16475,6 +16475,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7e5e620d38149b4f9c4df76a3c810a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleResultScreen
+  _sprPopup: {fileID: 21300000, guid: 0c62336c915913e4b837fa887e591163, type: 3}
+  _sprRankText: {fileID: 21300000, guid: 44a2d11b349402045ba43f3acde09e25, type: 3}
+  _sprRankS: {fileID: 21300000, guid: 23bba1a79e7acd54495abb9f024c53d4, type: 3}
+  _sprRankA: {fileID: 21300000, guid: 173fcc48e7ce96a4eb15befa02687b6e, type: 3}
+  _sprRankB: {fileID: 21300000, guid: 3ccb0c6007586004ca9cdeadab1e073e, type: 3}
+  _sprRankC: {fileID: 21300000, guid: a1458c736bb69de4fb76e3f0a9524f9e, type: 3}
+  _sprUnlockText: {fileID: 21300000, guid: 1e10938d5cec11045b0e58537172b50e, type: 3}
+  _sprRetryText: {fileID: 21300000, guid: 77b6df2c90711344aa5650ba9f9a4241, type: 3}
+  _sprArrow: {fileID: 21300000, guid: 26629c416402d8e41a9a53246175b483, type: 3}
+  _sprEquipTitle: {fileID: 21300000, guid: d3a2f7e70b8c235488af096e349a8543, type: 3}
+  _sprMuguText: {fileID: 21300000, guid: 084c5a172abd61842a5f23b1f4fb0751, type: 3}
+  _sprMuguItem: {fileID: 21300000, guid: 0d8b62d901704404b87a10b70277c517, type: 3}
 --- !u!4 &1998179209
 Transform:
   m_ObjectHideFlags: 0
