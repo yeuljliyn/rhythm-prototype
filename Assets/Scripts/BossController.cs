@@ -58,11 +58,9 @@ public class BossController : MonoBehaviour
 
     public void StopBeatCycle()
     {
-        // 보스 턴 시작 — idle 멈추고 ShowDirection 대기
+        // 보스 턴 시작 — idle 유지, ShowDirection 호출 시 자연스럽게 전환
         if (_beatCycleCr != null) { StopCoroutine(_beatCycleCr); _beatCycleCr = null; }
-        StopIdleLoop();
-        if (_dirSprites != null && _dirSprites.Length >= 4)
-            SetSprite(_dirSprites[0]);
+        StartIdleLoop();
     }
 
     public void ShowDirection(ArrowDir dir)
