@@ -92,16 +92,16 @@ public class TutorialIntroSceneManager : MonoBehaviour
     // ── Tutorial CLEAR 대사 ────────────────────────────────────────────
     static readonly Node[] ClearNodes =
     {
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_웃음1",
             Text="하아... 완벽합니다. 기계는 흉내 낼 수 없는 완벽한 타이밍입니다. 감사합니다. 이 정도면 통조림이 되는 것은 면할 수 있겠습니다.", Next=1 },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_무표정",
             Text="기본적인 설명은 여기까지입니다. 밖에서 의뢰인들... 아니, 원혼들이 줄을 서 있습니다.", Next=2 },
 
         new Node { Type=NodeType.Choice, ChoiceSpk="신령님", Next=3,
             Choices=new[]{ "그래서, 이제 누구부터 털면 되는데?", "빨리 수금하고 끝내자. 어디로 가?" } },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_무표정",
             Text="신당 로비로 모시겠습니다. 거기서 오늘 수금할 타겟을 직접 골라주시죠. 가시죠, 신령님!", Next=4 },
 
         new Node { Type=NodeType.End },
