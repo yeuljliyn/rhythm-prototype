@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class DialogueSceneManager : MonoBehaviour
 {
@@ -17,6 +18,14 @@ public class DialogueSceneManager : MonoBehaviour
         public string    Text;
         public string[]  Choices;
         public int       Next;
+        public string    EmotionKey;
+    }
+
+    [System.Serializable]
+    public class EmotionEntry
+    {
+        public string key;
+        public Sprite sprite;
     }
 
     static readonly string NameA = "잭두";
@@ -25,31 +34,31 @@ public class DialogueSceneManager : MonoBehaviour
     static readonly Node[] Nodes = new Node[]
     {
         // 0: 물귀신
-        new Node { Type=NodeType.Line, Spk=Speaker.B,
+        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔",
             Text="저기요... 9만 층에 사람 있어요...! 구조대 언제 오나요...? 네? 돔황챠? 이미 한강 물이 턱밑인데 어딜 도망쳐어어!!", Next=1 },
         // 1: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A,
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
             Text="신령님, 첫 번째 타겟입니다. '야수의 심장'으로 풀매수했다가 상장폐지 빔을 정통으로 맞고 악성 재고... 아니, 원혼이 되어버린 놈이죠.", Next=2 },
         // 2: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A,
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
             Text="오르고 내리는 세상의 이치를 그저 '빨간불'과 '파란불'로만 딱 잘라 정의하려 하니 저 꼴이 나는 겁니다. 주식이든 인생이든 한 치 앞도 모르는 '불확실성' 그 자체인데 말이죠.", Next=3 },
         // 3: 선택지
         new Node { Type=NodeType.Choice, Next=4,
             Choices=new[]{ "남 일 같지가 않네... 뼈 맞아서 튜토리얼 종료하고 싶다.", "저렇게 불쌍하게 울고 있는데 굳이 때려야 해?" } },
         // 4: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A,
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_분노",
             Text="신령님의 동정심은 제 마이너스 통장 이자를 단 1원도 깎아주지 않습니다! 저런 놈은 어설픈 '기도 매매법'으로 놔두면 평생 지박령이 됩니다. 신령님의 자비 없는 엇박자로 뚝배기를... 아니, 영혼을 물리적으로 구제해 주셔야 합니다!", Next=5 },
         // 5: 물귀신
-        new Node { Type=NodeType.Line, Spk=Speaker.B,
+        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
             Text="빨간색...? 너희들... 차트의 반등을 막는 공매도 세력이구나!! 내 돈 내놔!! 내 돈 내놔라아아!!", Next=6 },
         // 6: 물귀신
-        new Node { Type=NodeType.Line, Spk=Speaker.B,
+        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
             Text="영차!! 영차!! 가즈아아아!! 한강 물 온도 따뜻하다, 떡상 가즈아아!!", Next=7 },
         // 7: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A,
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_분노",
             Text="신령님, 놈이 눈물의 '물타기' 비트로 선창을 시작했습니다! 방금 들으신 그 박자 그대로, 제 몸을 조종해서 후창을 쳐주십시오!", Next=8 },
         // 8: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A,
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_분노",
             Text="부디 저 미련한 인간 지표에게 위대한 신의 리듬을 꽂아주시옵소서! 첫 수금, 들어갑니다!!", Next=9 },
         // 9: end
         new Node { Type=NodeType.End },
@@ -70,6 +79,10 @@ public class DialogueSceneManager : MonoBehaviour
     Button[]          _choiceBtns;
     TextMeshProUGUI[] _choiceTxts;
 
+    // ── Emotion sprites ───────────────────────────────────────────────
+    [SerializeField] EmotionEntry[] _emotions;
+    Dictionary<string, Sprite>      _emotionDict = new Dictionary<string, Sprite>();
+
     // ── State ─────────────────────────────────────────────────────────
     int         _nodeIdx     = 0;
     bool        _typing      = false;
@@ -88,6 +101,7 @@ public class DialogueSceneManager : MonoBehaviour
         _font = Resources.Load<TMP_FontAsset>("Fonts/NeoDunggeunmoProSDF");
         BuildUI();
         BuildVoice();
+        BuildEmotionDict();
 
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; }
@@ -114,6 +128,56 @@ public class DialogueSceneManager : MonoBehaviour
         _dialogueTxt.text = "";
         PlayNode(0);
     }
+
+    void BuildEmotionDict()
+    {
+        _emotionDict = new Dictionary<string, Sprite>();
+        if (_emotions == null) return;
+        foreach (var e in _emotions)
+            if (e != null && !string.IsNullOrEmpty(e.key) && e.sprite != null)
+                _emotionDict[e.key] = e.sprite;
+    }
+
+    void ApplyEmotion(string key, bool isA)
+    {
+        if (_emotionDict.TryGetValue(key, out var spr) && spr != null)
+        {
+            if (isA) { _charAImg.sprite = spr; _charAImg.preserveAspect = true; }
+            else     { _charBImg.sprite = spr; _charBImg.preserveAspect = true; }
+        }
+    }
+
+#if UNITY_EDITOR
+    // 표정 키 → 실제 파일 경로 매핑 (파일명과 키 이름이 다른 경우 처리)
+    static readonly Dictionary<string, string> EmotionKeyToPath = new Dictionary<string, string>
+    {
+        { "잭두_분노",        "Assets/EmotionImage/잭두_분노.png" },
+        { "잭두_무표정2_화남", "Assets/EmotionImage/잭두_무표정2, 화남.png" },
+        { "물귀신_슬픔",      "Assets/EmotionImage/광대물귀신_슬픔.png" },
+        { "물귀신_분노",      "Assets/EmotionImage/광대물귀신_분노.png" },
+    };
+
+    [ContextMenu("Auto-Load Emotions from Assets/EmotionImage")]
+    void EditorAutoLoadEmotions()
+    {
+        var list = new List<EmotionEntry>();
+        foreach (var kv in EmotionKeyToPath)
+        {
+            var spr = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(kv.Value);
+            if (spr != null)
+            {
+                list.Add(new EmotionEntry { key = kv.Key, sprite = spr });
+            }
+            else
+            {
+                Debug.LogWarning($"[DialogueScene] Emotion sprite not found: {kv.Value}");
+            }
+        }
+        _emotions = list.ToArray();
+        UnityEditor.EditorUtility.SetDirty(this);
+        Debug.Log($"[DialogueScene] Auto-loaded {list.Count}/{EmotionKeyToPath.Count} emotion sprites.");
+    }
+#endif
 
     void Update()
     {
@@ -165,6 +229,9 @@ public class DialogueSceneManager : MonoBehaviour
                 _speakerTxt.color = isA
                     ? new Color(0.25f, 0.85f, 0.50f)
                     : new Color(0.80f, 0.40f, 1.00f);
+
+                if (!string.IsNullOrEmpty(node.EmotionKey))
+                    ApplyEmotion(node.EmotionKey, isA);
 
                 if (_animCr != null) StopCoroutine(_animCr);
                 _animCr = StartCoroutine(AnimateChars(isA));

@@ -148,6 +148,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d059c2fb36f4d84cb817ccf2e09b92f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueSceneManager
+  _emotions:
+  - key: "\uC7AD\uB450_\uBD84\uB178"
+    sprite: {fileID: 21300000, guid: 7bcf71d1e74c66848a8f6d0fae226e02, type: 3}
+  - key: "\uC7AD\uB450_\uBB34\uD45C\uC8152_\uD654\uB0A8"
+    sprite: {fileID: 21300000, guid: 42150820a0c2de748a5370241e0da5be, type: 3}
+  - key: "\uBB3C\uADC0\uC2E0_\uC2AC\uD514"
+    sprite: {fileID: 21300000, guid: 90c2129e8b5db6842a4514757b916c63, type: 3}
+  - key: "\uBB3C\uADC0\uC2E0_\uBD84\uB178"
+    sprite: {fileID: 21300000, guid: 184a71de269f8094397dc411896f7ab1, type: 3}
 --- !u!4 &293011789
 Transform:
   m_ObjectHideFlags: 0
