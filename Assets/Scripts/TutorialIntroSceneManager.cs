@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// TutorialIntroScene  → 튜토리얼 시작 대사 → BattleScene(tutorial 플래그)
@@ -18,52 +19,73 @@ public class TutorialIntroSceneManager : MonoBehaviour
     class Node
     {
         public NodeType  Type;
-        public string    Speaker;    // Line 화자
-        public string    ChoiceSpk;  // Choice 화자 표시명 (null → "신령님")
+        public string    Speaker;
+        public string    ChoiceSpk;
         public string    Text;
         public string[]  Choices;
         public int       Next;
+        public string    EmotionKey;
+    }
+
+    [System.Serializable]
+    public class EmotionEntry
+    {
+        public string key;
+        public Sprite sprite;
     }
 
     // ── Tutorial START 대사 ────────────────────────────────────────────
     static readonly Node[] StartNodes =
     {
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 0: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_놀람, 당황",
             Text="시스템 재부팅... 으윽. 어? 화면 밖에... 누구 계십니까?", Next=1 },
 
+        // 1: 선택지 (???)
         new Node { Type=NodeType.Choice, ChoiceSpk="???", Next=2,
             Choices=new[]{ "어, 게임 방금 켰는데. 넌 뭐야?", "뭐지? 내 컴퓨터 해킹당한 건가?" } },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 2: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_웃음1",
             Text="아, 해킹 아닙니다! 놀라셨다면 죄송합니다. 저는 잭두라고 합니다. 원인 모를 신병을 고치려고 전 재산을 털어 내림굿을 받았는데... 제 시스템에 강림하신 신이 바로 당신이신 것 같군요.", Next=3 },
 
+        // 3: 선택지 (???)
         new Node { Type=NodeType.Choice, ChoiceSpk="???", Next=4,
             Choices=new[]{ "내가 신이라고? 난 그냥 게임 끌 건데.", "귀찮네. 그냥 종료 버튼 누르고 딴 거 할래. 수고해." } },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 4: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_슬픔2",
             Text="잠시만요 신령님!!! 제발 종료 버튼만은 누르지 말아주십시오! 지금 나가시면 전 내일 아침 폐차장에서 캔으로 압축됩니다 한 번만 살려주십시오...", Next=5 },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 5: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_무표정",
             Text="다행히 굿을 받고 나서, 억울한 귀신들의 한풀이 판을 깔아주는 하드웨어는 생겼습니다. 그런데 기계인 저 혼자서는 진짜 성불이 안 됩니다. 원혼을 달랠 진짜 '알맹이', 그러니까 화면 밖 신령님의 '리듬'이 개입해야만 위령이 가능합니다.", Next=6 },
 
+        // 6: 선택지 (신령님)
         new Node { Type=NodeType.Choice, ChoiceSpk="신령님", Next=7,
             Choices=new[]{ "결국 나보고 리듬 게임 대리 뛰어달라는 소리네.", "내가 치면 돈은 네가 번다고? 날강도네 완전." } },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 7: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_웃음2",
             Text="수익은... 제가 목숨만 건지면 어떻게든 보답하겠습니다! 제발 부탁드립니다. 방식은 아주 간단합니다. 귀신들이 먼저 자기들 한풀이랍시고 진상을 부리며 박자를 칠 겁니다.", Next=8 },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 8: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_웃음1",
             Text="저 녀석이 움직이는 방향과 박자를 그대로 기억했다가 방향키를 눌러 똑같이 따라 하십시오.\n\n마지막에 놈이 아래로 향하는 동작과 Hey! 소리를 내며 멈추면, 그게 턴이 끝났다는 신호입니다.", Next=9 },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 9: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_무표정",
             Text="아, 가장 중요한 판정을 깜빡할 뻔했군요. 박자를 얼마나 칼같이 맞추셨느냐에 따라 합격과 불합격이 갈립니다. 정확하게 맞출수록 제 시스템이 안정되지만, 타이밍을 놓치거나 엉뚱한 키를 누르면 제 몸뚱이가 둔탁하게 얻어맞는 소리와 함께 에러가 누적됩니다.", Next=10 },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 10: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_웃음1",
             Text="연습이니까 너무 긴장하실 필요는 없지만, 제 하드웨어가 버텨낼 수 있도록 최소한 B 랭크 이상은 제대로 맞춰 주셔야 합니다. 안 그러면... 통과할 때까지 이 지옥의 훈련을 무한 반복하셔야 하니까요!", Next=11 },
 
-        new Node { Type=NodeType.Line, Speaker="잭두",
+        // 11: 잭두
+        new Node { Type=NodeType.Line, Speaker="잭두", EmotionKey="잭두_웃음1",
             Text="말로 설명하는 것보다 직접 패보는 게 빠르겠죠. 연습용 샌드백 하나 띄우겠습니다.", Next=12 },
 
+        // 12: end
         new Node { Type=NodeType.End },
     };
 
@@ -101,6 +123,10 @@ public class TutorialIntroSceneManager : MonoBehaviour
     TextMeshProUGUI[] _choiceTxts;
     TMP_FontAsset     _font;
 
+    // ── Emotion sprites ────────────────────────────────────────────────
+    [SerializeField] EmotionEntry[] _emotions;
+    Dictionary<string, Sprite>      _emotionDict = new Dictionary<string, Sprite>();
+
     // ── State ──────────────────────────────────────────────────────────
     Node[]    _nodes;
     bool      _isClearScene;
@@ -123,6 +149,7 @@ public class TutorialIntroSceneManager : MonoBehaviour
         _font = Resources.Load<TMP_FontAsset>("Fonts/NeoDunggeunmoProSDF");
         BuildUI();
         BuildVoice();
+        BuildEmotionDict();
 
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; _charAImg.color = ColInactive; }
@@ -142,6 +169,49 @@ public class TutorialIntroSceneManager : MonoBehaviour
         _dialogueTxt.text = "";
         PlayNode(0);
     }
+
+    void BuildEmotionDict()
+    {
+        _emotionDict = new Dictionary<string, Sprite>();
+        if (_emotions == null) return;
+        foreach (var e in _emotions)
+            if (e != null && !string.IsNullOrEmpty(e.key) && e.sprite != null)
+                _emotionDict[e.key] = e.sprite;
+    }
+
+    void ApplyEmotion(string key)
+    {
+        if (_emotionDict.TryGetValue(key, out var spr) && spr != null)
+        {
+            _charAImg.sprite = spr;
+            _charAImg.preserveAspect = true;
+        }
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("Auto-Load Emotions from Assets/EmotionImage")]
+    void EditorAutoLoadEmotions()
+    {
+        var keys = new[] { "잭두_놀람, 당황", "잭두_웃음1", "잭두_웃음2", "잭두_슬픔2", "잭두_무표정" };
+        var list = new List<EmotionEntry>();
+        foreach (var key in keys)
+        {
+            var path = $"Assets/EmotionImage/{key}.png";
+            var spr  = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (spr != null)
+            {
+                list.Add(new EmotionEntry { key = key, sprite = spr });
+            }
+            else
+            {
+                Debug.LogWarning($"[TutorialIntro] Emotion sprite not found: {path} — 해당 PNG의 Texture Type을 'Sprite'로 변경해주세요.");
+            }
+        }
+        _emotions = list.ToArray();
+        UnityEditor.EditorUtility.SetDirty(this);
+        Debug.Log($"[TutorialIntro] Auto-loaded {list.Count}/{keys.Length} emotion sprites.");
+    }
+#endif
 
     void Update()
     {
@@ -193,6 +263,10 @@ public class TutorialIntroSceneManager : MonoBehaviour
                 _speakerTxt.color = isJackdoo
                     ? new Color(0.25f, 0.85f, 0.50f)
                     : new Color(0.85f, 0.80f, 0.30f);
+
+                if (isJackdoo && !string.IsNullOrEmpty(node.EmotionKey))
+                    ApplyEmotion(node.EmotionKey);
+
                 if (_animCr != null) StopCoroutine(_animCr);
                 _animCr = StartCoroutine(AnimateChar(isJackdoo));
                 if (_typeCr != null) StopCoroutine(_typeCr);

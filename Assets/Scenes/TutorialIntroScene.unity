@@ -146,9 +146,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93ecf79c3ca24ff4c8eb96464646890e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialIntroSceneManager
-  _font: {fileID: 11400000, guid: 12d0c77623cc95c449c35a1965ec0218, type: 2}
+  _emotions:
+  - key: "\uC7AD\uB450_\uB180\uB78C, \uB2F9\uD669"
+    sprite: {fileID: 21300000, guid: 4733557abea1d7f45a0c69ba27b86231, type: 3}
+  - key: "\uC7AD\uB450_\uC6C3\uC74C1"
+    sprite: {fileID: 21300000, guid: 2d29a0d6f75a67643a6647239f533c4f, type: 3}
+  - key: "\uC7AD\uB450_\uC6C3\uC74C2"
+    sprite: {fileID: 21300000, guid: 14911fddc8b858f45a9c25129c629bba, type: 3}
+  - key: "\uC7AD\uB450_\uC2AC\uD5142"
+    sprite: {fileID: 21300000, guid: 0bfc084e2a4a1e64fadb4f842ca274eb, type: 3}
+  - key: "\uC7AD\uB450_\uBB34\uD45C\uC815"
+    sprite: {fileID: 21300000, guid: df2abf19c9a529e448ca497f008bf28f, type: 3}
 --- !u!4 &100000003
 Transform:
   m_ObjectHideFlags: 0
@@ -267,7 +277,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
   m_RenderShadows: 1
   m_RequiresDepthTextureOption: 2
