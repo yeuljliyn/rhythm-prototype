@@ -29,9 +29,18 @@ StartScene → LobbyScene(스테이지 선택) → DialogueScene
 
 `NoteManager`, `Note`, `ArrowSprite`, `CircleSprites`, `LaneIndicator` 등은 예전 "노트 레인" 방식의 잔재. direction-pattern 방식으로 대체되어 현재 사용 안 함 — 이쪽을 되살릴 게 아니라면 건드릴 필요 없음.
 
-## 진행 중인 방향 (2026-07-14 기준)
+## Stage1 콜-리스폰스 배틀 (신규 — `Stage1Scene`, 진행 중)
 
-배틀씬을 완전히 다른 방식으로 새로 만들 예정. **기존 `BattleScene`/`BattleDirector`는 그대로 두고, 새 씬을 따로 만들어서 작업.** 기존 시스템을 "고친다"는 가정으로 수정하지 말 것 — 새 방향에 대한 구체적인 설계는 아직 미정이니 작업 전 사용자에게 확인.
+배틀씬을 완전히 다른 방식으로 새로 만드는 중. **기존 `BattleScene`/`BattleDirector`는 그대로 두고, `Assets/Scenes/Stage1Scene.unity`에서 독립적으로 작업.** 기존 시스템을 "고친다"는 가정으로 수정하지 말 것.
+
+리듬천국 스타일 콜(Call, 게임이 박자를 알려줌) + 리스폰스(Response, 탭/홀드릴리즈 입력) 엔진. 버튼 1개(Space·마우스 좌클릭을 같은 응답으로 처리), 판정은 Hit/Miss 2단뿐, 플레이 중 점수·콤보·%는 화면에 안 띄우고 콜마다 즉시 반응만 보여줌. 곡 끝에만 랭크(B 이상 클리어) 표시, 미스해도 곡은 끝까지 진행.
+
+- `CallPatternData` (ScriptableObject, `Assets/Scripts/Data/CallPatternData.cs`, 에셋은 `Assets/CallPatterns/`): 플랫한 `CallEntry`(`Tap`/`Hold`, `cueBeat`/`releaseBeat`) 리스트. 기존 `PatternData`의 `DirectionGroup`(콜 구간→응답 구간 순차 구조)과 달리 **구조적으로 콜끼리 겹칠 수 있음** — 이게 이번 재작업의 핵심 요구사항.
+- `CallClock`: `RhythmManager`와 별개의 dspTime 기반 클록. `RhythmManager`는 `PatternData` 타입에 결합돼 있어 재사용하지 않고 같은 공식을 새로 구현.
+- `CallDirector`: 겹치는 콜들의 판정 상태머신. 버튼 입력 시 열려있는 콜 중 **마감이 가장 임박한 콜**에 배정. Hold는 릴리즈 시점만 판정하고, 조기 이탈은 즉시 확정 미스(재시도 불가).
+- `CallCueIndicator` / `Stage1ResultUI`: 각각 플레이스홀더 큐 비주얼, 곡 끝 랭크 표시. `GameManager`/`ScreenVignetteFlash`/`BattleSFXController`는 방향(ArrowDir) 의존성이 없어 그대로 재사용.
+- 새 에디터 툴 `RhythmGame → Call Map Editor` (`Assets/Editor/Stage1CallMapEditorWindow.cs`): 기존 `RhythmGame → Beat Map Editor`(`BeatMapEditorWindow.cs`)를 참고했지만 절대 수정하지 않고 새로 작성. 기존 툴의 `IsBeatInConfirmedGroup` 같은 겹침 잠금 로직이 없음 — Tap/Hold 두 레인에 언제든 겹쳐 찍을 수 있음. REC 모드는 Space/마우스 클릭을 누르고 있는 길이로 Tap/Hold를 자동 구분.
+- **아직 안 된 것**: 스테이지1의 실제 미니게임 5개(개미 파도타기/물타기/존버/초단타/리믹스 보스) 각각의 전용 캐릭터 비주얼·사운드, 여러 `CallPatternData`를 이어 재생하는 시퀀스 매니저. 기획 비주얼 에셋 확보 후 진행 — 그 전까지는 위 엔진 + 에디터 툴 + 최소 재생 가능한 씬 골격까지만 완성된 상태.
 
 ## 컨벤션
 
@@ -40,3 +49,4 @@ StartScene → LobbyScene(스테이지 선택) → DialogueScene
 ## 참고
 
 - 이 컴퓨터엔 독립 git이 PATH에 없음. GitHub Desktop 번들 git 사용: `$env:LocalAppData\GitHubDesktop\app-*\resources\app\git\cmd\git.exe`
+- MCP 브릿지(`com.ivanmurzak.unity.mcp`)가 컴파일 에러(`CS0115` 등)로 안 뜨면 `Assets/Plugins/NuGet`의 의존 DLL 버전 불일치일 가능성이 높음. `Tools → AI Game Developer → Dependencies → Force Resolve NuGet DLLs`로 재해결 시도. 그래도 안 바뀌면 Unity 프로세스가 그 DLL을 물고 있어서(Windows 파일 잠금) 그런 것이니 에디터를 완전히 껐다 켠 뒤 다시 시도.

@@ -352,7 +352,7 @@ Read the /unity-initial-setup skill for detailed installation instructions.
       ],
       "description": "Component reference. Used to find a Component at GameObject."
     },
-    "System.String[]": {
+    "System.String-1": {
       "type": "array",
       "items": {
         "type": "string"
@@ -378,7 +378,7 @@ Read the /unity-initial-setup skill for detailed installation instructions.
           "description": "Index of the ParticleSystem component in the GameObject's component list."
         },
         "logs": {
-          "$ref": "#/$defs/System.String[]",
+          "$ref": "#/$defs/System.String-1",
           "description": "Log of modifications made and any warnings/errors encountered."
         }
       },

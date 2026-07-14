@@ -44,11 +44,11 @@ Read the /unity-initial-setup skill for detailed installation instructions.
   "type": "object",
   "properties": {
     "sourcePaths": {
-      "$ref": "#/$defs/System.String[]"
+      "$ref": "#/$defs/System.String-1"
     }
   },
   "$defs": {
-    "System.String[]": {
+    "System.String-1": {
       "type": "array",
       "items": {
         "type": "string"
@@ -70,17 +70,17 @@ Read the /unity-initial-setup skill for detailed installation instructions.
   "type": "object",
   "properties": {
     "result": {
-      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Animation.AnimationTools+CreateAnimationResponse"
+      "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Animation.AnimationTools-CreateAnimationResponse"
     }
   },
   "$defs": {
-    "System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Animation.AnimationTools+CreatedAnimationInfo>": {
+    "System.Collections.Generic.List(com.IvanMurzak.Unity.MCP.Animation.AnimationTools-CreatedAnimationInfo)": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Animation.AnimationTools+CreatedAnimationInfo"
+        "$ref": "#/$defs/com.IvanMurzak.Unity.MCP.Animation.AnimationTools-CreatedAnimationInfo"
       }
     },
-    "com.IvanMurzak.Unity.MCP.Animation.AnimationTools+CreatedAnimationInfo": {
+    "com.IvanMurzak.Unity.MCP.Animation.AnimationTools-CreatedAnimationInfo": {
       "type": "object",
       "properties": {
         "path": {
@@ -97,20 +97,20 @@ Read the /unity-initial-setup skill for detailed installation instructions.
         "instanceId"
       ]
     },
-    "System.Collections.Generic.List<System.String>": {
+    "System.Collections.Generic.List(System.String)": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "com.IvanMurzak.Unity.MCP.Animation.AnimationTools+CreateAnimationResponse": {
+    "com.IvanMurzak.Unity.MCP.Animation.AnimationTools-CreateAnimationResponse": {
       "type": "object",
       "properties": {
         "createdAssets": {
-          "$ref": "#/$defs/System.Collections.Generic.List<com.IvanMurzak.Unity.MCP.Animation.AnimationTools+CreatedAnimationInfo>"
+          "$ref": "#/$defs/System.Collections.Generic.List(com.IvanMurzak.Unity.MCP.Animation.AnimationTools-CreatedAnimationInfo)"
         },
         "errors": {
-          "$ref": "#/$defs/System.Collections.Generic.List<System.String>"
+          "$ref": "#/$defs/System.Collections.Generic.List(System.String)"
         }
       }
     }
