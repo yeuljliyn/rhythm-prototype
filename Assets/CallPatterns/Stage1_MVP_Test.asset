@@ -18,13 +18,4 @@ MonoBehaviour:
   introDelay: 2
   hitWindow: 0.12
   liveInputStartBeat: 0
-  calls:
-  - type: 0
-    cueBeat: 8
-    releaseBeat: 0
-  - type: 0
-    cueBeat: 8.25
-    releaseBeat: 0
-  - type: 1
-    cueBeat: 10
-    releaseBeat: 12
+  calls: []

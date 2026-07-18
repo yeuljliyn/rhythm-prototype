@@ -77,7 +77,7 @@ public class CallDirector : MonoBehaviour
     LiveCall BuildLiveCall(CallEntry entry)
     {
         float cueTime = pattern.BeatToTime(entry.cueBeat);
-        bool  isDemo  = entry.cueBeat < pattern.liveInputStartBeat;
+        bool  isDemo  = entry.role == CallRole.Call || entry.cueBeat < pattern.liveInputStartBeat;
 
         if (entry.type == CallType.Tap)
         {

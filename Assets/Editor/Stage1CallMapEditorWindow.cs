@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,13 @@ using UnityEngine;
 /// REC mode: Space or mouse-left down/up records a Tap (short press) or Hold (long press).
 /// Edit mode: Tap lane = click add / drag move / right-click delete.
 ///            Hold lane = drag to create a bar / drag either handle to resize / drag body to move.
+///
+/// Call/Response workflow: every hand-placed note defaults to CallRole.Call (the designer only
+/// ever authors the "boss shows the rhythm" notes). Press Z once the call group is finished to
+/// mirror its rhythm into an auto-generated CallRole.Response group (CallDirector judges Response,
+/// never Call) — the matching response notes are never hand-placed. Select a note and press C to
+/// flip its role manually for the rare exception (e.g. an extra Call dropped inside an already-
+/// generated Response range for look-ahead, which needs to stay Call after the echo).
 /// </summary>
 public class Stage1CallMapEditorWindow : EditorWindow
 {
@@ -46,11 +54,23 @@ public class Stage1CallMapEditorWindow : EditorWindow
     static readonly string[] SnapLabels = { "1/1", "1/2", "1/4", "1/8", "1/16" };
     int _snapIndex = 2;
 
+    // ── Echo (Z key) ────────────────────────────────────────────────────────
+    // New Call notes are stamped with _currentGroupId as they're placed (regardless of where
+    // they land in time — an overlapping look-ahead Call dropped inside an active Response zone
+    // still belongs to "whatever group is currently being authored"). Z mirrors that group's Call
+    // entries into a Response group (same groupId), then advances to the next id. This grouping
+    // is authoring-order based, not time-order based, so it can't be corrupted by overlaps.
+    int _currentGroupId;
+    [SerializeField] float _echoGapBeats = 1f;
+
     // ── Layout constants ───────────────────────────────────────────────────
     const float LABEL_W    = 48f;
     const float RULER_H    = 22f;
     const float LANE_H     = 44f;
-    const int   LANE_COUNT = 2;
+    const int   LANE_COUNT = 2;   // sections: Tap, Hold
+    const int   SUBROWS    = 2;   // each section is always drawn as this many fixed full-height rows
+    const int   TOTAL_ROWS = LANE_COUNT * SUBROWS;
+    const int   GROUP_BANDS = 2;  // fixed bands the group background wash is split into when groups overlap in time
     const float NOTE_W     = 10f;
     const float MIN_HOLD_BEATS = 0.1f;
 
@@ -59,6 +79,13 @@ public class Stage1CallMapEditorWindow : EditorWindow
     {
         new Color(1.00f, 0.85f, 0.20f),   // Tap  – yellow
         new Color(0.30f, 0.70f, 1.00f),   // Hold – blue
+    };
+
+    // Alternating call+response group background tints (mirrors BeatMapEditorWindow's look)
+    static readonly Color[] GroupBgColors =
+    {
+        new Color(0.20f, 0.40f, 0.60f, 0.12f),
+        new Color(0.50f, 0.20f, 0.60f, 0.12f),
     };
 
     // ── Audio reflection ───────────────────────────────────────────────────
@@ -128,7 +155,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
             {
                 var next = (CallPatternData)EditorGUILayout.ObjectField(
                     "Call Pattern Data", _pattern, typeof(CallPatternData), false);
-                if (next != _pattern) { StopSession(); _pattern = next; _selEntry = null; }
+                if (next != _pattern) { StopSession(); _pattern = next; _selEntry = null; _currentGroupId = NextFreeGroupId(next); }
                 if (GUILayout.Button("New", GUILayout.Width(44))) CreateNewCallPattern();
             }
 
@@ -158,16 +185,20 @@ public class Stage1CallMapEditorWindow : EditorWindow
             if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(_pattern);
 
             int total = _pattern.calls?.Count ?? 0;
-            int taps  = 0, holds = 0;
+            int taps  = 0, holds = 0, calls = 0, responses = 0;
             if (_pattern.calls != null)
-                foreach (var c in _pattern.calls) { if (c.type == CallType.Tap) taps++; else holds++; }
+                foreach (var c in _pattern.calls)
+                {
+                    if (c.type == CallType.Tap) taps++; else holds++;
+                    if (c.role == CallRole.Call) calls++; else responses++;
+                }
 
             float dur = _pattern.music != null ? _pattern.music.length : 0f;
             string durStr = dur > 0
                 ? $"{Mathf.FloorToInt(dur / 60f):0}:{dur % 60f:00.#}"
                 : "–";
             EditorGUILayout.LabelField(
-                $"Calls: {total}  (Tap {taps} / Hold {holds})   Duration: {durStr}   " +
+                $"Calls: {total}  (Tap {taps} / Hold {holds})   Call {calls} / Response {responses}   Duration: {durStr}   " +
                 "Overlap is always allowed — no lock zones.",
                 EditorStyles.miniLabel);
         }
@@ -219,6 +250,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
                         Undo.RecordObject(_pattern, "Clear Pattern");
                         _pattern.calls?.Clear();
                         _selEntry = null;
+                        _currentGroupId = 0;
                         EditorUtility.SetDirty(_pattern);
                     }
                 }
@@ -234,6 +266,16 @@ public class Stage1CallMapEditorWindow : EditorWindow
                 GUILayout.Space(8);
                 EditorGUILayout.LabelField("Snap", EditorStyles.miniLabel, GUILayout.Width(32));
                 _snapIndex = EditorGUILayout.Popup(_snapIndex, SnapLabels, EditorStyles.toolbarPopup, GUILayout.Width(50));
+                GUILayout.Space(8);
+                EditorGUILayout.LabelField(
+                    new GUIContent("Echo Gap", "Only used as a fallback when Z is pressed with no music " +
+                        "playing (REC/PREVIEW off). While REC/PREVIEW is running, Z uses the exact beat " +
+                        "it was pressed at instead."),
+                    EditorStyles.miniLabel, GUILayout.Width(56));
+                _echoGapBeats = EditorGUILayout.FloatField(_echoGapBeats, GUILayout.Width(36));
+                GUILayout.Space(8);
+                EditorGUILayout.LabelField("Group #", EditorStyles.miniLabel, GUILayout.Width(48));
+                _currentGroupId = Mathf.Max(0, EditorGUILayout.IntField(_currentGroupId, GUILayout.Width(30)));
                 GUILayout.Space(8);
 
                 string timeStr = (_isRecording || _isPlaying) && _pattern != null
@@ -255,10 +297,14 @@ public class Stage1CallMapEditorWindow : EditorWindow
             }
             else if (!_isPlaying)
             {
-                string selInfo = _selEntry != null ? $"   |   Selected: {_selEntry.type} @ beat {_selEntry.cueBeat:F2}" : "";
+                string selInfo = _selEntry != null
+                    ? $"   |   Selected: {_selEntry.type} @ beat {_selEntry.cueBeat:F2} [{_selEntry.role}]  (C = toggle Call/Response)"
+                    : "";
                 EditorGUILayout.LabelField(
                     "Tap lane: click = add, drag = move, right-click = delete.   " +
-                    "Hold lane: drag empty space = create, drag handles/body = resize/move.   Del = delete selected" + selInfo,
+                    "Hold lane: drag empty space = create, drag handles/body = resize/move.   " +
+                    $"Z = echo Group #{_currentGroupId}'s Calls into a Response, then advance to #{_currentGroupId + 1}.   " +
+                    "Del = delete selected" + selInfo,
                     EditorStyles.miniLabel);
             }
         }
@@ -276,9 +322,9 @@ public class Stage1CallMapEditorWindow : EditorWindow
 
         float totalAudio = Mathf.Max(10f, _pattern.music != null ? _pattern.music.length : 60f);
         float contentW   = (_pattern.introDelay + totalAudio) * _zoom + 120f;
-        float contentH   = RULER_H + LANE_H * LANE_COUNT;
+        float contentH   = RULER_H + LANE_H * TOTAL_ROWS;
 
-        Rect labelsRect = new Rect(full.x, full.y + RULER_H, LABEL_W, LANE_H * LANE_COUNT);
+        Rect labelsRect = new Rect(full.x, full.y + RULER_H, LABEL_W, LANE_H * TOTAL_ROWS);
         DrawLaneLabels(labelsRect);
 
         Rect scrollRect  = new Rect(full.x + LABEL_W, full.y, full.width - LABEL_W, full.height);
@@ -289,6 +335,8 @@ public class Stage1CallMapEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(0, 0, contentW, contentH), new Color(0.12f, 0.12f, 0.12f));
         DrawRulerAndGrid(contentW, totalAudio);
         DrawLaneBackgrounds(contentW);
+        RecomputeGroupBands();
+        DrawCallResponseGroups(contentH);
         DrawCalls();
         if (_isRecording && _isPressed) DrawRecordingPreview();
         DrawPlayhead(contentH);
@@ -298,14 +346,25 @@ public class Stage1CallMapEditorWindow : EditorWindow
         GUI.EndScrollView();
     }
 
+    // Physical row layout interleaves sections instead of stacking each section's rows together:
+    // row 0 = Tap/sub0, row 1 = Hold/sub0, row 2 = Tap/sub1, row 3 = Hold/sub1 ("TAP HOLD TAP
+    // HOLD", not "TAP TAP HOLD HOLD"). This matters for DrawCallResponseGroups' band split: with
+    // interleaving, band 0 (rows 0-1) and band 1 (rows 2-3) each contain one full Tap+Hold pass,
+    // instead of band 0 = Tap section, band 1 = Hold section (a coincidence in the old ordering
+    // that made overlapping-group bands look identical to the Tap/Hold split).
+    static int SectionOfRow(int row) => row % LANE_COUNT;
+    static int SubRowOfRow(int row)  => row / LANE_COUNT;
+    static int RowOf(int section, int subRow) => subRow * LANE_COUNT + section;
+
     void DrawLaneLabels(Rect rect)
     {
-        for (int i = 0; i < LANE_COUNT; i++)
+        for (int row = 0; row < TOTAL_ROWS; row++)
         {
-            Rect  r = new Rect(rect.x, rect.y + i * LANE_H, rect.width, LANE_H);
-            Color c = LaneColors[i];
+            int   section = SectionOfRow(row);
+            Rect  r = new Rect(rect.x, rect.y + row * LANE_H, rect.width, LANE_H);
+            Color c = LaneColors[section];
             EditorGUI.DrawRect(r, new Color(c.r * 0.18f, c.g * 0.18f, c.b * 0.18f));
-            GUI.Label(r, LaneLabels[i], new GUIStyle(EditorStyles.boldLabel)
+            GUI.Label(r, LaneLabels[section], new GUIStyle(EditorStyles.boldLabel)
             {
                 alignment = TextAnchor.MiddleCenter,
                 normal    = { textColor = c }
@@ -318,7 +377,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(0, 0, totalW, RULER_H), new Color(0.08f, 0.08f, 0.08f));
 
         float introW = _pattern.introDelay * _zoom;
-        EditorGUI.DrawRect(new Rect(0, 0, introW, RULER_H + LANE_H * LANE_COUNT),
+        EditorGUI.DrawRect(new Rect(0, 0, introW, RULER_H + LANE_H * TOTAL_ROWS),
             new Color(0f, 0f, 0f, 0.35f));
         if (introW > 20f)
             GUI.Label(new Rect(4f, 2f, 50f, RULER_H - 4f), "intro",
@@ -327,7 +386,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
         float liveX = (_pattern.introDelay + _pattern.BeatToTime(_pattern.liveInputStartBeat)) * _zoom;
         if (liveX > introW && liveX < totalW)
         {
-            EditorGUI.DrawRect(new Rect(liveX, 0f, 2f, RULER_H + LANE_H * LANE_COUNT), new Color(0.6f, 1f, 0.6f, 0.6f));
+            EditorGUI.DrawRect(new Rect(liveX, 0f, 2f, RULER_H + LANE_H * TOTAL_ROWS), new Color(0.6f, 1f, 0.6f, 0.6f));
             GUI.Label(new Rect(liveX + 3f, 2f, 40f, RULER_H - 4f), "LIVE",
                 new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(0.6f, 1f, 0.6f) } });
         }
@@ -343,7 +402,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
             if (x > totalW) break;
 
             bool isMeasure = (i % 4 == 0);
-            EditorGUI.DrawRect(new Rect(x, RULER_H, 1f, LANE_H * LANE_COUNT),
+            EditorGUI.DrawRect(new Rect(x, RULER_H, 1f, LANE_H * TOTAL_ROWS),
                 new Color(0.6f, 0.6f, 0.6f, isMeasure ? 0.55f : 0.20f));
 
             if (isMeasure)
@@ -362,36 +421,90 @@ public class Stage1CallMapEditorWindow : EditorWindow
 
     void DrawLaneBackgrounds(float totalW)
     {
-        for (int i = 0; i < LANE_COUNT; i++)
+        for (int row = 0; row < TOTAL_ROWS; row++)
         {
-            float y  = RULER_H + i * LANE_H;
-            Color bg = i % 2 == 0 ? new Color(0.155f, 0.155f, 0.155f) : new Color(0.130f, 0.130f, 0.130f);
+            int   section = SectionOfRow(row);
+            float y  = RULER_H + row * LANE_H;
+            Color bg = section % 2 == 0 ? new Color(0.155f, 0.155f, 0.155f) : new Color(0.130f, 0.130f, 0.130f);
             EditorGUI.DrawRect(new Rect(0f, y, totalW, LANE_H), bg);
+
+            if (row < TOTAL_ROWS - 1)
+                EditorGUI.DrawRect(new Rect(0f, y + LANE_H, totalW, 1f), new Color(0f, 0f, 0f, 0.35f));
         }
+    }
+
+    // Sub-row assignment from the most recent DrawCalls() pass, reused by hit-testing so a click
+    // only matches notes actually in the row under the cursor (fixes picking the wrong one of two
+    // vertically-stacked overlapping notes).
+    readonly Dictionary<CallEntry, int> _tapRowCache  = new Dictionary<CallEntry, int>();
+    readonly Dictionary<CallEntry, int> _holdRowCache = new Dictionary<CallEntry, int>();
+
+    // groupId -> band (0/1), recomputed once per repaint (see RecomputeGroupBands) and shared by
+    // both DrawCallResponseGroups (background wash) and DrawCalls (note rows) so a group's notes
+    // always land in the same row as its own background band.
+    readonly Dictionary<int, int> _groupBandCache = new Dictionary<int, int>();
+
+    /// Alternates groups between GROUP_BANDS fixed bands in start-time order (0, 1, 0, 1, ...).
+    void RecomputeGroupBands()
+    {
+        _groupBandCache.Clear();
+        if (_pattern.calls == null) return;
+
+        var starts = new List<(int groupId, float start)>();
+        foreach (var grp in _pattern.calls.Where(c => c.groupId >= 0).GroupBy(c => c.groupId))
+        {
+            var callEntries = grp.Where(c => c.role == CallRole.Call).ToList();
+            var respEntries = grp.Where(c => c.role == CallRole.Response).ToList();
+            if (callEntries.Count == 0 && respEntries.Count == 0) continue;
+
+            float start = callEntries.Count > 0 ? callEntries.Min(c => c.cueBeat) : respEntries.Min(c => c.cueBeat);
+            starts.Add((grp.Key, start));
+        }
+
+        var ordered = starts.OrderBy(s => s.start).ToList();
+        for (int i = 0; i < ordered.Count; i++)
+            _groupBandCache[ordered[i].groupId] = i % GROUP_BANDS;
     }
 
     void DrawCalls()
     {
         if (_pattern.calls == null) return;
+
+        _tapRowCache.Clear();
+        _holdRowCache.Clear();
         foreach (var entry in _pattern.calls)
         {
-            if (entry.type == CallType.Tap) DrawTapNote(entry);
-            else                            DrawHoldBar(entry);
+            // A note's row always matches the fixed band its own group was assigned (see
+            // RecomputeGroupBands) — not an independent per-note overlap check. This keeps every
+            // note visually lined up with its group's background wash, and means row assignment
+            // no longer depends on whether notes happen to literally overlap in time: different
+            // groups always land on different rows, same group always shares one row.
+            int band = entry.groupId >= 0 && _groupBandCache.TryGetValue(entry.groupId, out int b) ? b : 0;
+            if (entry.type == CallType.Tap) { _tapRowCache[entry] = band; DrawTapNote(entry, band); }
+            else                            { _holdRowCache[entry] = band; DrawHoldBar(entry, band); }
         }
     }
 
     float BeatX(float beat) => (_pattern.introDelay + _pattern.BeatToTime(beat)) * _zoom;
 
-    void DrawTapNote(CallEntry entry)
+    /// Fixed-position rect for one of a section's SUBROWS (2) always-present full-height rows.
+    /// sectionIndex: 0 = Tap, 1 = Hold.
+    static (float y, float h) FixedSubRowRect(int sectionIndex, int subRow)
+    {
+        float rowTop = RULER_H + RowOf(sectionIndex, subRow) * LANE_H;
+        return (rowTop + 6f, LANE_H - 12f);
+    }
+
+    void DrawTapNote(CallEntry entry, int subRow)
     {
         bool  selected = entry == _selEntry;
         bool  dragging = selected && _isDragging && _dragHandle == DragHandle.TapNote;
         float beat     = dragging ? _dragOriginCueBeat + _dragBeatDelta : entry.cueBeat;
 
+        var (y, h) = FixedSubRowRect(0, subRow);
         float x = BeatX(beat) - NOTE_W * 0.5f;
-        float y = RULER_H + 0 * LANE_H + 6f;
-        float h = LANE_H - 12f;
         Color col = LaneColors[0];
+        if (entry.role == CallRole.Call) col.a = 0.4f; // Call = demo cue, dimmed. Response = full color.
 
         if (selected)
         {
@@ -400,7 +513,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
         }
         EditorGUI.DrawRect(new Rect(x, y, NOTE_W, h), col);
         EditorGUI.DrawRect(new Rect(x + 2f, y + 2f, NOTE_W - 4f, h * 0.4f),
-            new Color(1f, 1f, 1f, 0.35f));
+            new Color(1f, 1f, 1f, entry.role == CallRole.Call ? 0.2f : 0.35f));
 
         if (dragging)
             GUI.Label(new Rect(x - 12f, y - 16f, 50f, 14f), $"B {beat:F2}",
@@ -410,7 +523,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
             EditorGUIUtility.AddCursorRect(new Rect(x - 6f, y, NOTE_W + 12f, h), MouseCursor.MoveArrow);
     }
 
-    void DrawHoldBar(CallEntry entry)
+    void DrawHoldBar(CallEntry entry, int subRow)
     {
         bool selected = entry == _selEntry;
         float cueBeat     = entry.cueBeat;
@@ -426,11 +539,11 @@ public class Stage1CallMapEditorWindow : EditorWindow
             }
         }
 
+        var (y, h) = FixedSubRowRect(1, subRow);
         float x0 = BeatX(cueBeat);
         float x1 = BeatX(releaseBeat);
-        float y  = RULER_H + 1 * LANE_H + 6f;
-        float h  = LANE_H - 12f;
         Color col = LaneColors[1];
+        if (entry.role == CallRole.Call) col.a = 0.4f;
 
         if (selected)
         {
@@ -454,11 +567,72 @@ public class Stage1CallMapEditorWindow : EditorWindow
         }
     }
 
+    /// Groups the chart by each entry's explicit groupId (assigned at authoring time, not
+    /// inferred from time layout — see EchoCallGroupToResponse), and draws them the same way
+    /// BeatMapEditorWindow draws its DirectionGroup + player zone: a background wash across the
+    /// whole group, a green "RESPONSE" zone tint over the response half, and a marker line at the
+    /// exact call-end/response-start boundary. Groups simply alternate between GROUP_BANDS fixed
+    /// bands in start-time order (band 0, 1, 0, 1, ...) rather than only splitting bands when an
+    /// actual time-overlap is detected — simpler and more predictable, and consecutive groups are
+    /// never on the same band even when they don't strictly overlap.
+    void DrawCallResponseGroups(float contentH)
+    {
+        if (_pattern.calls == null || _pattern.calls.Count == 0) return;
+
+        float End(CallEntry c) => c.type == CallType.Hold ? c.releaseBeat : c.cueBeat;
+
+        var spans = new List<(int groupId, float start, float end, List<CallEntry> resps)>();
+        foreach (var grp in _pattern.calls.Where(c => c.groupId >= 0).GroupBy(c => c.groupId))
+        {
+            var callEntries = grp.Where(c => c.role == CallRole.Call).ToList();
+            var respEntries = grp.Where(c => c.role == CallRole.Response).ToList();
+            if (callEntries.Count == 0 && respEntries.Count == 0) continue;
+
+            float start = callEntries.Count > 0 ? callEntries.Min(c => c.cueBeat) : respEntries.Min(c => c.cueBeat);
+            float end   = respEntries.Count > 0 ? respEntries.Max(End)
+                        : callEntries.Count > 0 ? callEntries.Max(End) : start;
+            spans.Add((grp.Key, start, end, respEntries));
+        }
+        if (spans.Count == 0) return;
+
+        var ordered = spans.OrderBy(s => s.start).ToList();
+        float bandH = (contentH - RULER_H) / GROUP_BANDS;
+
+        int colorIndex = 0;
+        foreach (var s in ordered)
+        {
+            float bandY = RULER_H + (_groupBandCache.TryGetValue(s.groupId, out int bnd) ? bnd : 0) * bandH;
+
+            float x0 = BeatX(s.start);
+            float x1 = BeatX(s.end);
+            EditorGUI.DrawRect(new Rect(x0, bandY, Mathf.Max(1f, x1 - x0), bandH),
+                GroupBgColors[colorIndex % GroupBgColors.Length]);
+            colorIndex++;
+
+            if (s.resps.Count == 0) continue;
+
+            float rStart = s.resps.Min(c => c.cueBeat);
+            float rEnd   = s.resps.Max(End);
+            float rx0 = BeatX(rStart);
+            float rx1 = BeatX(rEnd);
+            EditorGUI.DrawRect(new Rect(rx0, bandY, Mathf.Max(1f, rx1 - rx0), bandH),
+                new Color(0.1f, 0.55f, 0.35f, 0.18f));
+            GUI.Label(new Rect(rx0 + 4f, bandY + bandH - 16f, 80f, 14f), "RESPONSE",
+                new GUIStyle(EditorStyles.miniLabel)
+                    { normal = { textColor = new Color(0.4f, 1f, 0.7f, 0.9f) }, fontStyle = FontStyle.Bold });
+
+            Color lineCol = new Color(0.3f, 1f, 0.55f, 0.95f);
+            EditorGUI.DrawRect(new Rect(rx0 - 1f, bandY, 2f, bandH), lineCol);
+            GUI.Label(new Rect(rx0 + 3f, bandY + 2f, 28f, 14f), "Z",
+                new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = lineCol }, fontStyle = FontStyle.Bold });
+        }
+    }
+
     void DrawRecordingPreview()
     {
         float x0 = BeatX(_pressStartBeat);
         float x1 = (_currentSongTime + _pattern.introDelay) * _zoom;
-        EditorGUI.DrawRect(new Rect(Mathf.Min(x0, x1), RULER_H, Mathf.Max(2f, Mathf.Abs(x1 - x0)), LANE_H * LANE_COUNT),
+        EditorGUI.DrawRect(new Rect(Mathf.Min(x0, x1), RULER_H, Mathf.Max(2f, Mathf.Abs(x1 - x0)), LANE_H * TOTAL_ROWS),
             new Color(1f, 1f, 0.3f, 0.18f));
     }
 
@@ -480,8 +654,14 @@ public class Stage1CallMapEditorWindow : EditorWindow
             Vector2 mp = e.mousePosition;
             if (!contentRect.Contains(mp) || mp.y < RULER_H) return;
 
-            int lane = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
-            if (lane < 0 || lane >= LANE_COUNT) return;
+            // Release any leftover keyboard focus from Name/BPM/Echo Gap/etc. so that Z/C/Delete
+            // reach HandleGlobalKeys afterwards instead of being silently swallowed by a field
+            // that still holds keyboard focus from an earlier click.
+            GUI.FocusControl(null);
+
+            int row     = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
+            int section = row >= 0 && row < TOTAL_ROWS ? SectionOfRow(row) : -1; // 0 = Tap, 1 = Hold
+            if (section < 0) return;
 
             float songTime = mp.x / _zoom - _pattern.introDelay;
             float clickBeat = SnapBeat(_pattern.TimeToBeat(songTime));
@@ -500,10 +680,10 @@ public class Stage1CallMapEditorWindow : EditorWindow
                     {
                         BeginDrag(hitHold, handle, mp.x);
                     }
-                    else if (lane == 0)
+                    else if (section == 0)
                     {
                         Undo.RecordObject(_pattern, "Add Tap");
-                        var entry = new CallEntry { type = CallType.Tap, cueBeat = clickBeat };
+                        var entry = new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = clickBeat };
                         AddCall(entry);
                         _selEntry = entry;
                     }
@@ -512,7 +692,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
                         // Start creating a Hold: begin at click, immediately drag the end handle
                         float step = 1f / SnapDivs[_snapIndex];
                         Undo.RecordObject(_pattern, "Add Hold");
-                        var entry = new CallEntry { type = CallType.Hold, cueBeat = clickBeat, releaseBeat = clickBeat + step };
+                        var entry = new CallEntry { type = CallType.Hold, role = CallRole.Call, groupId = _currentGroupId, cueBeat = clickBeat, releaseBeat = clickBeat + step };
                         AddCall(entry);
                         BeginDrag(entry, DragHandle.HoldEnd, mp.x);
                     }
@@ -601,7 +781,22 @@ public class Stage1CallMapEditorWindow : EditorWindow
     {
         Event e = Event.current;
         if (e.type != EventType.KeyDown) return;
-        if (_pattern == null || _selEntry == null) return;
+        if (_pattern == null) return;
+        // Don't hijack Z/C/Delete while the user is actually typing into a text/number field
+        // (Name, BPM, Echo Gap, ...). Combined with the GUI.FocusControl(null) on timeline
+        // clicks below, this also fixes the common IMGUI bug where a field keeps keyboard
+        // focus after being clicked once and silently swallows all later key presses.
+        if (EditorGUIUtility.editingTextField) return;
+
+        if (e.keyCode == KeyCode.Z)
+        {
+            EchoCallGroupToResponse();
+            e.Use();
+            Repaint();
+            return;
+        }
+
+        if (_selEntry == null) return;
 
         if (e.keyCode == KeyCode.Delete || e.keyCode == KeyCode.Backspace)
         {
@@ -610,6 +805,102 @@ public class Stage1CallMapEditorWindow : EditorWindow
             e.Use();
             Repaint();
         }
+        else if (e.keyCode == KeyCode.C)
+        {
+            Undo.RecordObject(_pattern, "Toggle Call/Response");
+            _selEntry.role = _selEntry.role == CallRole.Call ? CallRole.Response : CallRole.Call;
+            EditorUtility.SetDirty(_pattern);
+            e.Use();
+            Repaint();
+        }
+    }
+
+    /// Z: takes every Call-role entry stamped with the current groupId (the group actively being
+    /// authored — however it's laid out in time, even if a look-ahead Call was dropped inside an
+    /// earlier group's already-generated Response range), and mirrors its rhythm — same relative
+    /// beat offsets, same Tap/Hold shape — into a new Response-role group sharing that same groupId,
+    /// starting _echoGapBeats after the call group ends. Designer never hand-places the matching
+    /// response notes. Grouping is authoring-order based (via groupId), not time-order based, so
+    /// it can't be corrupted by overlapping look-ahead Calls the way inferring groups from the
+    /// timeline layout would be.
+    void EchoCallGroupToResponse()
+    {
+        if (_pattern.calls == null || _pattern.calls.Count == 0) return;
+
+        var group = _pattern.calls
+            .Where(c => c.role == CallRole.Call && c.groupId == _currentGroupId)
+            .OrderBy(c => c.cueBeat)
+            .ToList();
+
+        if (group.Count == 0)
+        {
+            EditorUtility.DisplayDialog("Nothing to echo",
+                $"No Call notes found in the current group (#{_currentGroupId}).\n\n" +
+                "Place one or more Tap/Hold notes first (new notes default to Call, stamped with " +
+                $"the current Group # shown in the toolbar) — then press Z to mirror them into a Response group.",
+                "OK");
+            return;
+        }
+
+        float groupStart = group[0].cueBeat;
+        float groupEnd   = group.Max(c => c.type == CallType.Hold ? c.releaseBeat : c.cueBeat);
+
+        float responseStart;
+        if (_isRecording || _isPlaying)
+        {
+            // Live clock is running — the response starts exactly where Z was actually pressed
+            // (snapped to grid), not a fixed offset. Lets a musical pause before the response
+            // (or none at all) come from performing it live, same as the call notes themselves.
+            float pressedBeat = SnapBeat(_pattern.TimeToBeat(_currentSongTime));
+            responseStart = Mathf.Max(groupEnd, pressedBeat);
+        }
+        else
+        {
+            // No live playhead in pure edit mode (no music running) — fall back to a fixed gap.
+            responseStart = groupEnd + _echoGapBeats;
+        }
+
+        Undo.RecordObject(_pattern, "Echo Call Group to Response");
+
+        var newEntries = new List<CallEntry>();
+        foreach (var c in group)
+        {
+            float delta = c.cueBeat - groupStart;
+            var echoed = new CallEntry
+            {
+                type    = c.type,
+                role    = CallRole.Response,
+                groupId = _currentGroupId,
+                cueBeat = responseStart + delta,
+            };
+            if (c.type == CallType.Hold)
+                echoed.releaseBeat = responseStart + (c.releaseBeat - groupStart);
+            newEntries.Add(echoed);
+        }
+
+        _pattern.calls.AddRange(newEntries);
+        _pattern.calls.Sort((a, b) => a.cueBeat.CompareTo(b.cueBeat));
+        _selEntry = newEntries[0];
+        EditorUtility.SetDirty(_pattern);
+
+        // Scroll so the freshly-generated response group is actually visible — otherwise it can
+        // land off the right edge of the timeline view and look like nothing happened.
+        float targetX = BeatX(responseStart) - (position.width - LABEL_W - 20f) * 0.25f;
+        _scrollPos.x  = Mathf.Max(0f, targetX);
+
+        Debug.Log($"[Call Map Editor] Echoed group #{_currentGroupId}: {newEntries.Count} call(s) -> response starting at beat {responseStart:F2}.");
+
+        // Subsequent new notes (including overlapping look-ahead Calls placed inside this very
+        // Response range) belong to the next group, not this one.
+        _currentGroupId++;
+    }
+
+    static int NextFreeGroupId(CallPatternData p)
+    {
+        if (p?.calls == null || p.calls.Count == 0) return 0;
+        int max = -1;
+        foreach (var c in p.calls) max = Mathf.Max(max, c.groupId);
+        return max + 1;
     }
 
     // ── Recording key/mouse capture ────────────────────────────────────────
@@ -618,6 +909,17 @@ public class Stage1CallMapEditorWindow : EditorWindow
         Event e = Event.current;
 
         if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape) { StopSession(); e.Use(); return; }
+
+        // Z works during REC too (not just Edit mode) — punch in a call group live, hit Z
+        // without stopping the take, then keep recording the next group. Blocked while a
+        // note is currently being held down (_isPressed) so it can't fire mid-press.
+        if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Z && !_isPressed && !EditorGUIUtility.editingTextField)
+        {
+            EchoCallGroupToResponse();
+            e.Use();
+            return;
+        }
+
         if (_currentSongTime < 0f) return; // still in intro
 
         bool isPressEvent   = (e.type == EventType.KeyDown && e.keyCode == KeyCode.Space) ||
@@ -643,8 +945,8 @@ public class Stage1CallMapEditorWindow : EditorWindow
 
             Undo.RecordObject(_pattern, "Record Call");
             CallEntry entry = durationSec < _holdThresholdSec
-                ? new CallEntry { type = CallType.Tap, cueBeat = pressBeat }
-                : new CallEntry { type = CallType.Hold, cueBeat = pressBeat, releaseBeat = Mathf.Max(releaseBeat, pressBeat + MIN_HOLD_BEATS) };
+                ? new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = pressBeat }
+                : new CallEntry { type = CallType.Hold, role = CallRole.Call, groupId = _currentGroupId, cueBeat = pressBeat, releaseBeat = Mathf.Max(releaseBeat, pressBeat + MIN_HOLD_BEATS) };
             AddCall(entry);
             e.Use();
         }
@@ -677,14 +979,16 @@ public class Stage1CallMapEditorWindow : EditorWindow
     CallEntry FindTapNearPixel(Vector2 mp, float tolerance)
     {
         if (_pattern.calls == null) return null;
-        int lane = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
-        if (lane != 0) return null;
+        int row = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
+        if (row < 0 || row >= TOTAL_ROWS || SectionOfRow(row) != 0) return null;
+        int clickedSubRow = SubRowOfRow(row);
 
         float bestDx = tolerance;
         CallEntry best = null;
         foreach (var entry in _pattern.calls)
         {
             if (entry.type != CallType.Tap) continue;
+            if (!_tapRowCache.TryGetValue(entry, out int er) || er % SUBROWS != clickedSubRow) continue;
             float dx = Mathf.Abs(mp.x - BeatX(entry.cueBeat));
             if (dx < bestDx) { bestDx = dx; best = entry; }
         }
@@ -694,12 +998,15 @@ public class Stage1CallMapEditorWindow : EditorWindow
     (CallEntry entry, DragHandle handle) FindHoldNearPixel(Vector2 mp, float handleTolerance)
     {
         if (_pattern.calls == null) return (null, DragHandle.None);
-        int lane = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
-        if (lane != 1) return (null, DragHandle.None);
+        int row = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
+        if (row < 0 || row >= TOTAL_ROWS || SectionOfRow(row) != 1) return (null, DragHandle.None);
+        int clickedSubRow = SubRowOfRow(row);
 
         foreach (var entry in _pattern.calls)
         {
             if (entry.type != CallType.Hold) continue;
+            if (!_holdRowCache.TryGetValue(entry, out int er) || er % SUBROWS != clickedSubRow) continue;
+
             float x0 = BeatX(entry.cueBeat);
             float x1 = BeatX(entry.releaseBeat);
 

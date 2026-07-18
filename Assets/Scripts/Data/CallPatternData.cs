@@ -18,7 +18,9 @@ public class CallPatternData : ScriptableObject
     [Tooltip("Judgement half-window in seconds. Total window = 2x this.")]
     public float hitWindow = 0.12f;
 
-    [Tooltip("Calls whose cueBeat is before this beat are demo-only: shown, never judged, no input read.")]
+    [Tooltip("Extra global cutoff: calls whose cueBeat is before this beat are always demo-only " +
+             "(shown, never judged), regardless of their per-entry CallRole. Use 0 for intro-less charts " +
+             "where Call/Response is fully controlled per-entry via CallEntry.role.")]
     public float liveInputStartBeat = 0f;
 
     [Tooltip("Must stay sorted ascending by cueBeat. The editor tool re-sorts after every add/move.")]
@@ -31,10 +33,25 @@ public class CallPatternData : ScriptableObject
 
 public enum CallType { Tap, Hold }
 
+/// Response (default): judged normally against player input.
+/// Call: a demonstration cue (e.g. the boss/hand showing the rhythm) — shown, never judged, no input read.
+/// This is per-entry so Call/Response can alternate repeatedly through a chart, unlike the
+/// single global liveInputStartBeat cutoff (which only supports one demo-then-live split).
+public enum CallRole { Response, Call }
+
 [Serializable]
 public class CallEntry
 {
     public CallType type;
+    public CallRole role = CallRole.Response;
+
+    /// Which Call Map Editor Z-echo group this entry belongs to — a Call run and its mirrored
+    /// Response run share the same id. Assigned explicitly by the editor tool at authoring time
+    /// (not inferred from time/order), so overlapping look-ahead Calls dropped inside an already-
+    /// generated Response range don't get confused with that Response's own group. Purely an
+    /// authoring/visualization aid — CallDirector ignores this at runtime. -1 = ungrouped
+    /// (entries authored before this field existed).
+    public int groupId = -1;
 
     /// Tap: the single judged beat (window = cueBeat ± hitWindow).
     /// Hold: the beat at which the "start holding" cue is shown (not itself judged).
