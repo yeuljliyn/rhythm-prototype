@@ -109,7 +109,7 @@ public class SettingsManager : MonoBehaviour
         if (kb.escapeKey.wasPressedThisFrame)
         {
             if (IsPanelOpen) Close();
-            else if (PauseMenuManager.Instance == null) Open();
+            else if (PauseMenuManager.Instance == null && Stage1PauseMenuManager.Instance == null) Open();
         }
     }
 
@@ -145,7 +145,8 @@ public class SettingsManager : MonoBehaviour
         if (_pausedBySettings)
         {
             _pausedBySettings = false;
-            bool inBattle = SceneManager.GetActiveScene().name == "BattleScene";
+            string sceneName = SceneManager.GetActiveScene().name;
+            bool inBattle = sceneName == "BattleScene" || sceneName == "Stage1Scene";
             if (inBattle && _gameAudio != null)
                 _resumeRoutine = StartCoroutine(CountdownResume());
             else
@@ -416,7 +417,10 @@ public class SettingsManager : MonoBehaviour
     static AudioSource FindGameAudio()
     {
         var rm = RhythmManager.Instance;
-        return rm != null ? rm.GetComponent<AudioSource>() : null;
+        if (rm != null) return rm.GetComponent<AudioSource>();
+
+        var cc = FindObjectOfType<CallClock>();
+        return cc != null ? cc.GetComponent<AudioSource>() : null;
     }
 
     GameObject MakePage(Transform parent, string name)

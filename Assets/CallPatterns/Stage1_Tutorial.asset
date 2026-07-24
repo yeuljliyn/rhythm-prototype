@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a52a79781a00b2740886c3ec182da70a, type: 3}
+  m_Name: Stage1_Tutorial
+  m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
+  chartName: Stage1 Tutorial
+  music: {fileID: 8300000, guid: 58e18d14a2a2bfd4c9b10b2457434d2b, type: 3}
+  bpm: 120
+  introDelay: 2
+  hitWindow: 0.15
+  liveInputStartBeat: 0
+  calls:
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 0.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 0
+    cueBeat: 2.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 4.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 1
+    cueBeat: 6.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 8.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 2
+    cueBeat: 10.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 12.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 3
+    cueBeat: 14.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 16.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 4
+    cueBeat: 18.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 20.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 5
+    cueBeat: 22.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 24.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 6
+    cueBeat: 26.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 28.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 7
+    cueBeat: 30.25
+    releaseBeat: 0

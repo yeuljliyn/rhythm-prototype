@@ -14,9 +14,19 @@ public class CallClock : MonoBehaviour
     AudioSource _audio;
     double _scheduledMusicStartDsp;
     bool   _isRunning;
+    bool   _isPaused;
+    double _pauseStartDsp;
+    float  _frozenSongTime;
 
     public CallPatternData Pattern => pattern;
-    public float SongTime => _isRunning ? (float)(AudioSettings.dspTime - _scheduledMusicStartDsp) : 0f;
+    public bool  IsPaused => _isPaused;
+
+    // dspTime keeps advancing in real time regardless of Time.timeScale, so a plain
+    // (dspTime - epoch) formula would let SongTime jump forward across a pause. While paused,
+    // report the frozen value instead; Resume() shifts the epoch so it picks up right where it left off.
+    public float SongTime => _isRunning
+        ? (_isPaused ? _frozenSongTime : (float)(AudioSettings.dspTime - _scheduledMusicStartDsp))
+        : 0f;
 
     public bool IsMusicDone =>
         _isRunning && _audio != null && _audio.clip != null && SongTime >= _audio.clip.length;
@@ -26,6 +36,8 @@ public class CallClock : MonoBehaviour
         _audio = GetComponent<AudioSource>();
         _audio.playOnAwake = false;
         _audio.loop        = false;
+
+        Time.timeScale = 1f; // 이전 플레이 세션에서 timeScale=0이 남아있을 경우 초기화 (RhythmManager와 동일한 방어 로직)
     }
 
     void Start()
@@ -45,5 +57,22 @@ public class CallClock : MonoBehaviour
     {
         _isRunning = false;
         if (_audio != null && _audio.isPlaying) _audio.Stop();
+    }
+
+    public void Pause()
+    {
+        if (!_isRunning || _isPaused) return;
+        _frozenSongTime = SongTime;
+        _isPaused       = true;
+        _pauseStartDsp  = AudioSettings.dspTime;
+        if (_audio != null && _audio.isPlaying) _audio.Pause();
+    }
+
+    public void Resume()
+    {
+        if (!_isRunning || !_isPaused) return;
+        _scheduledMusicStartDsp += AudioSettings.dspTime - _pauseStartDsp; // shift epoch by the paused duration
+        _isPaused = false;
+        if (_audio != null) _audio.UnPause();
     }
 }

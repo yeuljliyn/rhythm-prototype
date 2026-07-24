@@ -20,6 +20,21 @@ public class CallDirector : MonoBehaviour
 
     public System.Action OnSongEnded;
 
+    /// Fires whenever the chart transitions from a Call-role entry to a Response-role entry
+    /// (or back), in chronological spawn order. Minigame visual scripts (e.g. Stage1WaterPourVisuals)
+    /// listen to this to switch which character is on screen — CallDirector itself stays
+    /// minigame-agnostic and knows nothing about Hand/Ants/Boss.
+    public System.Action<bool> OnPhaseChanged; // true = Response phase, false = Call phase
+
+    /// Fires exactly when a Call-role (demo) entry becomes live — i.e. on the beat the boss/hand
+    /// is demonstrating. This is a scripted cue driven by chart timing, not player input.
+    public System.Action OnCallCue;
+
+    /// Fires on every player button press (Space/click) edge, regardless of whether it lands on a
+    /// live Response window or not. Unlike OnCallCue, this is driven by the player's own input timing —
+    /// minigame visuals (e.g. Ants) that should react to the player's action, not the chart clock, use this.
+    public System.Action OnResponsePress;
+
     class LiveCall
     {
         public CallEntry data;
@@ -33,9 +48,16 @@ public class CallDirector : MonoBehaviour
 
     List<CallEntry> _calls;     // local sorted copy — never mutates the asset
     readonly List<LiveCall> _live = new List<LiveCall>();
+
+    /// Whether this chart's first entry (by cueBeat) is a Response — lets visual glue scripts
+    /// (e.g. Stage1WaterPourVisuals) initialize the right idle state without needing their own
+    /// CallPatternData reference, and without waiting for the first spawn/OnPhaseChanged event.
+    public bool StartsInResponsePhase => _calls != null && _calls.Count > 0 && _calls[0].role == CallRole.Response;
+
     int  _nextSpawnIdx;
     bool _songEndFired;
     bool _prevPressed; // Space + mouse left click combined, previous-frame state
+    bool? _currentPhaseIsResponse;
 
     void Awake()
     {
@@ -47,6 +69,8 @@ public class CallDirector : MonoBehaviour
     void Update()
     {
         if (clock == null || pattern == null) return;
+        if (clock.IsPaused) return; // frozen SongTime means no new spawns/timeouts, but input must be dropped too
+
         float t = clock.SongTime;
 
         SpawnDueCalls(t);
@@ -67,8 +91,16 @@ public class CallDirector : MonoBehaviour
             var lc = BuildLiveCall(entry);
             _live.Add(lc);
 
+            bool isResponsePhase = !lc.isDemo;
+            if (_currentPhaseIsResponse != isResponsePhase)
+            {
+                _currentPhaseIsResponse = isResponsePhase;
+                OnPhaseChanged?.Invoke(isResponsePhase);
+            }
+
             var indicator = entry.type == CallType.Tap ? tapIndicator : holdIndicator;
             indicator?.ShowOpen(lc.isDemo);
+            if (lc.isDemo) OnCallCue?.Invoke();
 
             _nextSpawnIdx++;
         }
@@ -132,6 +164,8 @@ public class CallDirector : MonoBehaviour
 
         if (pressEdge)
         {
+            OnResponsePress?.Invoke();
+
             LiveCall claim = null;
             float bestDeadline = float.MaxValue;
 
