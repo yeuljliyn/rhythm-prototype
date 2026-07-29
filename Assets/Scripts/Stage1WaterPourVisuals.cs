@@ -98,6 +98,10 @@ public class Stage1WaterPourVisuals : MonoBehaviour
         anim.speed = 1f;
         anim.Play(hash, 0, 0f);
         yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
+        // Pin to the last frame explicitly before freezing — otherwise a Loop-Time clip can wrap
+        // back to frame 0 for a single frame right at the speed=0 boundary, which reads as an
+        // unwanted extra replay (most visible on short clips like the 4-frame Ants flipbook).
+        anim.Play(hash, 0, 1f);
         anim.speed = 0f;
     }
 }

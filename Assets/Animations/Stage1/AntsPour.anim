@@ -22,9 +22,9 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: -1797662498313063398, guid: 6fa206ed1f1924a44aca7ff7a8fe21b6, type: 3}
-    - time: 0.125
+    - time: 0.02684975
       value: {fileID: -3843913230172931266, guid: 6fa206ed1f1924a44aca7ff7a8fe21b6, type: 3}
-    - time: 0.25
+    - time: 0.14171384
       value: {fileID: -9066603827084482368, guid: 6fa206ed1f1924a44aca7ff7a8fe21b6, type: 3}
     - time: 0.375
       value: {fileID: -2000371889038767709, guid: 6fa206ed1f1924a44aca7ff7a8fe21b6, type: 3}
@@ -64,7 +64,7 @@ AnimationClip:
     m_Level: 0
     m_CycleOffset: 0
     m_HasAdditiveReferencePose: 0
-    m_LoopTime: 1
+    m_LoopTime: 0
     m_LoopBlend: 0
     m_LoopBlendOrientation: 0
     m_LoopBlendPositionY: 0

@@ -16,7 +16,7 @@ MonoBehaviour:
   music: {fileID: 8300000, guid: 58e18d14a2a2bfd4c9b10b2457434d2b, type: 3}
   bpm: 120
   introDelay: 2
-  hitWindow: 0.15
+  hitWindow: 0.12
   liveInputStartBeat: 0
   calls:
   - type: 0

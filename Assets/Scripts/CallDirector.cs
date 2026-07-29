@@ -183,7 +183,12 @@ public class CallDirector : MonoBehaviour
                 if (claim.data.type == CallType.Tap) Resolve(claim, JudgementType.Hit);
                 else                                  claim.isHoldArmed = true; // judged on release
             }
-            // else: unmatched press — ignored, no penalty
+            else
+            {
+                // Unmatched press (no live claimable call): register as an immediate Miss so
+                // mashing the button can't fish for hits across every note's window for free.
+                GameManager.Instance?.RegisterJudgement(JudgementType.Miss);
+            }
         }
 
         if (releaseEdge)
