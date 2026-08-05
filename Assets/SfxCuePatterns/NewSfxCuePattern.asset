@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7beeab18dffe42545b3bffd4f77f57a3, type: 3}
+  m_Name: NewSfxCuePattern
+  m_EditorClassIdentifier: Assembly-CSharp::SfxCuePatternData
+  chartName: Segment 1
+  music: {fileID: 8300000, guid: 58e18d14a2a2bfd4c9b10b2457434d2b, type: 3}
+  bpm: 128
+  introDelay: 2
+  keySlots:
+  - {fileID: 8300000, guid: 541d76d038bdf3842a8145f7af20a117, type: 3}
+  - {fileID: 8300000, guid: a12e6b0f44a48194381162bcadf4d95c, type: 3}
+  - {fileID: 8300000, guid: 4128cc3f03a883a4485b6eb7a7c87ed0, type: 3}
+  - {fileID: 8300000, guid: 04b2625b559c78e44b93246613010bbc, type: 3}
+  cues:
+  - line: 0
+    beat: 4.75
+    clip: {fileID: 8300000, guid: 541d76d038bdf3842a8145f7af20a117, type: 3}
+  - line: 1
+    beat: 7.5
+    clip: {fileID: 8300000, guid: a12e6b0f44a48194381162bcadf4d95c, type: 3}
+  - line: 2
+    beat: 10.25
+    clip: {fileID: 8300000, guid: 4128cc3f03a883a4485b6eb7a7c87ed0, type: 3}
+  - line: 3
+    beat: 13.5
+    clip: {fileID: 8300000, guid: 04b2625b559c78e44b93246613010bbc, type: 3}
+  - line: 1
+    beat: 17.75
+    clip: {fileID: 8300000, guid: a12e6b0f44a48194381162bcadf4d95c, type: 3}
+  - line: 2
+    beat: 22
+    clip: {fileID: 8300000, guid: 4128cc3f03a883a4485b6eb7a7c87ed0, type: 3}
+  - line: 0
+    beat: 26.25
+    clip: {fileID: 8300000, guid: 541d76d038bdf3842a8145f7af20a117, type: 3}
+  - line: 2
+    beat: 30.5
+    clip: {fileID: 8300000, guid: 4128cc3f03a883a4485b6eb7a7c87ed0, type: 3}
+  - line: 3
+    beat: 35
+    clip: {fileID: 8300000, guid: 04b2625b559c78e44b93246613010bbc, type: 3}
+  - line: 1
+    beat: 39.75
+    clip: {fileID: 8300000, guid: a12e6b0f44a48194381162bcadf4d95c, type: 3}
