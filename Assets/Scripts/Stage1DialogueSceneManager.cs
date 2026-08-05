@@ -88,15 +88,16 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     static readonly Vector3 ScaleActive   = new Vector3(1.10f, 1.10f, 1f);
     static readonly Vector3 ScaleInactive = new Vector3(0.93f, 0.93f, 1f);
 
-    // ── UI refs ───────────────────────────────────────────────────────
-    RectTransform     _charARt, _charBRt;
-    Image             _charAImg, _charBImg;
-    Image             _bgImg;
-    TextMeshProUGUI   _speakerTxt, _dialogueTxt;
-    GameObject        _promptGO;
-    GameObject        _choicePanel;
-    Button[]          _choiceBtns;
-    TextMeshProUGUI[] _choiceTxts;
+    // ── UI refs (assigned in Editor — see Assets/Scenes/Stage1DialogueScene.unity) ──
+    [SerializeField] RectTransform     _charARt, _charBRt;
+    [SerializeField] Image             _charAImg, _charBImg;
+    [SerializeField] Image             _bgImg;
+    [SerializeField] TextMeshProUGUI   _speakerTxt, _dialogueTxt;
+    [SerializeField] GameObject        _promptGO;
+    [SerializeField] GameObject        _choicePanel;
+    [SerializeField] Button[]          _choiceBtns;
+    [SerializeField] TextMeshProUGUI[] _choiceTxts;
+    [SerializeField] AudioSource       _voice;
 
     // ── Emotion sprites ───────────────────────────────────────────────
     [SerializeField] EmotionEntry[] _emotions;
@@ -109,17 +110,13 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     bool        _waitChoice  = false;
     Coroutine   _typeCr;
     Coroutine   _animCr;
-    AudioSource _voice;
     AudioClip   _blipClip;
-    TMP_FontAsset _font;
 
     // ── Lifecycle ─────────────────────────────────────────────────────
     IEnumerator Start()
     {
         Time.timeScale = 1f;
-        _font = Resources.Load<TMP_FontAsset>("Fonts/NeoDunggeunmoProSDF");
-        BuildUI();
-        BuildVoice();
+        _blipClip = GenerateBlip();
         BuildEmotionDict();
 
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
@@ -382,16 +379,6 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     }
 
     // ── Voice ─────────────────────────────────────────────────────────
-    void BuildVoice()
-    {
-        var go = new GameObject("[DialogueVoice]");
-        go.transform.SetParent(transform);
-        _voice             = go.AddComponent<AudioSource>();
-        _voice.playOnAwake = false;
-        _voice.volume      = 0.45f;
-        _blipClip          = GenerateBlip();
-    }
-
     void PlayBlip(char c, bool isA)
     {
         _voice.pitch = CharToPitch(c, isA);
@@ -428,169 +415,4 @@ public class Stage1DialogueSceneManager : MonoBehaviour
         return clip;
     }
 
-    // ── UI Builder ────────────────────────────────────────────────────
-    void BuildUI()
-    {
-        var cGO    = new GameObject("Canvas");
-        var canvas = cGO.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        var scaler = cGO.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode         = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.screenMatchMode     = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight  = 0.5f;
-        cGO.AddComponent<GraphicRaycaster>();
-
-        // Background
-        var bgGO = Stretch(cGO.transform, "BG");
-        _bgImg   = bgGO.AddComponent<Image>();
-        _bgImg.color = new Color(0.04f, 0.02f, 0.08f);
-
-        // Separator line
-        var lineGO = Anchored(cGO.transform, "Line",
-            new Vector2(0f, 0.22f), new Vector2(1f, 0.22f),
-            new Vector2(0.5f, 0.5f), new Vector2(0f, 2f), Vector2.zero);
-        lineGO.AddComponent<Image>().color = new Color(0.40f, 0.30f, 0.60f, 0.60f);
-
-        // CharA (left — 잭두)
-        var aGO  = Anchored(cGO.transform, "CharA",
-            new Vector2(0.06f, 0.20f), new Vector2(0.38f, 0.98f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        _charARt  = aGO.GetComponent<RectTransform>();
-        _charAImg = aGO.AddComponent<Image>();
-
-        var aLblGO = Anchored(aGO.transform, "NameA",
-            new Vector2(0f, 0f), new Vector2(1f, 0f),
-            new Vector2(0.5f, 1f), new Vector2(0f, 36f), new Vector2(0f, -4f));
-        var aLbl = MakeTMP(aLblGO, NameA, 18f, TextAlignmentOptions.Center);
-        aLbl.color = new Color(0.55f, 1.00f, 0.65f, 0.80f);
-
-        // CharB (right — 물귀신)
-        var bGO  = Anchored(cGO.transform, "CharB",
-            new Vector2(0.62f, 0.20f), new Vector2(0.94f, 0.98f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        _charBRt  = bGO.GetComponent<RectTransform>();
-        _charBImg = bGO.AddComponent<Image>();
-
-        var bLblGO = Anchored(bGO.transform, "NameB",
-            new Vector2(0f, 0f), new Vector2(1f, 0f),
-            new Vector2(0.5f, 1f), new Vector2(0f, 36f), new Vector2(0f, -4f));
-        var bLbl = MakeTMP(bLblGO, NameB, 18f, TextAlignmentOptions.Center);
-        bLbl.color = new Color(0.90f, 0.50f, 1.00f, 0.80f);
-
-        // Dialogue box
-        var dlgBox = Anchored(cGO.transform, "DialogueBox",
-            Vector2.zero, new Vector2(1f, 0.22f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        dlgBox.AddComponent<Image>().color = new Color(0.04f, 0.03f, 0.10f, 0.97f);
-
-        // Speaker name
-        var nameGO = Anchored(dlgBox.transform, "SpeakerName",
-            new Vector2(0.04f, 0.62f), new Vector2(0.50f, 0.95f),
-            new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
-        _speakerTxt           = MakeTMP(nameGO, "", 24f, TextAlignmentOptions.BottomLeft);
-        _speakerTxt.fontStyle = FontStyles.Bold;
-        _speakerTxt.color     = Color.white;
-
-        // Dialogue text
-        var textGO = Anchored(dlgBox.transform, "DialogueText",
-            new Vector2(0.04f, 0.06f), new Vector2(0.93f, 0.62f),
-            new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
-        _dialogueTxt       = MakeTMP(textGO, "", 26f, TextAlignmentOptions.TopLeft);
-        _dialogueTxt.color = new Color(0.92f, 0.92f, 1.00f);
-
-        // Prompt ▶
-        _promptGO = Anchored(dlgBox.transform, "Prompt",
-            new Vector2(0.93f, 0.06f), new Vector2(1.00f, 0.50f),
-            new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
-        var promptTxt = MakeTMP(_promptGO, "▶", 28f, TextAlignmentOptions.Center);
-        promptTxt.color = new Color(0.75f, 0.75f, 1f, 0.9f);
-        _promptGO.SetActive(false);
-
-        // Skip hint
-        var skipGO  = Anchored(dlgBox.transform, "SkipHint",
-            new Vector2(0.04f, 0f), new Vector2(0.5f, 0.10f),
-            new Vector2(0f, 0f), Vector2.zero, Vector2.zero);
-        var skipTxt = MakeTMP(skipGO, "CLICK  /  SPACE  to continue", 13f, TextAlignmentOptions.BottomLeft);
-        skipTxt.color = new Color(0.45f, 0.45f, 0.65f, 0.80f);
-
-        // Choice panel (대사창 안 선택지)
-        _choicePanel = Anchored(dlgBox.transform, "ChoicePanel",
-            new Vector2(0.02f, 0.04f), new Vector2(0.98f, 0.60f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-
-        _choiceBtns = new Button[2];
-        _choiceTxts = new TextMeshProUGUI[2];
-        for (int i = 0; i < 2; i++)
-        {
-            float yMin = i == 0 ? 0.52f : 0.02f;
-            float yMax = i == 0 ? 0.98f : 0.48f;
-            var btnGO  = Anchored(_choicePanel.transform, $"Choice{i}",
-                new Vector2(0f, yMin), new Vector2(1f, yMax),
-                new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
-            var btnImg = btnGO.AddComponent<Image>();
-            btnImg.color = new Color(0.14f, 0.09f, 0.24f, 0.90f);
-            var btn    = btnGO.AddComponent<Button>();
-            var colors = btn.colors;
-            colors.normalColor      = new Color(0.14f, 0.09f, 0.24f, 0.90f);
-            colors.highlightedColor = new Color(0.32f, 0.22f, 0.52f, 1.00f);
-            colors.pressedColor     = new Color(0.52f, 0.32f, 0.82f, 1.00f);
-            btn.colors        = colors;
-            btn.targetGraphic = btnImg;
-
-            var txtGO = Stretch(btnGO.transform, "BtnText");
-            var txt   = MakeTMP(txtGO, "", 19f, TextAlignmentOptions.MidlineLeft);
-            txt.margin = new Vector4(10f, 0f, 4f, 0f);
-            txt.color  = new Color(0.92f, 0.92f, 1.00f);
-
-            _choiceBtns[i] = btn;
-            _choiceTxts[i] = txt;
-        }
-        _choicePanel.SetActive(false);
-
-        // EventSystem (마우스 클릭 지원)
-        if (UnityEngine.EventSystems.EventSystem.current == null)
-        {
-            var esGO = new GameObject("EventSystem");
-            esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            esGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
-        }
-    }
-
-    TextMeshProUGUI MakeTMP(GameObject go, string text, float size, TextAlignmentOptions align)
-    {
-        var t           = go.AddComponent<TextMeshProUGUI>();
-        t.text          = text;
-        t.fontSize      = size;
-        t.alignment     = align;
-        t.raycastTarget = false;
-        if (_font != null) t.font = _font;
-        return t;
-    }
-
-    // ── UI helpers ────────────────────────────────────────────────────
-    static GameObject Stretch(Transform parent, string name)
-    {
-        var go   = new GameObject(name);
-        go.transform.SetParent(parent, false);
-        var r    = go.AddComponent<RectTransform>();
-        r.anchorMin = Vector2.zero; r.anchorMax = Vector2.one;
-        r.offsetMin = r.offsetMax = Vector2.zero;
-        return go;
-    }
-
-    static GameObject Anchored(Transform parent, string name,
-        Vector2 anchorMin, Vector2 anchorMax,
-        Vector2 pivot, Vector2 sizeDelta, Vector2 anchoredPos)
-    {
-        var go   = new GameObject(name);
-        go.transform.SetParent(parent, false);
-        var r             = go.AddComponent<RectTransform>();
-        r.anchorMin        = anchorMin;
-        r.anchorMax        = anchorMax;
-        r.pivot            = pivot;
-        r.sizeDelta        = sizeDelta;
-        r.anchoredPosition = anchoredPos;
-        return go;
-    }
 }
