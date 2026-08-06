@@ -146,7 +146,7 @@ public class SettingsManager : MonoBehaviour
         {
             _pausedBySettings = false;
             string sceneName = SceneManager.GetActiveScene().name;
-            bool inBattle = sceneName == "BattleScene" || sceneName == "Stage1Scene";
+            bool inBattle = sceneName == "BattleScene" || sceneName.StartsWith("Stage1");
             if (inBattle && _gameAudio != null)
                 _resumeRoutine = StartCoroutine(CountdownResume());
             else

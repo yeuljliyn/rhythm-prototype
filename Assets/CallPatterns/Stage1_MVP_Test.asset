@@ -19,11 +19,21 @@ MonoBehaviour:
   hitWindow: 0.12
   liveInputStartBeat: 0
   calls:
+  - type: 1
+    role: 1
+    groupId: 10
+    cueBeat: 3.5
+    releaseBeat: 3.75
   - type: 0
     role: 1
     groupId: 0
     cueBeat: 4.5
     releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 10
+    cueBeat: 4.75
+    releaseBeat: 5
   - type: 0
     role: 1
     groupId: 0
@@ -175,13 +185,13 @@ MonoBehaviour:
     cueBeat: 53
     releaseBeat: 0
   - type: 0
-    role: 1
-    groupId: 5
+    role: 0
+    groupId: 4
     cueBeat: 54.75
     releaseBeat: 0
   - type: 0
-    role: 0
-    groupId: 4
+    role: 1
+    groupId: 5
     cueBeat: 54.75
     releaseBeat: 0
   - type: 0
@@ -255,13 +265,13 @@ MonoBehaviour:
     cueBeat: 73.5
     releaseBeat: 0
   - type: 0
-    role: 0
-    groupId: 7
+    role: 1
+    groupId: 8
     cueBeat: 75.75
     releaseBeat: 0
   - type: 0
-    role: 1
-    groupId: 8
+    role: 0
+    groupId: 7
     cueBeat: 75.75
     releaseBeat: 0
   - type: 0

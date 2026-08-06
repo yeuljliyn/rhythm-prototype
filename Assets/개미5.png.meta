@@ -1,0 +1,217 @@
+fileFormatVersion: 2
+guid: 8b24f156baceb5646b0b08c410cce998
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6591854455289895792
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_0
+  - first:
+      213: -7055224303622479271
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_1
+  - first:
+      213: 1925921602713111841
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_2
+  - first:
+      213: 7703940925604853283
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_3
+  - first:
+      213: -3231314720100037430
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_4
+  - first:
+      213: 1021786658337827260
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_5
+  - first:
+      213: -7381810216133312473
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_6
+  - first:
+      213: -509669943899700073
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_7
+  - first:
+      213: 8501187556440869941
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_8
+  - first:
+      213: 2053528739601394004
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_9
+  - first:
+      213: -8707077690921191005
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_10
+  - first:
+      213: -2946747022427960662
+    second: Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_11
+  - first:
+      213: 4556012968066511082
+    second: Ant5_Idle
+  - first:
+      213: -9025307660614962876
+    second: Ant5_Raised
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Ant5_Idle
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1024
+        width: 512
+        height: 1024
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae07da9d7a53a3f30800000000000000
+      internalID: 4556012968066511082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ant5_Raised
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 512
+        height: 1024
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 441fe64308aafb280800000000000000
+      internalID: -9025307660614962876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 277ff908710145b44a701a87d031edcb
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Ant5_Idle: 4556012968066511082
+      Ant5_Raised: -9025307660614962876
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_0: 6591854455289895792
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_1: -7055224303622479271
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_10: -8707077690921191005
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_11: -2946747022427960662
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_2: 1925921602713111841
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_3: 7703940925604853283
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_4: -3231314720100037430
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_5: 1021786658337827260
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_6: -7381810216133312473
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_7: -509669943899700073
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_8: 8501187556440869941
+      Gemini_Generated_Image_czekvlczekvlczek_nologo_nobg_9: 2053528739601394004
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -5,9 +5,11 @@ using TMPro;
 using System.Collections;
 
 /// <summary>
-/// Stage1Scene-only pause menu — same behavior as PauseMenuManager (ESC toggle, 3-2-1 resume
-/// countdown, CONTINUE/SETTINGS/RETRY/LOBBY), rebuilt as its own class because Stage1Scene's game
-/// audio lives on CallClock's AudioSource, not RhythmManager, and Retry needs to reload Stage1Scene.
+/// Stage1_x scene pause menu — same behavior as PauseMenuManager (ESC toggle, 3-2-1 resume
+/// countdown, CONTINUE/SETTINGS/RETRY/LOBBY), rebuilt as its own class because Stage1 scenes' game
+/// audio lives on CallClock's AudioSource, not RhythmManager. Retry reloads whichever Stage1_x scene
+/// is currently active (SceneManager.GetActiveScene().name), so this one instance works across all
+/// of them (Stage1Scene, Stage1_1Scene, ...) without per-scene subclassing.
 /// SettingsManager defers ESC-open to this when it is active (same as it does for PauseMenuManager).
 /// </summary>
 public class Stage1PauseMenuManager : MonoBehaviour
@@ -18,6 +20,7 @@ public class Stage1PauseMenuManager : MonoBehaviour
 
     // ── UI refs ───────────────────────────────────────────────────────────
     GameObject      _panel;
+    GameObject      _dim;
     TextMeshProUGUI _countdownTxt;
     CallClock       _clock;
 
@@ -78,12 +81,14 @@ public class Stage1PauseMenuManager : MonoBehaviour
         Time.timeScale = 0f;
 
         _panel.SetActive(true);
+        _dim.SetActive(true);
         IsPaused = true;
     }
 
     void OnContinue()
     {
         _panel.SetActive(false);
+        _dim.SetActive(false);
         if (_resumeCr != null) StopCoroutine(_resumeCr);
         _resumeCr = StartCoroutine(ResumeCountdown());
     }
@@ -119,7 +124,7 @@ public class Stage1PauseMenuManager : MonoBehaviour
     void OnRetry()
     {
         Time.timeScale = 1f;
-        SceneTransitionManager.Instance.LoadSceneWithFade("Stage1Scene");
+        SceneTransitionManager.Instance.LoadSceneWithFade(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
     void OnLobby()
@@ -143,10 +148,11 @@ public class Stage1PauseMenuManager : MonoBehaviour
         scaler.matchWidthOrHeight  = 0.5f;
         cGO.AddComponent<GraphicRaycaster>();
 
-        var dimGO  = Stretch(cGO.transform, "Dim");
-        var dimImg = dimGO.AddComponent<Image>();
+        _dim = Stretch(cGO.transform, "Dim");
+        var dimImg = _dim.AddComponent<Image>();
         dimImg.color          = new Color(0f, 0f, 0f, 0.55f);
         dimImg.raycastTarget  = false;
+        _dim.SetActive(false);
 
         var cdGO  = Anchored(cGO.transform, "Countdown",
                         new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),

@@ -1,0 +1,221 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a52a79781a00b2740886c3ec182da70a, type: 3}
+  m_Name: Stage1_1_WaveRide_Test
+  m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
+  chartName: Stage1-1 Wave Ride Test
+  music: {fileID: 8300000, guid: 58e18d14a2a2bfd4c9b10b2457434d2b, type: 3}
+  bpm: 120
+  introDelay: 2
+  hitWindow: 0.12
+  liveInputStartBeat: 0
+  calls:
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 4
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 6
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 7
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 0
+    cueBeat: 8
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 11
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 12
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 13
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 14
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 1
+    cueBeat: 15
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 18
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 19
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 20
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 21
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 2
+    cueBeat: 22
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 26
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 27
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 28
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 3
+    cueBeat: 29
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 32
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 33
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 34
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 35
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 4
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 39
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 5
+    cueBeat: 43
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 47
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 49
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 6
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 53
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 55
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 7
+    cueBeat: 57
+    releaseBeat: 0
