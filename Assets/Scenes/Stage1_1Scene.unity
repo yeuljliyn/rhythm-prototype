@@ -154,7 +154,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 600, y: 9}
-  m_SizeDelta: {x: 125, y: 260}
+  m_SizeDelta: {x: 140, y: 260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &300055628
 CanvasRenderer:
@@ -184,7 +184,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 28ca269af46d8554d92ee8caab9475cd, type: 3}
+  m_Sprite: {fileID: 4556012968066511082, guid: 8b24f156baceb5646b0b08c410cce998, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -229,7 +229,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -600, y: 150}
-  m_SizeDelta: {x: 466, y: 260}
+  m_SizeDelta: {x: 260, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &424127497
 MonoBehaviour:
@@ -251,7 +251,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 83846f911089e4b4c804c01fd966e125, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 093dc811a47e892468830324c4b3caa9, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -348,7 +348,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -300, y: 9}
-  m_SizeDelta: {x: 125, y: 260}
+  m_SizeDelta: {x: 140, y: 260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &478531423
 CanvasRenderer:
@@ -378,7 +378,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90943eda52c059c439b1331c3051e3df, type: 3}
+  m_Sprite: {fileID: -840710214039915002, guid: 18897e430a1699c46997ec2e9783f4e1, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -423,7 +423,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -600, y: 9}
-  m_SizeDelta: {x: 125, y: 260}
+  m_SizeDelta: {x: 140, y: 260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &503832749
 CanvasRenderer:
@@ -453,7 +453,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90943eda52c059c439b1331c3051e3df, type: 3}
+  m_Sprite: {fileID: -840710214039915002, guid: 18897e430a1699c46997ec2e9783f4e1, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -573,7 +573,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 9}
-  m_SizeDelta: {x: 125, y: 260}
+  m_SizeDelta: {x: 140, y: 260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &733658129
 CanvasRenderer:
@@ -603,7 +603,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90943eda52c059c439b1331c3051e3df, type: 3}
+  m_Sprite: {fileID: -840710214039915002, guid: 18897e430a1699c46997ec2e9783f4e1, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -702,7 +702,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 300, y: 9}
-  m_SizeDelta: {x: 125, y: 260}
+  m_SizeDelta: {x: 140, y: 260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1124142191
 CanvasRenderer:
@@ -732,7 +732,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90943eda52c059c439b1331c3051e3df, type: 3}
+  m_Sprite: {fileID: -840710214039915002, guid: 18897e430a1699c46997ec2e9783f4e1, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1178,11 +1178,12 @@ MonoBehaviour:
   - {fileID: 733658130}
   - {fileID: 1124142192}
   - {fileID: 300055629}
-  callAntSprite: {fileID: 21300000, guid: 90943eda52c059c439b1331c3051e3df, type: 3}
-  responseAntSprite: {fileID: 21300000, guid: 28ca269af46d8554d92ee8caab9475cd, type: 3}
+  callAntIdleSprite: {fileID: -840710214039915002, guid: 18897e430a1699c46997ec2e9783f4e1, type: 3}
+  callAntRaisedSprite: {fileID: -9015765669186515461, guid: 18897e430a1699c46997ec2e9783f4e1, type: 3}
+  responseAntIdleSprite: {fileID: 4556012968066511082, guid: 8b24f156baceb5646b0b08c410cce998, type: 3}
+  responseAntRaisedSprite: {fileID: -9025307660614962876, guid: 8b24f156baceb5646b0b08c410cce998, type: 3}
   clownRect: {fileID: 424127496}
   antPulseDuration: 0.25
-  antJumpHeight: 30
   returnToStartDelay: 0.5
   springStiffness: 70
   springDamping: 10

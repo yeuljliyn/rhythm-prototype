@@ -29,17 +29,16 @@ public class Stage1WaveRideVisuals : MonoBehaviour
 {
     [SerializeField] CallDirector callDirector;
 
-    [Header("Ant1..Ant4 = Call, Ant5 (last) = Response — single sprite each, no idle/raised pair")]
+    [Header("Ant1..Ant4 = Call, Ant5 (last) = Response")]
     [SerializeField] Image[] antImages = new Image[5];
-    [SerializeField] Sprite callAntSprite;
-    [SerializeField] Sprite responseAntSprite;
+    [SerializeField] Sprite callAntIdleSprite;
+    [SerializeField] Sprite callAntRaisedSprite;
+    [SerializeField] Sprite responseAntIdleSprite;
+    [SerializeField] Sprite responseAntRaisedSprite;
 
     [SerializeField] RectTransform clownRect;
 
-    [Tooltip("How long the hop (up and back down) takes.")]
     [SerializeField] float antPulseDuration = 0.25f;
-    [Tooltip("How high the ant hops, in UI pixels.")]
-    [SerializeField] float antJumpHeight = 30f;
 
     [Tooltip("Seconds after entering the Response phase (ant5) before the clown proactively heads " +
              "back to ant1, instead of waiting for the next group's actual OnCallCue. There's usually " +
@@ -65,7 +64,6 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     [SerializeField] float maxTiltDegrees = 14f;
 
     readonly Coroutine[] _antPulses = new Coroutine[5];
-    readonly float[] _antBaseY = new float[5];
     Coroutine _returnToStartCr;
     int _callCueCount;
     int _targetAntIndex;
@@ -80,11 +78,7 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     void Start()
     {
         for (int i = 0; i < antImages.Length; i++)
-        {
-            if (antImages[i] == null) continue;
-            antImages[i].sprite = SpriteFor(i);
-            _antBaseY[i] = antImages[i].rectTransform.anchoredPosition.y;
-        }
+            if (antImages[i] != null) antImages[i].sprite = IdleSpriteFor(i);
 
         _targetAntIndex = callDirector != null && callDirector.StartsInResponsePhase ? 4 : 0;
 
@@ -186,36 +180,22 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     {
         if (index < 0 || index >= antImages.Length || antImages[index] == null) return;
         if (_antPulses[index] != null) StopCoroutine(_antPulses[index]);
-        _antPulses[index] = StartCoroutine(JumpAntRoutine(index));
+        _antPulses[index] = StartCoroutine(PulseAntRoutine(index));
     }
 
-    // Each ant is a single static sprite (already posed mid-cheer, arms up) — no idle/raised frame
-    // swap to sell "hands up for the wave" anymore, so instead the ant physically hops: rises off
-    // _antBaseY along a sine arc (0 at start/end, peak at the midpoint) and settles back down.
-    IEnumerator JumpAntRoutine(int index)
+    IEnumerator PulseAntRoutine(int index)
     {
-        var rt = antImages[index].rectTransform;
-        float baseY = _antBaseY[index];
-        float t = 0f;
-        while (t < antPulseDuration)
-        {
-            t += Time.deltaTime;
-            float frac = Mathf.Clamp01(t / antPulseDuration);
-            float y = baseY + Mathf.Sin(frac * Mathf.PI) * antJumpHeight;
-            var pos = rt.anchoredPosition;
-            pos.y = y;
-            rt.anchoredPosition = pos;
-            yield return null;
-        }
-        var finalPos = rt.anchoredPosition;
-        finalPos.y = baseY;
-        rt.anchoredPosition = finalPos;
+        var img = antImages[index];
+        img.sprite = RaisedSpriteFor(index);
+        yield return new WaitForSeconds(antPulseDuration);
+        img.sprite = IdleSpriteFor(index);
         _antPulses[index] = null;
     }
 
     // Ant1..Ant4 (index 0-3, Call role) share one look; Ant5 (index 4, Response role) is the
     // player's own distinct character.
-    Sprite SpriteFor(int index) => index == 4 ? responseAntSprite : callAntSprite;
+    Sprite IdleSpriteFor(int index)   => index == 4 ? responseAntIdleSprite   : callAntIdleSprite;
+    Sprite RaisedSpriteFor(int index) => index == 4 ? responseAntRaisedSprite : callAntRaisedSprite;
 
     float AntX(int index) => antImages[index].rectTransform.anchoredPosition.x;
 
