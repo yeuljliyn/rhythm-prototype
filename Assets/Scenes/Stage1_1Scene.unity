@@ -1185,6 +1185,12 @@ MonoBehaviour:
   responseAntRaisedSprite: {fileID: -9025307660614962876, guid: 8b24f156baceb5646b0b08c410cce998, type: 3}
   clownRect: {fileID: 424127496}
   antPulseDuration: 0.25
+  springStiffness: 70
+  springDamping: 10
+  bobAmplitude: 6
+  bobSpeed: 5
+  tiltPerSpeed: 0.03
+  maxTiltDegrees: 10
 --- !u!4 &1648010845
 Transform:
   m_ObjectHideFlags: 0

@@ -15,21 +15,19 @@ using UnityEngine.UI;
 /// a single response) with exactly 4 Call notes per group. So a running counter mod 4 recovers the
 /// ant index (0..3) without CallDirector needing to know anything about ants.
 ///
-/// The clown's horizontal position is driven directly off CallClock.SongTime against precomputed
-/// cueBeat timestamps (BuildWaypoints/Update) instead of a fixed-duration coroutine kicked off by
-/// CallDirector's OnCallCue/OnPhaseChanged events. Those events fire at spawn time — cueTime minus
-/// the chart's hitWindow, i.e. slightly *before* the judged beat — so a short fixed-duration glide
-/// from there sits idle for the rest of the beat (looks jerky/discrete), while a glide stretched to
-/// fill the whole beat overshoots past the actual judged beat (arrives late, after the hit window has
-/// already closed). Waypoint-based motion is always in transit and always lands exactly on the real
-/// cueBeat (using the chart's own cueBeat->seconds conversion, not the event's fire time), so it's
-/// both continuous and lands on the same beat the original snap-move used to land close to.
+/// The clown's *target* ant snaps the instant CallClock.SongTime crosses each cueBeat (using the
+/// chart's own cueBeat->seconds conversion — see BuildWaypoints), so it always changes exactly on
+/// the judged beat, same as the original snap-move used to land close to. But instead of teleporting
+/// (or tweening) straight to that target, the rendered position is a damped spring chasing it —
+/// overshoots past the target and wobbles back into place, like a marionette being tugged by a
+/// puppeteer's hand rather than a perfectly-eased UI element. A small continuous vertical bob and a
+/// velocity-based tilt are layered on top for the same reason — see SpringToTarget/Update.
 /// </summary>
 public class Stage1WaveRideVisuals : MonoBehaviour
 {
     [SerializeField] CallDirector callDirector;
 
-    // Source of truth for both SongTime (per-frame clown position) and the chart's cueBeats
+    // Source of truth for both SongTime (which ant is the current target) and the chart's cueBeats
     // (waypoint timestamps) — see BuildWaypoints/Update.
     [SerializeField] CallClock clock;
 
@@ -44,12 +42,29 @@ public class Stage1WaveRideVisuals : MonoBehaviour
 
     [SerializeField] float antPulseDuration = 0.25f;
 
+    [Header("Puppet motion — spring chasing the current ant")]
+    [Tooltip("Higher = snappier pull toward the target, lower = looser/floppier string.")]
+    [SerializeField] float springStiffness = 90f;
+    [Tooltip("Higher = settles faster with less wobble, lower = bounces longer.")]
+    [SerializeField] float springDamping = 8f;
+
+    [Header("Puppet motion — idle bob/tilt")]
+    [SerializeField] float bobAmplitude = 6f;
+    [SerializeField] float bobSpeed = 5f;
+    [Tooltip("Degrees of lean per unit of horizontal speed (px/s), clamped by maxTiltDegrees.")]
+    [SerializeField] float tiltPerSpeed = 0.06f;
+    [SerializeField] float maxTiltDegrees = 14f;
+
     struct Waypoint { public float time; public int antIndex; }
     List<Waypoint> _waypoints;
     int _cachedSegment; // index of the last-known "next waypoint" — search resumes from here
 
     readonly Coroutine[] _antPulses = new Coroutine[5];
     int _callCueCount;
+
+    float _posX, _velX;
+    float _baseY;
+    float _bobPhase;
 
     void OnEnable()  { Bind(callDirector); }
     void OnDisable() { Unbind(callDirector); }
@@ -61,10 +76,12 @@ public class Stage1WaveRideVisuals : MonoBehaviour
 
         BuildWaypoints();
 
-        if (clownRect != null && _waypoints.Count > 0)
-            SetClownX(AntX(_waypoints[0].antIndex));
-        else if (clownRect != null && antImages.Length > 0 && antImages[0] != null)
-            SetClownX(AntX(0));
+        if (clownRect != null)
+        {
+            _baseY = clownRect.anchoredPosition.y;
+            _posX  = AntX(_waypoints.Count > 0 ? _waypoints[0].antIndex : 0);
+            ApplyTransform(_posX, _baseY, 0f);
+        }
     }
 
     void Update()
@@ -78,13 +95,27 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         while (_cachedSegment < _waypoints.Count && _waypoints[_cachedSegment].time <= t)
             _cachedSegment++;
 
-        if (_cachedSegment == 0) { SetClownX(AntX(_waypoints[0].antIndex)); return; }
-        if (_cachedSegment >= _waypoints.Count) { SetClownX(AntX(_waypoints[_waypoints.Count - 1].antIndex)); return; }
+        int targetAnt = _waypoints[Mathf.Clamp(_cachedSegment - 1, 0, _waypoints.Count - 1)].antIndex;
+        float targetX = AntX(targetAnt);
 
-        var prev = _waypoints[_cachedSegment - 1];
-        var next = _waypoints[_cachedSegment];
-        float frac = Mathf.Clamp01((t - prev.time) / Mathf.Max(0.0001f, next.time - prev.time));
-        SetClownX(Mathf.SmoothStep(AntX(prev.antIndex), AntX(next.antIndex), frac));
+        float dt = Mathf.Min(Time.deltaTime, 1f / 30f); // clamp so a frame hitch can't fling the spring
+        SpringToTarget(targetX, dt);
+
+        _bobPhase += dt * bobSpeed;
+        float bobY = Mathf.Sin(_bobPhase) * bobAmplitude;
+        float tilt = Mathf.Clamp(-_velX * tiltPerSpeed, -maxTiltDegrees, maxTiltDegrees);
+
+        ApplyTransform(_posX, _baseY + bobY, tilt);
+    }
+
+    // Damped harmonic oscillator (semi-implicit Euler) — _posX chases targetX, overshooting and
+    // wobbling back rather than smoothly easing straight in. Frame-rate dependent but stable enough
+    // at typical UI update rates with dt clamped above; good enough for a cosmetic flourish.
+    void SpringToTarget(float targetX, float dt)
+    {
+        float accel = (targetX - _posX) * springStiffness - _velX * springDamping;
+        _velX += accel * dt;
+        _posX += _velX * dt;
     }
 
     /// Switches which CallDirector drives these visuals — same rebind pattern as
@@ -169,10 +200,9 @@ public class Stage1WaveRideVisuals : MonoBehaviour
 
     float AntX(int index) => antImages[index].rectTransform.anchoredPosition.x;
 
-    void SetClownX(float x)
+    void ApplyTransform(float x, float y, float tiltDegrees)
     {
-        var pos = clownRect.anchoredPosition;
-        pos.x = x;
-        clownRect.anchoredPosition = pos;
+        clownRect.anchoredPosition = new Vector2(x, y);
+        clownRect.localRotation    = Quaternion.Euler(0f, 0f, tiltDegrees);
     }
 }
