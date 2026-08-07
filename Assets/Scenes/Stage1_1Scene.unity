@@ -1172,6 +1172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stage1WaveRideVisuals
   callDirector: {fileID: 1605954057}
+  clock: {fileID: 1605954058}
   antImages:
   - {fileID: 503832750}
   - {fileID: 478531424}
@@ -1184,7 +1185,6 @@ MonoBehaviour:
   responseAntRaisedSprite: {fileID: -9025307660614962876, guid: 8b24f156baceb5646b0b08c410cce998, type: 3}
   clownRect: {fileID: 424127496}
   antPulseDuration: 0.25
-  clownMoveDuration: 0.15
 --- !u!4 &1648010845
 Transform:
   m_ObjectHideFlags: 0
