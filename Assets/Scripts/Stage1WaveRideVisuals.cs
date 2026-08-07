@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,32 +14,42 @@ using UnityEngine.UI;
 /// a single response) with exactly 4 Call notes per group. So a running counter mod 4 recovers the
 /// ant index (0..3) without CallDirector needing to know anything about ants.
 ///
-/// The clown's *target* ant snaps the instant CallClock.SongTime crosses each cueBeat (using the
-/// chart's own cueBeat->seconds conversion — see BuildWaypoints), so it always changes exactly on
-/// the judged beat, same as the original snap-move used to land close to. But instead of teleporting
-/// (or tweening) straight to that target, the rendered position is a damped spring chasing it —
-/// overshoots past the target and wobbles back into place, like a marionette being tugged by a
-/// puppeteer's hand rather than a perfectly-eased UI element. A small continuous vertical bob and a
-/// velocity-based tilt are layered on top for the same reason — see SpringToTarget/Update.
+/// The clown's *target* ant is set directly by CallDirector's own rhythm events — OnCallCue for
+/// ant0..ant3, OnPhaseChanged(true) for ant4 — the exact same events that drive each ant's hand-raise
+/// pulse below. This is deliberate: those events are the game's actual rhythm source (whatever future
+/// beat-synced SFX gets added will hang off the same source too), so the target must switch on them
+/// directly rather than off an independently-computed SongTime/cueBeat schedule — a separate clock
+/// can drift out of lockstep with "when the ant raises its hand" even if it's individually more
+/// precise against the chart's raw beat math. What happens *between* target changes — the spring
+/// chase, bob, and tilt below — is a purely cosmetic layer that doesn't affect *when* anything syncs,
+/// only *how* it looks while getting there: overshoots past the target and wobbles back into place
+/// like a marionette being tugged by a puppeteer's hand, instead of a perfectly-eased UI tween.
 /// </summary>
 public class Stage1WaveRideVisuals : MonoBehaviour
 {
     [SerializeField] CallDirector callDirector;
 
-    // Source of truth for both SongTime (which ant is the current target) and the chart's cueBeats
-    // (waypoint timestamps) — see BuildWaypoints/Update.
-    [SerializeField] CallClock clock;
-
-    [Header("Ant1..Ant4 = Call, Ant5 (last) = Response")]
+    [Header("Ant1..Ant4 = Call, Ant5 (last) = Response — single sprite each, no idle/raised pair")]
     [SerializeField] Image[] antImages = new Image[5];
-    [SerializeField] Sprite callAntIdleSprite;
-    [SerializeField] Sprite callAntRaisedSprite;
-    [SerializeField] Sprite responseAntIdleSprite;
-    [SerializeField] Sprite responseAntRaisedSprite;
+    [SerializeField] Sprite callAntSprite;
+    [SerializeField] Sprite responseAntSprite;
 
     [SerializeField] RectTransform clownRect;
 
+    [Tooltip("How long the hop (up and back down) takes.")]
     [SerializeField] float antPulseDuration = 0.25f;
+    [Tooltip("How high the ant hops, in UI pixels.")]
+    [SerializeField] float antJumpHeight = 30f;
+
+    [Tooltip("Seconds after entering the Response phase (ant5) before the clown proactively heads " +
+             "back to ant1, instead of waiting for the next group's actual OnCallCue. There's usually " +
+             "a multi-beat rest between a group's response and the next group's first call — without " +
+             "this, the clown only starts the long ant5->ant1 trip exactly when that next call fires, " +
+             "leaving it no time to arrive before immediately having to head on to ant2, so it never " +
+             "visibly lands on ant1. Purely cosmetic head-start — gets overwritten harmlessly by the " +
+             "real OnCallCue once it fires, so it never affects judgement/SFX timing. Tune to be " +
+             "shorter than this chart's actual response->next-group gap.")]
+    [SerializeField] float returnToStartDelay = 0.5f;
 
     [Header("Puppet motion — spring chasing the current ant")]
     [Tooltip("Higher = snappier pull toward the target, lower = looser/floppier string.")]
@@ -55,12 +64,11 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     [SerializeField] float tiltPerSpeed = 0.06f;
     [SerializeField] float maxTiltDegrees = 14f;
 
-    struct Waypoint { public float time; public int antIndex; }
-    List<Waypoint> _waypoints;
-    int _cachedSegment; // index of the last-known "next waypoint" — search resumes from here
-
     readonly Coroutine[] _antPulses = new Coroutine[5];
+    readonly float[] _antBaseY = new float[5];
+    Coroutine _returnToStartCr;
     int _callCueCount;
+    int _targetAntIndex;
 
     float _posX, _velX;
     float _baseY;
@@ -72,31 +80,27 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     void Start()
     {
         for (int i = 0; i < antImages.Length; i++)
-            if (antImages[i] != null) antImages[i].sprite = IdleSpriteFor(i);
+        {
+            if (antImages[i] == null) continue;
+            antImages[i].sprite = SpriteFor(i);
+            _antBaseY[i] = antImages[i].rectTransform.anchoredPosition.y;
+        }
 
-        BuildWaypoints();
+        _targetAntIndex = callDirector != null && callDirector.StartsInResponsePhase ? 4 : 0;
 
         if (clownRect != null)
         {
             _baseY = clownRect.anchoredPosition.y;
-            _posX  = AntX(_waypoints.Count > 0 ? _waypoints[0].antIndex : 0);
+            _posX  = AntX(_targetAntIndex);
             ApplyTransform(_posX, _baseY, 0f);
         }
     }
 
     void Update()
     {
-        if (clock == null || clownRect == null || _waypoints == null || _waypoints.Count == 0) return;
+        if (clownRect == null || antImages == null || antImages.Length == 0) return;
 
-        float t = clock.SongTime;
-
-        // Advance the cached search forward only — SongTime only increases (except while paused,
-        // where it's frozen and this is a harmless no-op).
-        while (_cachedSegment < _waypoints.Count && _waypoints[_cachedSegment].time <= t)
-            _cachedSegment++;
-
-        int targetAnt = _waypoints[Mathf.Clamp(_cachedSegment - 1, 0, _waypoints.Count - 1)].antIndex;
-        float targetX = AntX(targetAnt);
+        float targetX = AntX(_targetAntIndex);
 
         float dt = Mathf.Min(Time.deltaTime, 1f / 30f); // clamp so a frame hitch can't fling the spring
         SpringToTarget(targetX, dt);
@@ -125,13 +129,15 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         Unbind(callDirector);
         callDirector = newDirector;
         Bind(callDirector);
-        BuildWaypoints();
+        _callCueCount   = 0;
+        _targetAntIndex = callDirector != null && callDirector.StartsInResponsePhase ? 4 : 0;
     }
 
     void Bind(CallDirector d)
     {
         if (d == null) return;
         d.OnCallCue       += HandleCallCue;
+        d.OnPhaseChanged  += HandlePhaseChanged;
         d.OnResponsePress += HandleResponsePress;
     }
 
@@ -139,6 +145,7 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     {
         if (d == null) return;
         d.OnCallCue       -= HandleCallCue;
+        d.OnPhaseChanged  -= HandlePhaseChanged;
         d.OnResponsePress -= HandleResponsePress;
     }
 
@@ -147,6 +154,27 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         int antIndex = _callCueCount % 4; // relies on exactly 4 Call notes per group — see class doc
         _callCueCount++;
         PulseAnt(antIndex);
+        _targetAntIndex = antIndex; // same event that pulses the ant also retargets the clown
+
+        if (_returnToStartCr != null) { StopCoroutine(_returnToStartCr); _returnToStartCr = null; }
+    }
+
+    void HandlePhaseChanged(bool isResponsePhase)
+    {
+        if (!isResponsePhase) return;
+
+        _targetAntIndex = 4;
+
+        if (_returnToStartCr != null) StopCoroutine(_returnToStartCr);
+        _returnToStartCr = StartCoroutine(ReturnToStartAfterDelay());
+    }
+
+    // Cosmetic head-start for the ant5->ant1 wrap — see returnToStartDelay's tooltip.
+    IEnumerator ReturnToStartAfterDelay()
+    {
+        yield return new WaitForSeconds(returnToStartDelay);
+        if (_targetAntIndex == 4) _targetAntIndex = 0; // no-op if a real OnCallCue already moved on
+        _returnToStartCr = null;
     }
 
     void HandleResponsePress()
@@ -154,49 +182,40 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         PulseAnt(4);
     }
 
-    /// Precomputes, in chart order, which ant the clown should be standing on at each cueBeat —
-    /// Call-role entries cycle ant0..ant3 (same %4 logic as HandleCallCue), Response-role entries
-    /// are always ant4. Rebuilt whenever the driving CallClock/pattern changes.
-    void BuildWaypoints()
-    {
-        _waypoints = new List<Waypoint>();
-        _cachedSegment = 0;
-        _callCueCount = 0;
-
-        var pattern = clock != null ? clock.Pattern : null;
-        if (pattern == null || pattern.calls == null) return;
-
-        var calls = new List<CallEntry>(pattern.calls);
-        calls.Sort((a, b) => a.cueBeat.CompareTo(b.cueBeat));
-
-        int callCounter = 0;
-        foreach (var c in calls)
-        {
-            int antIndex = c.role == CallRole.Call ? (callCounter++ % 4) : 4;
-            _waypoints.Add(new Waypoint { time = pattern.BeatToTime(c.cueBeat), antIndex = antIndex });
-        }
-    }
-
     void PulseAnt(int index)
     {
         if (index < 0 || index >= antImages.Length || antImages[index] == null) return;
         if (_antPulses[index] != null) StopCoroutine(_antPulses[index]);
-        _antPulses[index] = StartCoroutine(PulseAntRoutine(index));
+        _antPulses[index] = StartCoroutine(JumpAntRoutine(index));
     }
 
-    IEnumerator PulseAntRoutine(int index)
+    // Each ant is a single static sprite (already posed mid-cheer, arms up) — no idle/raised frame
+    // swap to sell "hands up for the wave" anymore, so instead the ant physically hops: rises off
+    // _antBaseY along a sine arc (0 at start/end, peak at the midpoint) and settles back down.
+    IEnumerator JumpAntRoutine(int index)
     {
-        var img = antImages[index];
-        img.sprite = RaisedSpriteFor(index);
-        yield return new WaitForSeconds(antPulseDuration);
-        img.sprite = IdleSpriteFor(index);
+        var rt = antImages[index].rectTransform;
+        float baseY = _antBaseY[index];
+        float t = 0f;
+        while (t < antPulseDuration)
+        {
+            t += Time.deltaTime;
+            float frac = Mathf.Clamp01(t / antPulseDuration);
+            float y = baseY + Mathf.Sin(frac * Mathf.PI) * antJumpHeight;
+            var pos = rt.anchoredPosition;
+            pos.y = y;
+            rt.anchoredPosition = pos;
+            yield return null;
+        }
+        var finalPos = rt.anchoredPosition;
+        finalPos.y = baseY;
+        rt.anchoredPosition = finalPos;
         _antPulses[index] = null;
     }
 
     // Ant1..Ant4 (index 0-3, Call role) share one look; Ant5 (index 4, Response role) is the
     // player's own distinct character.
-    Sprite IdleSpriteFor(int index)   => index == 4 ? responseAntIdleSprite   : callAntIdleSprite;
-    Sprite RaisedSpriteFor(int index) => index == 4 ? responseAntRaisedSprite : callAntRaisedSprite;
+    Sprite SpriteFor(int index) => index == 4 ? responseAntSprite : callAntSprite;
 
     float AntX(int index) => antImages[index].rectTransform.anchoredPosition.x;
 
