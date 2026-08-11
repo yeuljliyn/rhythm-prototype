@@ -15,8 +15,25 @@ public class CallPatternData : ScriptableObject
     [Range(40f, 300f)] public float bpm = 128f;
     public float introDelay = 2f;
 
-    [Tooltip("Judgement half-window in seconds. Total window = 2x this.")]
+    [Tooltip("Judgement half-window in seconds — a press within cueBeat (or releaseBeat for a " +
+             "Hold's release) ± this is a Hit. Total Hit span = 2x this.")]
     public float hitWindow = 0.12f;
+
+    [Tooltip("Extra half-width 'near miss' band immediately outside hitWindow, in seconds. A press " +
+             "that misses the Hit window but still lands within hitWindow + missWindow of a note is " +
+             "judged a Miss (close enough that it reads as a real wrong-timing attempt, not random " +
+             "noise) and starts the mash-guard cooldown. A press further out than that isn't judged " +
+             "at all — no Hit, no Miss, no cooldown, just whatever reactive visuals play on every " +
+             "press regardless. 0 = no separate fail band; anything outside hitWindow goes unjudged.")]
+    public float missWindow = 0.12f;
+
+    [Tooltip("Mash-guard cooldown, in seconds (per-song — tune per chart). Only ever started by an " +
+             "'empty air' press (one that lands on no live note): that press is judged as an " +
+             "immediate Miss, then for this many seconds afterward ALL input — including presses " +
+             "that would otherwise land inside a real note's window — is silently ignored. A press " +
+             "that lands correctly on a live note is judged normally and never starts this cooldown, " +
+             "so fast legitimate back-to-back hits are never penalized. 0 = no mash guard.")]
+    public float minInputIntervalSeconds = 0f;
 
     [Tooltip("Extra global cutoff: calls whose cueBeat is before this beat are always demo-only " +
              "(shown, never judged), regardless of their per-entry CallRole. Use 0 for intro-less charts " +

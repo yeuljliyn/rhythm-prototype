@@ -17,6 +17,8 @@ MonoBehaviour:
   bpm: 128
   introDelay: 2
   hitWindow: 0.12
+  missWindow: 0.12
+  minInputIntervalSeconds: 0
   liveInputStartBeat: 0
   calls:
   - type: 0

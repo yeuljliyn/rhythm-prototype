@@ -58,6 +58,27 @@ public class CallDirector : MonoBehaviour
     bool _songEndFired;
     bool _prevPressed; // Space + mouse left click combined, previous-frame state
     bool? _currentPhaseIsResponse;
+    // SongTime until which ALL input is ignored — only ever set by an "empty air" press (see
+    // HandleInput). A press that lands on a real note never sets this, so legitimate fast
+    // back-to-back hits are never throttled, only wasted/mistimed presses cost you a cooldown.
+    float _cooldownUntil = float.NegativeInfinity;
+
+    // groupId -> already took a Miss this turn. Caps a turn at one Miss no matter how it happens
+    // (a mistimed press now, the note's own timeout later, a second Response note in the same
+    // group, ...) — one blown turn shouldn't cascade into several. groupId is unique per turn for
+    // a whole chart (Call Map Editor's group counter only ever increments), so this never needs
+    // clearing mid-song. -1 (ungrouped/legacy entries) is intentionally never tracked here.
+    readonly HashSet<int> _failedGroups = new HashSet<int>();
+
+    // A note gets exactly one judgement attempt across its whole span (front Miss Window + Hit
+    // Window + back Miss Window), whichever comes first. Without this, an early near-miss press
+    // (which doesn't resolve the LiveCall — see FindNearMissEntry) left the note's Hit Window still
+    // claimable, so a second, later press could still land a Hit on a note you already fumbled —
+    // and conversely a press in the *back* Miss Window after an already-resolved Hit had nothing
+    // stopping FindNearMissEntry from matching it again and firing a phantom extra Miss. Reference
+    // equality is fine: entries in _calls are the same CallEntry instances referenced by every
+    // LiveCall.data built from them.
+    readonly HashSet<CallEntry> _judgedEntries = new HashSet<CallEntry>();
 
     void Awake()
     {
@@ -146,6 +167,14 @@ public class CallDirector : MonoBehaviour
 
             if (t <= lc.deadline) continue;
 
+            if (_judgedEntries.Contains(lc.data))
+            {
+                // Already used its one judgement via an earlier near-miss press — just clean up,
+                // no second Resolve() call (no double SFX/indicator/score).
+                lc.resolved = true;
+                continue;
+            }
+
             // Deadline passed without a valid resolution:
             //  - Tap: never pressed in [windowOpenTime, deadline]
             //  - Hold: never pressed at all, OR held past the window without releasing
@@ -164,30 +193,67 @@ public class CallDirector : MonoBehaviour
 
         if (pressEdge)
         {
+            // OnResponsePress always fires, even inside the mash-guard cooldown below — reactive
+            // visuals (a normal ant's hand-raise, a cup pass) should still play on every physical
+            // press so the game feels responsive, even when that press doesn't count for judgement.
             OnResponsePress?.Invoke();
 
-            LiveCall claim = null;
-            float bestDeadline = float.MaxValue;
-
-            foreach (var lc in _live)
+            if (t < _cooldownUntil)
             {
-                if (lc.resolved || lc.isDemo) continue;
-                if (lc.data.type == CallType.Hold && lc.isHoldArmed) continue; // already holding this one
-                if (t < lc.claimableFromTime || t > lc.deadline) continue;
-
-                if (lc.deadline < bestDeadline) { bestDeadline = lc.deadline; claim = lc; } // earliest-deadline wins
-            }
-
-            if (claim != null)
-            {
-                if (claim.data.type == CallType.Tap) Resolve(claim, JudgementType.Hit);
-                else                                  claim.isHoldArmed = true; // judged on release
+                // Still cooling down from an earlier empty-air press — every input is ignored
+                // outright during this window, including one that would otherwise land on a real
+                // note (it'll simply time out on its own later, same as never pressing at all).
             }
             else
             {
-                // Unmatched press (no live claimable call): register as an immediate Miss so
-                // mashing the button can't fish for hits across every note's window for free.
-                GameManager.Instance?.RegisterJudgement(JudgementType.Miss);
+                LiveCall claim = null;
+                float bestDeadline = float.MaxValue;
+
+                foreach (var lc in _live)
+                {
+                    if (lc.resolved || lc.isDemo) continue;
+                    if (_judgedEntries.Contains(lc.data)) continue; // already used its one judgement (an earlier near-miss)
+                    if (lc.data.type == CallType.Hold && lc.isHoldArmed) continue; // already holding this one
+                    if (t < lc.claimableFromTime || t > lc.deadline) continue;
+
+                    if (lc.deadline < bestDeadline) { bestDeadline = lc.deadline; claim = lc; } // earliest-deadline wins
+                }
+
+                if (claim != null)
+                {
+                    // Landed inside a real note's window — judge normally. Deliberately does NOT
+                    // start the mash cooldown, so a fast run of genuinely-on-time hits is never
+                    // throttled by it.
+                    if (claim.data.type == CallType.Tap) Resolve(claim, JudgementType.Hit);
+                    else                                  claim.isHoldArmed = true; // judged on release
+                }
+                else
+                {
+                    // Missed the Hit window, but check whether it's still close enough to some
+                    // note (within hitWindow+missWindow) to read as a real wrong-timing attempt
+                    // rather than random noise.
+                    CallEntry nearMiss = FindNearMissEntry(t);
+                    if (nearMiss != null)
+                    {
+                        // This note's one judgement attempt is now spent — a later press anywhere
+                        // else in its span (front/back Miss Window, or even its own Hit Window once
+                        // it opens) can no longer claim a Hit or register another Miss for it.
+                        _judgedEntries.Add(nearMiss);
+
+                        // Close but wrong: register a Miss so mashing near a note can't fish for
+                        // hits across its whole window for free — unless this turn already took its
+                        // one Miss (see _failedGroups), in which case this press is just noise on
+                        // top of an already-failed turn. Either way, this is what starts the mash
+                        // cooldown.
+                        int groupId = nearMiss.groupId;
+                        if (groupId < 0 || _failedGroups.Add(groupId))
+                            GameManager.Instance?.RegisterJudgement(JudgementType.Miss);
+
+                        if (pattern.minInputIntervalSeconds > 0f)
+                            _cooldownUntil = t + pattern.minInputIntervalSeconds;
+                    }
+                    // else: nowhere near any note at all — pure noise, not judged, no cooldown.
+                }
             }
         }
 
@@ -207,10 +273,41 @@ public class CallDirector : MonoBehaviour
         }
     }
 
+    // Scans the *full* chart (not just _live) for a Response entry whose judged instant (cueBeat
+    // for Tap, releaseBeat for Hold) is within hitWindow+missWindow of t. Needs the full list rather
+    // than _live because the fail band can reach earlier than a note's own spawn time
+    // (cueTime - hitWindow, see SpawnDueCalls), so the note may not be live yet when an early
+    // near-miss press happens.
+    CallEntry FindNearMissEntry(float t)
+    {
+        float failRadius = pattern.hitWindow + pattern.missWindow;
+        foreach (var entry in _calls)
+        {
+            bool isDemo = entry.role == CallRole.Call || entry.cueBeat < pattern.liveInputStartBeat;
+            if (isDemo) continue;
+            if (_judgedEntries.Contains(entry)) continue; // already used its one judgement attempt
+
+            float judgedTime = entry.type == CallType.Tap
+                ? pattern.BeatToTime(entry.cueBeat)
+                : pattern.BeatToTime(entry.releaseBeat);
+
+            if (Mathf.Abs(t - judgedTime) <= failRadius) return entry;
+        }
+        return null;
+    }
+
     void Resolve(LiveCall lc, JudgementType j)
     {
         lc.resolved = true;
-        GameManager.Instance?.RegisterJudgement(j); // fires OnJudgement -> ScreenVignetteFlash, BattleSFXController.PlayHit/Miss
+        _judgedEntries.Add(lc.data); // this note's one judgement attempt is spent
+
+        // A Miss only counts against score/combo the first time its turn fails — see
+        // _failedGroups. Hits always count normally, even in an already-failed turn, so a player
+        // who recovers mid-turn still gets credit for the notes they do land.
+        bool countsForScore = j == JudgementType.Hit ||
+                               lc.data.groupId < 0 || _failedGroups.Add(lc.data.groupId);
+        if (countsForScore)
+            GameManager.Instance?.RegisterJudgement(j); // fires OnJudgement -> ScreenVignetteFlash, BattleSFXController.PlayHit/Miss
 
         var indicator = lc.data.type == CallType.Tap ? tapIndicator : holdIndicator;
         if (j == JudgementType.Hit) indicator?.ShowHit();

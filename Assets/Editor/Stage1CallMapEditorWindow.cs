@@ -177,8 +177,25 @@ public class Stage1CallMapEditorWindow : EditorWindow
                 EditorGUILayout.LabelField("Hit Window (±s)", GUILayout.Width(96));
                 _pattern.hitWindow = EditorGUILayout.FloatField(_pattern.hitWindow, GUILayout.Width(56));
                 GUILayout.Space(8);
+                EditorGUILayout.LabelField(
+                    new GUIContent("Miss Window (±s)", "Extra 'near miss' band right outside Hit Window — a " +
+                        "press here still fails as a Miss (and starts the mash cooldown) instead of going " +
+                        "unjudged. Total judged span per note = 2 x (Hit Window + Miss Window)."),
+                    GUILayout.Width(102));
+                _pattern.missWindow = EditorGUILayout.FloatField(_pattern.missWindow, GUILayout.Width(56));
+                GUILayout.Space(8);
                 EditorGUILayout.LabelField("Live Input From Beat", GUILayout.Width(120));
                 _pattern.liveInputStartBeat = EditorGUILayout.FloatField(_pattern.liveInputStartBeat, GUILayout.Width(56));
+            }
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField(
+                    new GUIContent("Mash Cooldown (s)", "Per-song mash guard. Only a near-miss press (inside " +
+                        "Hit+Miss Window but outside Hit Window) starts this cooldown; a real Hit never does. " +
+                        "While cooling down, ALL input is ignored — including one that would otherwise land a " +
+                        "Hit. Reactive visuals (OnResponsePress) still fire regardless. 0 = no cooldown."),
+                    GUILayout.Width(104));
+                _pattern.minInputIntervalSeconds = EditorGUILayout.FloatField(_pattern.minInputIntervalSeconds, GUILayout.Width(56));
             }
             _pattern.music = (AudioClip)EditorGUILayout.ObjectField(
                 "Music", _pattern.music, typeof(AudioClip), false);

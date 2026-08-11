@@ -176,10 +176,17 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         PulseAnt(4);
     }
 
+    // Skips the trigger (rather than stopping-and-restarting) while already mid-pulse. ant4's pulse
+    // is driven by OnResponsePress, which fires on every physical press regardless of the chart's
+    // input cooldown (visuals must react to every press even during that cooldown — see
+    // CallDirector). A stop-and-restart guard would mean mashing faster than antPulseDuration keeps
+    // re-triggering the "raised" sprite before the revert-to-idle step ever lands, so the ant looks
+    // permanently raised. Skipping instead guarantees every pulse that does play completes its full
+    // raised->idle cycle, capping the visible reaction rate at antPulseDuration.
     void PulseAnt(int index)
     {
         if (index < 0 || index >= antImages.Length || antImages[index] == null) return;
-        if (_antPulses[index] != null) StopCoroutine(_antPulses[index]);
+        if (_antPulses[index] != null) return; // still mid-pulse — let it finish
         _antPulses[index] = StartCoroutine(PulseAntRoutine(index));
     }
 
