@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Stage1_1_WaveRide_Test
   m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
   chartName: Stage1-1 Wave Ride Test
-  music: {fileID: 8300000, guid: 58e18d14a2a2bfd4c9b10b2457434d2b, type: 3}
-  bpm: 120
+  music: {fileID: 8300000, guid: 93861d541ed922046a2faadcc6b94a53, type: 3}
+  bpm: 122
   introDelay: 2
   hitWindow: 0.12
   missWindow: 0.38
