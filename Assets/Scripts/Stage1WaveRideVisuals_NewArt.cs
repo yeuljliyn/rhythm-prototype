@@ -22,31 +22,30 @@ public class Stage1WaveRideVisuals_NewArt : MonoBehaviour
 
     [SerializeField] RectTransform clownRect;
 
-    [Tooltip("How long the hop (up and back down) takes.")]
+    [Tooltip("한 번 뛰었다가(위로) 다시 내려오기까지 걸리는 시간")]
     [SerializeField] float antPulseDuration = 0.25f;
-    [Tooltip("How high the ant hops, in UI pixels.")]
+    [Tooltip("개미가 뛰어오르는 높이(UI 픽셀 단위)")]
     [SerializeField] float antJumpHeight = 30f;
 
-    [Tooltip("Seconds after entering the Response phase (ant5) before the clown proactively heads " +
-             "back to ant1, instead of waiting for the next group's actual OnCallCue. There's usually " +
-             "a multi-beat rest between a group's response and the next group's first call — without " +
-             "this, the clown only starts the long ant5->ant1 trip exactly when that next call fires, " +
-             "leaving it no time to arrive before immediately having to head on to ant2, so it never " +
-             "visibly lands on ant1. Purely cosmetic head-start — gets overwritten harmlessly by the " +
-             "real OnCallCue once it fires, so it never affects judgement/SFX timing. Tune to be " +
-             "shorter than this chart's actual response->next-group gap.")]
+    [Tooltip("Response 구간(ant5)에 들어간 뒤, 다음 그룹의 실제 OnCallCue를 기다리지 않고 광대가 " +
+             "미리 ant1 쪽으로 되돌아가기 시작하기까지의 시간(초). 보통 한 그룹의 response와 다음 " +
+             "그룹의 첫 콜 사이에는 몇 박 정도 쉬는 구간이 있는데, 이 값이 없으면 광대는 다음 콜이 " +
+             "실제로 뜨는 순간에야 ant5→ant1로 긴 이동을 시작해서, ant1에 도착하기도 전에 곧바로 " +
+             "ant2로 다시 움직여야 하다 보니 ant1에 제대로 도착하는 모습을 볼 수가 없음. 순전히 " +
+             "연출용 선행 이동이라 실제 OnCallCue가 뜨면 자연스럽게 덮어써지므로 판정/효과음 " +
+             "타이밍에는 영향 없음. 이 차트의 실제 response→다음 그룹 간격보다는 짧게 설정할 것.")]
     [SerializeField] float returnToStartDelay = 0.5f;
 
     [Header("Puppet motion — spring chasing the current ant")]
-    [Tooltip("Higher = snappier pull toward the target, lower = looser/floppier string.")]
+    [Tooltip("클수록 목표 지점으로 더 빠르고 탄탄하게 당겨짐, 작을수록 헐렁하고 흐물흐물해짐")]
     [SerializeField] float springStiffness = 90f;
-    [Tooltip("Higher = settles faster with less wobble, lower = bounces longer.")]
+    [Tooltip("클수록 흔들림 없이 빨리 안정되고, 작을수록 더 오래 통통 튐")]
     [SerializeField] float springDamping = 8f;
 
     [Header("Puppet motion — idle bob/tilt")]
     [SerializeField] float bobAmplitude = 6f;
     [SerializeField] float bobSpeed = 5f;
-    [Tooltip("Degrees of lean per unit of horizontal speed (px/s), clamped by maxTiltDegrees.")]
+    [Tooltip("가로 이동 속도(px/s) 단위당 기울어지는 각도. maxTiltDegrees로 상한 제한됨")]
     [SerializeField] float tiltPerSpeed = 0.06f;
     [SerializeField] float maxTiltDegrees = 14f;
 

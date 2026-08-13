@@ -38,33 +38,64 @@ public class Stage1WaveRideVisuals : MonoBehaviour
 
     [SerializeField] RectTransform clownRect;
 
+    [Header("Sea foreground — dips on every call/response note (chart-driven, not raw BPM)")]
+    [SerializeField] RectTransform seaRect;
+    [SerializeField] float seaWaveMinY = 135f;
+    [SerializeField] float seaWaveMaxY = 160f;
+    [Tooltip("노트가 뜬 후 seaWaveMinY까지 내려가는 데 걸리는 시간")]
+    [SerializeField] float seaWaveDipTime = 0.12f;
+    [Tooltip("내려갔다가 다시 seaWaveMaxY까지 올라오는 데 걸리는 시간")]
+    [SerializeField] float seaWaveRiseTime = 0.18f;
+
+    [Header("Clown — normal vs. Miss (falling) pose")]
+    [SerializeField] Image clownImage;
+    [SerializeField] Sprite clownNormalSprite;
+    [SerializeField] Sprite clownFallSprite;
+    [Tooltip("넘어지는 포즈가 유지되다가 원래 모습으로 돌아오기까지 걸리는 시간")]
+    [SerializeField] float missPoseDuration = 0.4f;
+
+    [Header("Ants — glare pose on Miss (Ant1-4 share one look, Ant5 has its own)")]
+    [SerializeField] Sprite antFailSprite;
+    [SerializeField] Sprite ant5FailSprite;
+
     [SerializeField] float antPulseDuration = 0.25f;
 
-    [Tooltip("Seconds after entering the Response phase (ant5) before the clown proactively heads " +
-             "back to ant1, instead of waiting for the next group's actual OnCallCue. There's usually " +
-             "a multi-beat rest between a group's response and the next group's first call — without " +
-             "this, the clown only starts the long ant5->ant1 trip exactly when that next call fires, " +
-             "leaving it no time to arrive before immediately having to head on to ant2, so it never " +
-             "visibly lands on ant1. Purely cosmetic head-start — gets overwritten harmlessly by the " +
-             "real OnCallCue once it fires, so it never affects judgement/SFX timing. Tune to be " +
-             "shorter than this chart's actual response->next-group gap.")]
+    [Header("Ants — Scale-Y \"둠칫둠칫\" bop continuously in time with the song's BPM (reads bpm " +
+            "live off clock.Pattern each frame, not a fixed number, so swapping in a different " +
+            "song/chart just works without touching this script)")]
+    [SerializeField] CallClock clock;
+    [SerializeField] float antScaleMinY = 1.50f;
+    [SerializeField] float antScaleMaxY = 1.55f;
+    [Tooltip("한 박에 몇 번 출렁이는지. 1이면 한 박에 한 번 오르내림.")]
+    [SerializeField] float antWaveCyclesPerBeat = 1f;
+
+    [Tooltip("Response 구간(ant5)에 들어간 뒤, 다음 그룹의 실제 OnCallCue를 기다리지 않고 광대가 " +
+             "미리 ant1 쪽으로 되돌아가기 시작하기까지의 시간(초). 보통 한 그룹의 response와 다음 " +
+             "그룹의 첫 콜 사이에는 몇 박 정도 쉬는 구간이 있는데, 이 값이 없으면 광대는 다음 콜이 " +
+             "실제로 뜨는 순간에야 ant5→ant1로 긴 이동을 시작해서, ant1에 도착하기도 전에 곧바로 " +
+             "ant2로 다시 움직여야 하다 보니 ant1에 제대로 도착하는 모습을 볼 수가 없음. 순전히 " +
+             "연출용 선행 이동이라 실제 OnCallCue가 뜨면 자연스럽게 덮어써지므로 판정/효과음 " +
+             "타이밍에는 영향 없음. 이 차트의 실제 response→다음 그룹 간격보다는 짧게 설정할 것.")]
     [SerializeField] float returnToStartDelay = 0.5f;
 
     [Header("Puppet motion — spring chasing the current ant")]
-    [Tooltip("Higher = snappier pull toward the target, lower = looser/floppier string.")]
+    [Tooltip("클수록 목표 지점으로 더 빠르고 탄탄하게 당겨짐, 작을수록 헐렁하고 흐물흐물해짐")]
     [SerializeField] float springStiffness = 90f;
-    [Tooltip("Higher = settles faster with less wobble, lower = bounces longer.")]
+    [Tooltip("클수록 흔들림 없이 빨리 안정되고, 작을수록 더 오래 통통 튐")]
     [SerializeField] float springDamping = 8f;
 
     [Header("Puppet motion — idle bob/tilt")]
     [SerializeField] float bobAmplitude = 6f;
     [SerializeField] float bobSpeed = 5f;
-    [Tooltip("Degrees of lean per unit of horizontal speed (px/s), clamped by maxTiltDegrees.")]
+    [Tooltip("가로 이동 속도(px/s) 단위당 기울어지는 각도. maxTiltDegrees로 상한 제한됨")]
     [SerializeField] float tiltPerSpeed = 0.06f;
     [SerializeField] float maxTiltDegrees = 14f;
 
     readonly Coroutine[] _antPulses = new Coroutine[5];
     Coroutine _returnToStartCr;
+    Coroutine _missPoseCr;
+    Coroutine _antFailCr;
+    Coroutine _seaWaveCr;
     int _callCueCount;
     int _targetAntIndex;
 
@@ -72,13 +103,24 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     float _baseY;
     float _bobPhase;
 
-    void OnEnable()  { Bind(callDirector); }
-    void OnDisable() { Unbind(callDirector); }
+    void OnEnable()
+    {
+        Bind(callDirector);
+        if (GameManager.Instance != null) GameManager.Instance.OnJudgement += HandleJudgement;
+    }
+
+    void OnDisable()
+    {
+        Unbind(callDirector);
+        if (GameManager.Instance != null) GameManager.Instance.OnJudgement -= HandleJudgement;
+    }
 
     void Start()
     {
         for (int i = 0; i < antImages.Length; i++)
             if (antImages[i] != null) antImages[i].sprite = IdleSpriteFor(i);
+
+        if (clownImage != null) clownImage.sprite = clownNormalSprite;
 
         _targetAntIndex = callDirector != null && callDirector.StartsInResponsePhase ? 4 : 0;
 
@@ -104,6 +146,34 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         float tilt = Mathf.Clamp(-_velX * tiltPerSpeed, -maxTiltDegrees, maxTiltDegrees);
 
         ApplyTransform(_posX, _baseY + bobY, tilt);
+
+        AnimateAntsWithBpm();
+    }
+
+    // Cosine (not sine) so phase 0 lands on antScaleMaxY — matches each ant's authored resting
+    // Scale Y in the scene, so there's no visible pop on the very first frame the song starts. Reads
+    // BPM off clock.Pattern.BeatInterval every frame (instead of caching it once) specifically so a
+    // chart swap mid-session — or just this CallClock's pattern reference being repointed at a
+    // different song later — is picked up automatically; nothing here hardcodes a tempo. Only
+    // Scale.y is touched so each ant's own x/z scale (already slightly different per ant) is left
+    // untouched.
+    void AnimateAntsWithBpm()
+    {
+        if (clock == null || antImages == null) return;
+
+        float beatInterval = clock.Pattern != null ? clock.Pattern.BeatInterval : 60f / 128f;
+        float phase = clock.SongTime / beatInterval * antWaveCyclesPerBeat;
+        float wave01 = (Mathf.Cos(phase * Mathf.PI * 2f) + 1f) * 0.5f;
+        float scaleY = Mathf.Lerp(antScaleMinY, antScaleMaxY, wave01);
+
+        for (int i = 0; i < antImages.Length; i++)
+        {
+            if (antImages[i] == null) continue;
+            var rect = antImages[i].rectTransform;
+            var scale = rect.localScale;
+            scale.y = scaleY;
+            rect.localScale = scale;
+        }
     }
 
     // Damped harmonic oscillator (semi-implicit Euler) — _posX chases targetX, overshooting and
@@ -149,6 +219,7 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         _callCueCount++;
         PulseAnt(antIndex);
         _targetAntIndex = antIndex; // same event that pulses the ant also retargets the clown
+        PulseSea();
 
         if (_returnToStartCr != null) { StopCoroutine(_returnToStartCr); _returnToStartCr = null; }
     }
@@ -174,6 +245,94 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     void HandleResponsePress()
     {
         PulseAnt(4);
+        PulseSea();
+    }
+
+    // Dips the sea down then back up on every note (Call or Response), restarting from wherever it
+    // currently sits rather than skipping-while-busy like PulseAnt does — notes can land closer
+    // together than a full dip+rise cycle, and retargeting mid-tween here just changes direction
+    // smoothly instead of popping, so it reads as the sea reacting to the chart's actual rhythm
+    // instead of an independent metronome (which is what the old free-running BPM sine wave looked
+    // like — synced to the song's tempo number, not to when notes actually land).
+    void PulseSea()
+    {
+        if (seaRect == null) return;
+        if (_seaWaveCr != null) StopCoroutine(_seaWaveCr);
+        _seaWaveCr = StartCoroutine(SeaWaveRoutine());
+    }
+
+    IEnumerator SeaWaveRoutine()
+    {
+        yield return TweenRectY(seaRect, seaWaveMinY, seaWaveDipTime);
+        yield return TweenRectY(seaRect, seaWaveMaxY, seaWaveRiseTime);
+        _seaWaveCr = null;
+    }
+
+    // Generic anchoredPosition.y tween, restarting cleanly from wherever the rect currently sits
+    // (reads startY fresh each call) rather than from a fixed value — used by both the sea and the
+    // ants so a retrigger mid-tween just changes direction instead of popping.
+    IEnumerator TweenRectY(RectTransform rect, float targetY, float duration)
+    {
+        float startY = rect.anchoredPosition.y;
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            var pos = rect.anchoredPosition;
+            pos.y = Mathf.Lerp(startY, targetY, Mathf.Clamp01(t / duration));
+            rect.anchoredPosition = pos;
+            yield return null;
+        }
+        var finalPos = rect.anchoredPosition;
+        finalPos.y = targetY;
+        rect.anchoredPosition = finalPos;
+    }
+
+    // Briefly swaps the clown to its falling pose on a Miss, regardless of which note (Call demo or
+    // the Response ant5 note) caused it — GameManager.OnJudgement doesn't say which, and the clown is
+    // the single shared "how's it going" readout for the whole group either way.
+    void HandleJudgement(JudgementType j)
+    {
+        if (j != JudgementType.Miss) return;
+
+        if (clownImage != null && clownFallSprite != null)
+        {
+            if (_missPoseCr != null) StopCoroutine(_missPoseCr);
+            _missPoseCr = StartCoroutine(MissPoseRoutine());
+        }
+
+        if (antImages != null && antImages.Length > 0)
+        {
+            if (_antFailCr != null) StopCoroutine(_antFailCr);
+            _antFailCr = StartCoroutine(AntFailPoseRoutine());
+        }
+    }
+
+    IEnumerator MissPoseRoutine()
+    {
+        clownImage.sprite = clownFallSprite;
+        yield return new WaitForSeconds(missPoseDuration);
+        clownImage.sprite = clownNormalSprite;
+        _missPoseCr = null;
+    }
+
+    // Ant1..Ant4 share one "glaring" look on Miss, Ant5 has its own — same brief swap-then-revert
+    // shape as the clown's fall pose, on the same missPoseDuration so every reaction to a single
+    // Miss lands and clears together.
+    IEnumerator AntFailPoseRoutine()
+    {
+        for (int i = 0; i < antImages.Length; i++)
+        {
+            if (antImages[i] == null) continue;
+            antImages[i].sprite = i == 4 ? ant5FailSprite : antFailSprite;
+        }
+
+        yield return new WaitForSeconds(missPoseDuration);
+
+        for (int i = 0; i < antImages.Length; i++)
+            if (antImages[i] != null) antImages[i].sprite = IdleSpriteFor(i);
+
+        _antFailCr = null;
     }
 
     // Skips the trigger (rather than stopping-and-restarting) while already mid-pulse. ant4's pulse

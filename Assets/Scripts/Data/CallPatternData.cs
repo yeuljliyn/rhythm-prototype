@@ -15,32 +15,32 @@ public class CallPatternData : ScriptableObject
     [Range(40f, 300f)] public float bpm = 128f;
     public float introDelay = 2f;
 
-    [Tooltip("Judgement half-window in seconds — a press within cueBeat (or releaseBeat for a " +
-             "Hold's release) ± this is a Hit. Total Hit span = 2x this.")]
+    [Tooltip("판정 반폭(초 단위) — cueBeat(홀드는 releaseBeat) ± 이 값 이내에 입력하면 Hit. " +
+             "실제 Hit 판정 구간 전체 폭은 이 값의 2배.")]
     public float hitWindow = 0.12f;
 
-    [Tooltip("Extra half-width 'near miss' band immediately outside hitWindow, in seconds. A press " +
-             "that misses the Hit window but still lands within hitWindow + missWindow of a note is " +
-             "judged a Miss (close enough that it reads as a real wrong-timing attempt, not random " +
-             "noise) and starts the mash-guard cooldown. A press further out than that isn't judged " +
-             "at all — no Hit, no Miss, no cooldown, just whatever reactive visuals play on every " +
-             "press regardless. 0 = no separate fail band; anything outside hitWindow goes unjudged.")]
+    [Tooltip("hitWindow 바로 바깥쪽에 붙는 '아깝게 놓침' 판정용 여유 반폭(초 단위). Hit 구간은 " +
+             "벗어났지만 hitWindow + missWindow 이내에 들어온 입력은 Miss로 판정(랜덤 노이즈가 " +
+             "아니라 실제로 타이밍을 노린 시도로 볼 수 있을 만큼 가까움)되고 마구 누르기 방지 " +
+             "쿨다운이 시작됨. 이보다 더 멀리 벗어난 입력은 아예 판정 대상이 아님 — Hit도 Miss도 " +
+             "쿨다운도 없고, 눌렀을 때 나오는 리액션 연출만 그대로 재생됨. 0이면 별도 실패 구간 " +
+             "없이 hitWindow 밖은 전부 판정 안 함.")]
     public float missWindow = 0.12f;
 
-    [Tooltip("Mash-guard cooldown, in seconds (per-song — tune per chart). Only ever started by an " +
-             "'empty air' press (one that lands on no live note): that press is judged as an " +
-             "immediate Miss, then for this many seconds afterward ALL input — including presses " +
-             "that would otherwise land inside a real note's window — is silently ignored. A press " +
-             "that lands correctly on a live note is judged normally and never starts this cooldown, " +
-             "so fast legitimate back-to-back hits are never penalized. 0 = no mash guard.")]
+    [Tooltip("마구 누르기 방지 쿨다운(초 단위, 곡마다 다르게 튜닝). 노트가 없는 '허공'에 입력했을 " +
+             "때만 시작됨 — 그 입력은 즉시 Miss로 판정되고, 이후 이 시간 동안은 실제 노트 판정 " +
+             "구간 안에 들어오는 입력이라도 포함해서 모든 입력이 조용히 무시됨. 실제 노트를 " +
+             "제대로 맞춘 입력은 정상 판정되고 이 쿨다운을 절대 시작시키지 않으므로, 정당하게 " +
+             "빠르게 연속으로 맞추는 건 절대 불이익을 받지 않음. 0이면 마구 누르기 방지 없음.")]
     public float minInputIntervalSeconds = 0f;
 
-    [Tooltip("Extra global cutoff: calls whose cueBeat is before this beat are always demo-only " +
-             "(shown, never judged), regardless of their per-entry CallRole. Use 0 for intro-less charts " +
-             "where Call/Response is fully controlled per-entry via CallEntry.role.")]
+    [Tooltip("추가 전역 컷오프: cueBeat가 이 박자보다 이전인 콜은 각 엔트리의 CallRole과 " +
+             "무관하게 항상 데모 전용(보여주기만 하고 판정 안 함)으로 취급됨. 인트로 없이 " +
+             "CallEntry.role로 콜/리스폰스를 엔트리별로 완전히 제어하는 차트라면 0으로 둘 것.")]
     public float liveInputStartBeat = 0f;
 
-    [Tooltip("Must stay sorted ascending by cueBeat. The editor tool re-sorts after every add/move.")]
+    [Tooltip("반드시 cueBeat 오름차순으로 정렬된 상태를 유지해야 함. 추가/이동할 때마다 에디터 " +
+             "툴이 자동으로 재정렬함.")]
     public List<CallEntry> calls = new List<CallEntry>();
 
     public float BeatInterval               => 60f / Mathf.Max(1f, bpm);

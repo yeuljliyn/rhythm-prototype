@@ -15,13 +15,14 @@ public class SfxCuePatternData : ScriptableObject
     [Range(40f, 300f)] public float bpm = 128f;
     public float introDelay = 2f;
 
-    [Tooltip("Q/W/E/R -> clip assignment used by the Sfx Cue Editor when stamping new notes " +
-             "(index 0=Q, 1=W, 2=E, 3=R). Purely an authoring convenience saved with the chart — " +
-             "changing a slot only affects notes stamped afterward, never notes already placed " +
-             "(each SfxCueEntry keeps its own resolved clip).")]
+    [Tooltip("Sfx Cue Editor에서 새 노트를 찍을 때 쓰이는 Q/W/E/R -> 클립 배정 " +
+             "(0=Q, 1=W, 2=E, 3=R). 차트와 함께 저장되는 순수 작업 편의용 설정 — " +
+             "슬롯을 바꿔도 그 이후에 찍는 노트에만 적용되고, 이미 찍어둔 노트는 " +
+             "영향받지 않음(SfxCueEntry마다 확정된 클립을 각자 따로 들고 있음).")]
     public AudioClip[] keySlots = new AudioClip[4];
 
-    [Tooltip("Must stay sorted ascending by beat. The editor tool re-sorts after every add/move.")]
+    [Tooltip("반드시 beat 오름차순으로 정렬된 상태를 유지해야 함. 추가/이동할 때마다 에디터 " +
+             "툴이 자동으로 재정렬함.")]
     public List<SfxCueEntry> cues = new List<SfxCueEntry>();
 
     public float BeatInterval               => 60f / Mathf.Max(1f, bpm);
