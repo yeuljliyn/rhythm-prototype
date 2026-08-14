@@ -30,10 +30,29 @@ public class CallDirector : MonoBehaviour
     /// is demonstrating. This is a scripted cue driven by chart timing, not player input.
     public System.Action OnCallCue;
 
+    /// Same moment as OnCallCue, additionally carrying the entry's groupId. Added alongside the
+    /// original (parameterless) event rather than changing OnCallCue's signature, specifically so
+    /// existing subscribers (Stage1WaveRideVisuals, Stage1WaterPourVisuals) don't need to change at
+    /// all — they infer "which note" from firing order via a running counter, which only works when
+    /// one group's calls always finish spawning before the next group's start (true for their
+    /// charts). That assumption breaks for a chart where groups are deliberately interleaved
+    /// call-by-call (e.g. Stage1QuickTapVisuals's cup relay wanting several relays running staggered
+    /// one-ant-apart) — a plain firing-order counter can't tell which relay a given cue belongs to
+    /// once two groups' individual calls start interleaving, not just overlapping as whole groups.
+    /// Consumers that need real overlap safety should use this instead of OnCallCue.
+    public System.Action<int> OnCallCueGroup;
+
     /// Fires on every player button press (Space/click) edge, regardless of whether it lands on a
     /// live Response window or not. Unlike OnCallCue, this is driven by the player's own input timing —
     /// minigame visuals (e.g. Ants) that should react to the player's action, not the chart clock, use this.
     public System.Action OnResponsePress;
+
+    /// Fires once per Response-role entry actually resolved (Hit or Miss), carrying that entry's
+    /// groupId — see Resolve(). Unlike GameManager.OnJudgement (global, no groupId, shared by every
+    /// minigame), this comes straight from CallDirector at the exact LiveCall being resolved, so a
+    /// minigame with several relays/groups in flight at once can tell which one this verdict belongs
+    /// to without guessing (no FIFO-queue-of-pending-groups workaround needed).
+    public System.Action<int, JudgementType> OnGroupJudged;
 
     class LiveCall
     {
@@ -121,7 +140,11 @@ public class CallDirector : MonoBehaviour
 
             var indicator = entry.type == CallType.Tap ? tapIndicator : holdIndicator;
             indicator?.ShowOpen(lc.isDemo);
-            if (lc.isDemo) OnCallCue?.Invoke();
+            if (lc.isDemo)
+            {
+                OnCallCue?.Invoke();
+                OnCallCueGroup?.Invoke(entry.groupId);
+            }
 
             _nextSpawnIdx++;
         }
@@ -249,6 +272,20 @@ public class CallDirector : MonoBehaviour
                         if (groupId < 0 || _failedGroups.Add(groupId))
                             GameManager.Instance?.RegisterJudgement(JudgementType.Miss);
 
+                        // A near-miss press never reaches Resolve() (that's the whole point — it
+                        // must not double-register score), so it also never fired OnGroupJudged on
+                        // its own. But ResolveTimeouts later sees this entry already in
+                        // _judgedEntries and skips calling Resolve() for it too (see the "already
+                        // used its one judgement" branch above) — meaning without this line,
+                        // OnGroupJudged would NEVER fire for a near-missed group at all. Any visual
+                        // glue keyed off groupId (e.g. Stage1QuickTapVisuals' cup relay, which parks
+                        // the cup at the last Call-role ant until OnGroupJudged tells it to hop
+                        // onward) would then strand its per-group state forever — this was a real
+                        // reported bug ("cup stuck at ant5"). Fired unconditionally, matching
+                        // Resolve() itself, which always fires OnGroupJudged regardless of whether
+                        // this turn's Miss actually counted for score.
+                        OnGroupJudged?.Invoke(groupId, JudgementType.Miss);
+
                         if (pattern.minInputIntervalSeconds > 0f)
                             _cooldownUntil = t + pattern.minInputIntervalSeconds;
                     }
@@ -312,6 +349,8 @@ public class CallDirector : MonoBehaviour
         var indicator = lc.data.type == CallType.Tap ? tapIndicator : holdIndicator;
         if (j == JudgementType.Hit) indicator?.ShowHit();
         else                        indicator?.ShowMiss();
+
+        OnGroupJudged?.Invoke(lc.data.groupId, j);
     }
 
     void CheckSongEnd(float t)

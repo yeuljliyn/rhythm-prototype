@@ -43,9 +43,51 @@ public class CallPatternData : ScriptableObject
              "툴이 자동으로 재정렬함.")]
     public List<CallEntry> calls = new List<CallEntry>();
 
+    [Tooltip("1-5(리믹스)처럼 곡 하나 안에서 여러 미니게임 스타일을 오갈 때, 어느 구간이 어느 " +
+             "스타일인지 표시하는 목록. 비어있으면(기본값) '파일 전체가 하나의 스타일'이라는 " +
+             "뜻이라 1-1/1-2/1-4처럼 phase 개념이 필요 없는 기존 채보는 전혀 영향 없음. 같은 " +
+             "styleId가 곡 안에서 여러 번(연속 안 해도) 나와도 됨 — 예: 1-1 구간 -> 1-4 구간 -> " +
+             "다시 1-1 구간.")]
+    public List<ChartPhase> phases = new List<ChartPhase>();
+
     public float BeatInterval               => 60f / Mathf.Max(1f, bpm);
     public float BeatToTime(float beat)     => beat * BeatInterval;
     public float TimeToBeat(float songTime) => songTime / BeatInterval;
+
+    /// First phase whose [startBeat, endBeat) contains the given beat, or null if phases is empty
+    /// or the beat falls in a gap between phases. Overlapping phases (shouldn't normally happen,
+    /// but nothing stops a designer from authoring it) resolve to whichever comes first in the list.
+    public ChartPhase GetPhaseAt(float beat)
+    {
+        if (phases == null) return null;
+        foreach (var p in phases)
+            if (beat >= p.startBeat && beat < p.endBeat) return p;
+        return null;
+    }
+
+    /// True if the given beat falls inside a phase tagged with this exact styleId. Minigame visuals
+    /// scripts sharing a single multi-phase chart (1-5) use this as a cheap per-event guard — see
+    /// CallPatternData.phases' tooltip. Always true if this chart has no phases at all (single-style
+    /// chart, e.g. any of today's 1-1/1-2/1-4 charts), so existing single-style scripts don't need
+    /// any special-casing to keep working once this field exists.
+    public bool IsBeatInStyle(float beat, string styleId)
+    {
+        if (phases == null || phases.Count == 0) return true;
+        var p = GetPhaseAt(beat);
+        return p != null && p.styleId == styleId;
+    }
+}
+
+/// One labeled beat range within a multi-phase (1-5-style) chart — see CallPatternData.phases.
+[Serializable]
+public class ChartPhase
+{
+    [Tooltip("어느 미니게임 스타일인지 (예: \"1-1\", \"1-2\", \"1-3\", \"1-4\"). 자유 문자열 — " +
+             "미니게임 비주얼 스크립트가 CallPatternData.IsBeatInStyle(beat, styleId)로 자기 " +
+             "구간인지 확인할 때 쓰는 값과 정확히 일치해야 함.")]
+    public string styleId = "";
+    public float  startBeat;
+    public float  endBeat;
 }
 
 public enum CallType { Tap, Hold }
