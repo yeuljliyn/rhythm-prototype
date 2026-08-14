@@ -80,6 +80,7 @@ StartScene → LobbyScene(스테이지 선택) → DialogueScene
 ## 컨벤션
 
 - **오브젝트는 에디터에서 바로 보이게, 실행(Play)해야 보이는 방식 지양.** 기존 씬 매니저 중 일부(`LobbySceneManager.BuildUI()` 등)는 UI 전체를 `Start()`에서 코드로 절차적 생성 — 그래서 Play해야만 Hierarchy에 오브젝트가 보임. 앞으로는 GameObject/프리팹을 MCP 도구(`gameobject-create`, `assets-prefab-create` 등)로 에디터에 직접 만들어서, Play 없이도 Hierarchy에서 보고 위치 등을 직접 수정할 수 있게 할 것.
+- **UI 위치를 코드에서 손으로 더하거나 뺄 때(RectTransform 계층 밖에서) `canvas.scaleFactor`를 반드시 곱할 것.** 이 프로젝트의 Canvas들은 `Screen Space - Overlay` + `CanvasScaler`를 `Scale With Screen Size`(기준 해상도 1920×1080)로 씀 — 이 모드에서 `RectTransform.position`(world position)은 이미 "현재 Game 뷰 해상도 기준 실제 픽셀"이라, 여기에 고정 숫자(예: `target.position + new Vector3(0, 90, 0)`)를 그냥 더하면 그 오프셋만 해상도에 안 맞물려서 일반 Game 뷰랑 maximize한 Game 뷰(=해상도/스케일이 다름)에서 위치가 달라 보임 — 실제로 겪은 버그(`Stage1QuickTapVisuals`의 컵 오프셋/튀는 높이, `ScaledOffset()` 헬퍼로 해결). 캐릭터 크기·간격 등 나머지는 Canvas가 자동으로 스케일하는데 손으로 더한 오프셋만 안 따라가서 어긋나는 것 — 앞으로 비슷하게 코드에서 위치를 오프셋하는 곳(다른 미니게임 비주얼 등)엔 전부 `canvas.scaleFactor`를 곱해서 적용할 것.
 
 ## 참고
 
