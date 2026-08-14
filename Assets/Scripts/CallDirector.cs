@@ -54,6 +54,25 @@ public class CallDirector : MonoBehaviour
     /// to without guessing (no FIFO-queue-of-pending-groups workaround needed).
     public System.Action<int, JudgementType> OnGroupJudged;
 
+    /// Fires the instant a Response-role Hold is successfully claimed (armed) by a press — i.e. the
+    /// player started holding a real, live Hold note. Distinct from OnResponsePress (fires on every
+    /// press regardless of whether it claimed anything): this only fires for a genuine successful
+    /// arm, so minigame visuals that need to show "the player is now actively holding" (e.g.
+    /// Stage1SurviveVisuals diving the player character underwater) know exactly when that state
+    /// actually starts, not just when a press happened.
+    public System.Action<int> OnHoldArmed;
+
+    /// Fires the instant an armed Hold is released too early (before its release window opens),
+    /// right before the Resolve(Miss) call that immediately follows — carries that entry's groupId.
+    /// A Hold can fail two different ways (see HandleInput's releaseEdge branch and ResolveTimeouts):
+    /// released too early, or never released in time (timeout, including never pressed at all).
+    /// OnGroupJudged alone can't tell these apart (both just arrive as groupId+Miss) — minigames that
+    /// need to show a different visual depending on which kind of fail happened (e.g.
+    /// Stage1SurviveVisuals: early release surfaces the character before showing its fail sprite,
+    /// timeout leaves it submerged) listen for this to flag the upcoming Miss, then consume that
+    /// flag when OnGroupJudged fires for the same groupId right after.
+    public System.Action<int> OnHoldEarlyRelease;
+
     class LiveCall
     {
         public CallEntry data;
@@ -248,7 +267,11 @@ public class CallDirector : MonoBehaviour
                     // start the mash cooldown, so a fast run of genuinely-on-time hits is never
                     // throttled by it.
                     if (claim.data.type == CallType.Tap) Resolve(claim, JudgementType.Hit);
-                    else                                  claim.isHoldArmed = true; // judged on release
+                    else
+                    {
+                        claim.isHoldArmed = true; // judged on release
+                        OnHoldArmed?.Invoke(claim.data.groupId);
+                    }
                 }
                 else
                 {
@@ -302,7 +325,13 @@ public class CallDirector : MonoBehaviour
 
             if (armed != null)
             {
-                if (t < armed.windowOpenTime)      Resolve(armed, JudgementType.Miss); // early release -> final Miss
+                if (t < armed.windowOpenTime)
+                {
+                    OnHoldEarlyRelease?.Invoke(armed.data.groupId); // fires just before the Resolve() below so
+                                                                     // OnGroupJudged subscribers can tell this
+                                                                     // Miss apart from a timeout Miss
+                    Resolve(armed, JudgementType.Miss); // early release -> final Miss
+                }
                 else if (t <= armed.deadline)      Resolve(armed, JudgementType.Hit);
                 // else: already handled by ResolveTimeouts as a timeout Miss
             }
