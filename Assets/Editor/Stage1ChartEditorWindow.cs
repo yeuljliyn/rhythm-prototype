@@ -96,6 +96,12 @@ public class Stage1ChartEditorWindow : EditorWindow
     int _currentGroupId;
     [SerializeField] float _echoGapBeats = 1f;
 
+    // ── Survive-cycle batch placement (존버 사이클 한번에 찍기) — see DrawToolbar's row for this ──
+    [SerializeField] float _surviveClownOffset = 1f;
+    [SerializeField] float _surviveAntOffset = 2f;
+    [SerializeField] float _surviveReleaseOffset = 3f;
+    [SerializeField] float _surviveResubmergeOffset = 4f;
+
     // ── Phases (1-5-style multi-stage charts — see CallPatternData.phases) ─────────────────────
     // A separate strip below the note lanes, not another note type: phases tag beat *ranges* with
     // which minigame style owns them, independent of the Tap/Hold/Call/Response notes placed inside
@@ -349,6 +355,24 @@ public class Stage1ChartEditorWindow : EditorWindow
                     new GUIContent("탐색 박자", "타임라인 눈금자를 클릭하면 여기에 설정됨 — '여기서 ▸' 버튼이 처음부터가 아니라 이 지점부터 재생/녹음을 시작함."),
                     EditorStyles.miniLabel, GUILayout.Width(62));
                 _scrubBeat = Mathf.Max(0f, EditorGUILayout.FloatField(_scrubBeat, GUILayout.Width(44)));
+
+                GUILayout.Space(10);
+                EditorGUILayout.LabelField(
+                    new GUIContent("존버", "'광대 Tap → 개미 Tap → 플레이어 Hold → 다같이 재잠수 Tap' 4노트를 탐색 박자를 " +
+                        "시작점 삼아 한 번에 찍음. 그룹 #은 지금 Group #을 쓰고 찍은 뒤 Z처럼 자동 1 증가, " +
+                        "탐색 박자도 재잠수 시점으로 이동해서 바로 이어 찍기 편함. 1-5 리믹스 같은 다른 " +
+                        "CallPatternData에서도 그대로 쓸 수 있음(이 채보 전용 기능 아님)."),
+                    EditorStyles.miniBoldLabel, GUILayout.Width(30));
+                EditorGUILayout.LabelField("광대+", EditorStyles.miniLabel, GUILayout.Width(28));
+                _surviveClownOffset = EditorGUILayout.FloatField(_surviveClownOffset, GUILayout.Width(26));
+                EditorGUILayout.LabelField("개미+", EditorStyles.miniLabel, GUILayout.Width(28));
+                _surviveAntOffset = EditorGUILayout.FloatField(_surviveAntOffset, GUILayout.Width(26));
+                EditorGUILayout.LabelField("릴리즈+", EditorStyles.miniLabel, GUILayout.Width(34));
+                _surviveReleaseOffset = EditorGUILayout.FloatField(_surviveReleaseOffset, GUILayout.Width(26));
+                EditorGUILayout.LabelField("재잠수+", EditorStyles.miniLabel, GUILayout.Width(34));
+                _surviveResubmergeOffset = EditorGUILayout.FloatField(_surviveResubmergeOffset, GUILayout.Width(26));
+                if (GUILayout.Button("찍기", EditorStyles.toolbarButton, GUILayout.Width(40)))
+                    PlaceSurviveCycle();
 
                 GUILayout.Space(10);
                 if (GUILayout.Button("전체 삭제", EditorStyles.toolbarButton, GUILayout.Width(68)))
@@ -1506,6 +1530,41 @@ public class Stage1ChartEditorWindow : EditorWindow
         if (_pattern.calls == null) _pattern.calls = new List<CallEntry>();
         _pattern.calls.Add(entry);
         SortAndDirty();
+    }
+
+    // Places one Stage1SurviveVisuals-shaped cycle (Clown Tap, NormalAnt Tap, player Hold, resubmerge
+    // Tap — see that script's class doc) starting at the scrub beat, using the 4 offset fields above.
+    // Pure CallEntry data manipulation, no scene/stage dependency — works on whatever CallPatternData
+    // is currently open, including a future 1-5 remix chart. Only saves the per-note beat arithmetic;
+    // the resulting entries are ordinary notes you can still drag individually afterward, so different
+    // cycles are free to use different pacing (the offset fields are just this click's starting point,
+    // not a constraint baked into the data).
+    void PlaceSurviveCycle()
+    {
+        float start = _scrubBeat;
+
+        Undo.RecordObject(_pattern, "Add Survive Cycle");
+        if (_pattern.calls == null) _pattern.calls = new List<CallEntry>();
+
+        var clown = new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = start + _surviveClownOffset };
+        var ant = new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = start + _surviveAntOffset };
+        var player = new CallEntry { type = CallType.Hold, role = CallRole.Response, groupId = _currentGroupId, cueBeat = start, releaseBeat = start + _surviveReleaseOffset };
+        var resubmerge = new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = start + _surviveResubmergeOffset };
+
+        _pattern.calls.Add(clown);
+        _pattern.calls.Add(ant);
+        _pattern.calls.Add(player);
+        _pattern.calls.Add(resubmerge);
+        SortAndDirty();
+
+        _selection.Clear();
+        foreach (var n in new[] { clown, ant, player, resubmerge }) _selection.Add(n);
+        _primaryEntry = player;
+
+        Debug.Log($"[Chart Editor] 존버 사이클 #{_currentGroupId} 찍음 — 시작 {start:F2}, 릴리즈 {start + _surviveReleaseOffset:F2}, 재잠수 {start + _surviveResubmergeOffset:F2}.");
+
+        _currentGroupId++;
+        _scrubBeat = start + _surviveResubmergeOffset; // 바로 이어서 다음 사이클 찍기 편하게
     }
 
     void DeleteEntries(IList<CallEntry> entries)

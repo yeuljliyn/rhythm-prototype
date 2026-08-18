@@ -21,6 +21,16 @@ MonoBehaviour:
   minInputIntervalSeconds: 0
   liveInputStartBeat: 0
   calls:
+  - type: 1
+    role: 0
+    groupId: 0
+    cueBeat: 0
+    releaseBeat: 6
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 2
+    releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
@@ -29,67 +39,37 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 4.01
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 0
-    cueBeat: 5
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 0
-    cueBeat: 5.01
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 0
-    cueBeat: 6
+    cueBeat: 8
     releaseBeat: 0
   - type: 1
     role: 0
-    groupId: 0
-    cueBeat: 6
-    releaseBeat: 8
+    groupId: 1
+    cueBeat: 8
+    releaseBeat: 14
   - type: 0
     role: 1
-    groupId: 0
-    cueBeat: 7
+    groupId: 1
+    cueBeat: 10
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
     cueBeat: 12
     releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 1
-    cueBeat: 12.01
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 1
-    cueBeat: 13
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 1
-    cueBeat: 13.01
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 1
-    cueBeat: 14
-    releaseBeat: 0
   - type: 1
     role: 0
-    groupId: 1
-    cueBeat: 14
-    releaseBeat: 16
+    groupId: 2
+    cueBeat: 16
+    releaseBeat: 22
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 15
+    cueBeat: 16
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 18
     releaseBeat: 0
   - type: 0
     role: 1
@@ -99,66 +79,186 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 2
-    cueBeat: 20.01
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 2
-    cueBeat: 21
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 2
-    cueBeat: 21.01
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 2
-    cueBeat: 22
+    cueBeat: 24
     releaseBeat: 0
   - type: 1
     role: 0
-    groupId: 2
-    cueBeat: 22
-    releaseBeat: 24
+    groupId: 3
+    cueBeat: 24
+    releaseBeat: 30
   - type: 0
     role: 1
-    groupId: 2
-    cueBeat: 23
+    groupId: 3
+    cueBeat: 26
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
     cueBeat: 28
     releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 4
+    cueBeat: 32
+    releaseBeat: 38
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 28.01
+    cueBeat: 32
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 3
-    cueBeat: 29
+    groupId: 4
+    cueBeat: 34
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 3
-    cueBeat: 29.01
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 3
-    cueBeat: 30
+    groupId: 4
+    cueBeat: 36
     releaseBeat: 0
   - type: 1
     role: 0
-    groupId: 3
-    cueBeat: 30
-    releaseBeat: 32
+    groupId: 5
+    cueBeat: 40
+    releaseBeat: 46
   - type: 0
     role: 1
-    groupId: 3
-    cueBeat: 31
+    groupId: 4
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 6
+    cueBeat: 48
+    releaseBeat: 54
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 7
+    cueBeat: 56
+    releaseBeat: 62
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 8
+    cueBeat: 64
+    releaseBeat: 70
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 9
+    cueBeat: 72
+    releaseBeat: 78
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 74
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 10
+    cueBeat: 80
+    releaseBeat: 86
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 82
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 11
+    cueBeat: 88
+    releaseBeat: 94
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 90
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 96
     releaseBeat: 0
   phases: []
