@@ -679,7 +679,7 @@ GameObject:
   - component: {fileID: 1124142191}
   - component: {fileID: 1124142192}
   m_Layer: 0
-  m_Name: ' '
+  m_Name: Ant4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
