@@ -87,13 +87,17 @@ using UnityEngine.UI;
 /// free," with no new chart entries needed. Clown/NormalAnt's bubble is hidden in DelayedReveal's
 /// completion callback (the exact moment they become visually surfaced); PlayerAnt's bubble is hidden
 /// unconditionally in HandlePlayerResponsePress/Release (covers every way it can surface: on-time
-/// Hit, early-release Miss, everything). Known gap: cycle 0's very first Clown bubble has no earlier
-/// beat4Cue to hang off of, so it's simply never shown — a one-time, likely-unnoticed exception at the
-/// very start of the song; every cycle after that is correct.
+/// Hit, early-release Miss, everything). Cycle 0's Clown bubble has no earlier beat4Cue to cascade off
+/// of (there is no "previous cycle"), so it's handled separately: ShowFirstClownBubble() reads the
+/// chart directly off `clock` (the only reason this script holds a CallClock reference at all) to find
+/// the very first Call-role entry's cueBeat, then waits until exactly 1 beat before it — same "1 beat
+/// before" rule as everywhere else, just computed once instead of cascaded from an event.
 /// </summary>
 public class Stage1SurviveVisuals : MonoBehaviour
 {
     [SerializeField] CallDirector callDirector;
+    [Tooltip("cycle 0의 첫 광대 기포 타이밍 계산에만 씀 — ShowFirstClownBubble() 참고.")]
+    [SerializeField] CallClock clock;
 
     [Header("광대")]
     [SerializeField] Image clownImage;
@@ -211,6 +215,36 @@ public class Stage1SurviveVisuals : MonoBehaviour
         SetBubble(clownBubbleImage, false);
         SetBubble(antBubbleImage, false);
         SetBubble(playerBubbleImage, false);
+
+        if (clock != null && clownBubbleImage != null) StartCoroutine(ShowFirstClownBubble());
+    }
+
+    // Cycle 0's Clown bubble has no earlier beat4Cue to cascade off of (see class doc) — this computes
+    // its "1 beat before" timing directly instead, once, by reading the chart's own first Call-role
+    // entry off `clock.Pattern`. `calls` is guaranteed sorted by cueBeat (CallPatternData's own
+    // invariant), but the *very first* entry overall is usually the player's own Hold (its cueBeat ==
+    // this cycle's start, earlier than Clown's), so this specifically scans for the first Call-role one
+    // rather than just taking calls[0].
+    IEnumerator ShowFirstClownBubble()
+    {
+        yield return null; // let every other script's Start() (including CallClock's) run first —
+                            // clock.SongTime reads as a stale 0 before CallClock has started running.
+
+        var pattern = clock.Pattern;
+        if (pattern == null) yield break;
+
+        CallEntry firstClownCue = null;
+        foreach (var entry in pattern.calls)
+        {
+            if (entry.role == CallRole.Call) { firstClownCue = entry; break; }
+        }
+        if (firstClownCue == null) yield break;
+
+        float targetTime = pattern.BeatToTime(firstClownCue.cueBeat - 1f);
+        float wait = targetTime - clock.SongTime;
+        if (wait > 0f) yield return new WaitForSeconds(wait);
+
+        SetBubble(clownBubbleImage, true);
     }
 
     void HandleCallCueGroup(int groupId)

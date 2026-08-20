@@ -1238,6 +1238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stage1SurviveVisuals
   callDirector: {fileID: 974819150}
+  clock: {fileID: 974819151}
   clownImage: {fileID: 1606977268}
   clownDiveSprite: {fileID: 159862324487942223, guid: 1c902b53c6c66d04aad5c750e990ef26, type: 3}
   clownSurfaceSprite: {fileID: -4867720692944348638, guid: 1c902b53c6c66d04aad5c750e990ef26, type: 3}
