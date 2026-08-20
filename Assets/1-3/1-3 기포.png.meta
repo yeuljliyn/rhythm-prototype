@@ -1,0 +1,351 @@
+fileFormatVersion: 2
+guid: 561cf64fa8cd44540852cc37ee30d43f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3644606489036516976
+    second: "1-3 \uAE30\uD3EC_0"
+  - first:
+      213: 4022260600777226258
+    second: "1-3 \uAE30\uD3EC_1"
+  - first:
+      213: 8045520674920572451
+    second: "1-3 \uAE30\uD3EC_2"
+  - first:
+      213: 1110311770003322452
+    second: "1-3 \uAE30\uD3EC_3"
+  - first:
+      213: 2404191739592322383
+    second: "1-3 \uAE30\uD3EC_4"
+  - first:
+      213: -5236170586889588920
+    second: "1-3 \uAE30\uD3EC_5"
+  - first:
+      213: 3349263123276114129
+    second: "1-3 \uAE30\uD3EC_6"
+  - first:
+      213: -638889899470368785
+    second: "1-3 \uAE30\uD3EC_7"
+  - first:
+      213: -6144062476719534632
+    second: "1-3 \uAE30\uD3EC_8"
+  - first:
+      213: -1196896468882389485
+    second: "1-3 \uAE30\uD3EC_9"
+  - first:
+      213: -3907200370795840150
+    second: "1-3 \uAE30\uD3EC_10"
+  - first:
+      213: -5449493050502982655
+    second: "1-3 \uAE30\uD3EC_11"
+  - first:
+      213: -4442479820409885881
+    second: "1-3 \uAE30\uD3EC_12"
+  - first:
+      213: -7560115575890944699
+    second: "1-3 \uAE30\uD3EC_13"
+  - first:
+      213: -88135339242777954
+    second: "1-3 \uAE30\uD3EC_14"
+  - first:
+      213: 5030002211990829080
+    second: "1-3 \uAE30\uD3EC_15"
+  - first:
+      213: -3251596590795772711
+    second: "1-3 \uAE30\uD3EC_16"
+  - first:
+      213: -722418717826420744
+    second: "1-3 \uAE30\uD3EC_17"
+  - first:
+      213: -2746538855389216190
+    second: "1-3 \uAE30\uD3EC_18"
+  - first:
+      213: -2434626097450610043
+    second: "1-3 \uAE30\uD3EC_19"
+  - first:
+      213: -1396537208156562787
+    second: "1-3 \uAE30\uD3EC_20"
+  - first:
+      213: 2333787905218917358
+    second: "1-3 \uAE30\uD3EC_21"
+  - first:
+      213: -1320267643889139680
+    second: "1-3 \uAE30\uD3EC_22"
+  - first:
+      213: -2332161556722875784
+    second: "1-3 \uAE30\uD3EC_23"
+  - first:
+      213: -3920228830413004994
+    second: "1-3 \uAE30\uD3EC_24"
+  - first:
+      213: -1455458832013586004
+    second: "1-3 \uAE30\uD3EC_25"
+  - first:
+      213: -2199050088151188529
+    second: "1-3 \uAE30\uD3EC_26"
+  - first:
+      213: -3928884016024788894
+    second: "1-3 \uAE30\uD3EC_27"
+  - first:
+      213: 4256668904520769523
+    second: "1-3 \uAE30\uD3EC_28"
+  - first:
+      213: 8884794003401709778
+    second: "1-3 \uAE30\uD3EC_29"
+  - first:
+      213: -5505760306558038359
+    second: "1-3 \uAE30\uD3EC_30"
+  - first:
+      213: -6692442491667975541
+    second: "1-3 \uAE30\uD3EC_31"
+  - first:
+      213: 1036896049801354988
+    second: "1-3 \uAE30\uD3EC_32"
+  - first:
+      213: -6197208824953294908
+    second: "1-3 \uAE30\uD3EC_33"
+  - first:
+      213: -480495539443260713
+    second: "1-3 \uAE30\uD3EC_34"
+  - first:
+      213: 259203633027843560
+    second: "1-3 \uAE30\uD3EC_35"
+  - first:
+      213: 629111066151832205
+    second: "1-3 \uAE30\uD3EC_36"
+  - first:
+      213: -8334175837075973904
+    second: "1-3 \uAE30\uD3EC_37"
+  - first:
+      213: -8311636898193219174
+    second: "1-3 \uAE30\uD3EC_38"
+  - first:
+      213: -7406384970473825249
+    second: "1-3 \uAE30\uD3EC_39"
+  - first:
+      213: 3928789801597810067
+    second: "1-3 \uAE30\uD3EC_40"
+  - first:
+      213: -7560290565119865750
+    second: "1-3 \uAE30\uD3EC_41"
+  - first:
+      213: -1241313406337865340
+    second: "1-3 \uAE30\uD3EC_42"
+  - first:
+      213: -8961289034449763365
+    second: "1-3 \uAE30\uD3EC_43"
+  - first:
+      213: -7896072190279029769
+    second: "1-3 \uAE30\uD3EC_44"
+  - first:
+      213: -2618109499775004598
+    second: "1-3 \uAE30\uD3EC_45"
+  - first:
+      213: -2466134073676418755
+    second: "1-3 \uAE30\uD3EC_46"
+  - first:
+      213: -1529098923553814327
+    second: "1-3 \uAE30\uD3EC_47"
+  - first:
+      213: 6671757328485718811
+    second: "1-3 \uAE30\uD3EC_48"
+  - first:
+      213: -1663653673589586861
+    second: "1-3 \uAE30\uD3EC_49"
+  - first:
+      213: 2878022060789389300
+    second: "1-3 \uAE30\uD3EC_50"
+  - first:
+      213: 6776095762694415400
+    second: "1-3 \uAE30\uD3EC_51"
+  - first:
+      213: -1831430682052201277
+    second: "1-3 \uAE30\uD3EC_52"
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: "1-3 \uAE30\uD3EC_47"
+      rect:
+        serializedVersion: 2
+        x: 1232
+        y: 567
+        width: 234
+        height: 390
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c8842b61ac87cae0800000000000000
+      internalID: -1529098923553814327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 7cf71510adaf1fa4a9c23a6eb2bbd778
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      "1-3 \uAE30\uD3EC_0": 3644606489036516976
+      "1-3 \uAE30\uD3EC_1": 4022260600777226258
+      "1-3 \uAE30\uD3EC_10": -3907200370795840150
+      "1-3 \uAE30\uD3EC_11": -5449493050502982655
+      "1-3 \uAE30\uD3EC_12": -4442479820409885881
+      "1-3 \uAE30\uD3EC_13": -7560115575890944699
+      "1-3 \uAE30\uD3EC_14": -88135339242777954
+      "1-3 \uAE30\uD3EC_15": 5030002211990829080
+      "1-3 \uAE30\uD3EC_16": -3251596590795772711
+      "1-3 \uAE30\uD3EC_17": -722418717826420744
+      "1-3 \uAE30\uD3EC_18": -2746538855389216190
+      "1-3 \uAE30\uD3EC_19": -2434626097450610043
+      "1-3 \uAE30\uD3EC_2": 8045520674920572451
+      "1-3 \uAE30\uD3EC_20": -1396537208156562787
+      "1-3 \uAE30\uD3EC_21": 2333787905218917358
+      "1-3 \uAE30\uD3EC_22": -1320267643889139680
+      "1-3 \uAE30\uD3EC_23": -2332161556722875784
+      "1-3 \uAE30\uD3EC_24": -3920228830413004994
+      "1-3 \uAE30\uD3EC_25": -1455458832013586004
+      "1-3 \uAE30\uD3EC_26": -2199050088151188529
+      "1-3 \uAE30\uD3EC_27": -3928884016024788894
+      "1-3 \uAE30\uD3EC_28": 4256668904520769523
+      "1-3 \uAE30\uD3EC_29": 8884794003401709778
+      "1-3 \uAE30\uD3EC_3": 1110311770003322452
+      "1-3 \uAE30\uD3EC_30": -5505760306558038359
+      "1-3 \uAE30\uD3EC_31": -6692442491667975541
+      "1-3 \uAE30\uD3EC_32": 1036896049801354988
+      "1-3 \uAE30\uD3EC_33": -6197208824953294908
+      "1-3 \uAE30\uD3EC_34": -480495539443260713
+      "1-3 \uAE30\uD3EC_35": 259203633027843560
+      "1-3 \uAE30\uD3EC_36": 629111066151832205
+      "1-3 \uAE30\uD3EC_37": -8334175837075973904
+      "1-3 \uAE30\uD3EC_38": -8311636898193219174
+      "1-3 \uAE30\uD3EC_39": -7406384970473825249
+      "1-3 \uAE30\uD3EC_4": 2404191739592322383
+      "1-3 \uAE30\uD3EC_40": 3928789801597810067
+      "1-3 \uAE30\uD3EC_41": -7560290565119865750
+      "1-3 \uAE30\uD3EC_42": -1241313406337865340
+      "1-3 \uAE30\uD3EC_43": -8961289034449763365
+      "1-3 \uAE30\uD3EC_44": -7896072190279029769
+      "1-3 \uAE30\uD3EC_45": -2618109499775004598
+      "1-3 \uAE30\uD3EC_46": -2466134073676418755
+      "1-3 \uAE30\uD3EC_47": -1529098923553814327
+      "1-3 \uAE30\uD3EC_48": 6671757328485718811
+      "1-3 \uAE30\uD3EC_49": -1663653673589586861
+      "1-3 \uAE30\uD3EC_5": -5236170586889588920
+      "1-3 \uAE30\uD3EC_50": 2878022060789389300
+      "1-3 \uAE30\uD3EC_51": 6776095762694415400
+      "1-3 \uAE30\uD3EC_52": -1831430682052201277
+      "1-3 \uAE30\uD3EC_6": 3349263123276114129
+      "1-3 \uAE30\uD3EC_7": -638889899470368785
+      "1-3 \uAE30\uD3EC_8": -6144062476719534632
+      "1-3 \uAE30\uD3EC_9": -1196896468882389485
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

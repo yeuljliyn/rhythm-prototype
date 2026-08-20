@@ -47,6 +47,29 @@ public class CallDirector : MonoBehaviour
     /// minigame visuals (e.g. Ants) that should react to the player's action, not the chart clock, use this.
     public System.Action OnResponsePress;
 
+    /// Same as OnResponsePress but for the release edge — fires on every physical release, regardless
+    /// of whether anything was armed/judged. Added for Stage1SurviveVisuals: minigames where a
+    /// character's on-screen position should be a literal, unconditional mirror of "is the button
+    /// currently held" (not gated by whether that hold happened to land inside a judged window) need
+    /// this instead of inferring release from OnHoldArmed/OnGroupJudged — those only fire for a
+    /// *successful* arm/judgement, so a mistimed press that never claimed a live note left the
+    /// character stuck in whatever pose its last successful event set, with no event ever firing to
+    /// move it back (confirmed as a real reported bug — player stayed surfaced indefinitely after a
+    /// mistimed release).
+    public System.Action OnResponseRelease;
+
+    /// Fires whenever a press or release happens that doesn't correspond to any live, claimable note
+    /// at all — mash-cooldown presses, presses/releases nowhere near any note's window, and a
+    /// press/release after this cycle's note is already judged/resolved. A near-miss press/an early
+    /// Hold release still get their own Miss via OnGroupJudged (already fail-worthy on their own) so
+    /// this deliberately does NOT also fire for those — it's specifically for input that CallDirector
+    /// currently treats as complete no-ops. Added for Stage1SurviveVisuals: with OnResponsePress/
+    /// OnResponseRelease driving the player's dive/surface pose unconditionally (see those events'
+    /// doc comments), a genuinely off-beat press/release would otherwise still show a perfectly normal
+    /// dive/surface pose — this lets that minigame fail-flash it instead, without CallDirector needing
+    /// to know anything about "diving" or "surfacing".
+    public System.Action OnResponseWasted;
+
     /// Fires once per Response-role entry actually resolved (Hit or Miss), carrying that entry's
     /// groupId — see Resolve(). Unlike GameManager.OnJudgement (global, no groupId, shared by every
     /// minigame), this comes straight from CallDirector at the exact LiveCall being resolved, so a
@@ -245,6 +268,7 @@ public class CallDirector : MonoBehaviour
                 // Still cooling down from an earlier empty-air press — every input is ignored
                 // outright during this window, including one that would otherwise land on a real
                 // note (it'll simply time out on its own later, same as never pressing at all).
+                OnResponseWasted?.Invoke();
             }
             else
             {
@@ -312,13 +336,24 @@ public class CallDirector : MonoBehaviour
                         if (pattern.minInputIntervalSeconds > 0f)
                             _cooldownUntil = t + pattern.minInputIntervalSeconds;
                     }
-                    // else: nowhere near any note at all — pure noise, not judged, no cooldown.
+                    else
+                    {
+                        // Nowhere near any note at all — pure noise, not judged, no cooldown. Still
+                        // tell minigame visuals a press happened that claimed nothing real (see
+                        // OnResponseWasted) — near-miss above already got its own Miss/fail via
+                        // OnGroupJudged, so this branch is specifically the "not even close" case,
+                        // including a press that arrives after this cycle's note is already fully
+                        // judged/locked (_judgedEntries excludes it from FindNearMissEntry too).
+                        OnResponseWasted?.Invoke();
+                    }
                 }
             }
         }
 
         if (releaseEdge)
         {
+            OnResponseRelease?.Invoke(); // unconditional, mirrors OnResponsePress — see its doc comment
+
             LiveCall armed = null;
             foreach (var lc in _live)
                 if (!lc.resolved && lc.data.type == CallType.Hold && lc.isHoldArmed) { armed = lc; break; }
@@ -335,7 +370,12 @@ public class CallDirector : MonoBehaviour
                 else if (t <= armed.deadline)      Resolve(armed, JudgementType.Hit);
                 // else: already handled by ResolveTimeouts as a timeout Miss
             }
-            // else: release with nothing armed — ignored
+            else
+            {
+                // Release with nothing currently armed (never pressed, or this cycle's note is
+                // already judged/resolved) — previously just silently ignored. See OnResponseWasted.
+                OnResponseWasted?.Invoke();
+            }
         }
     }
 

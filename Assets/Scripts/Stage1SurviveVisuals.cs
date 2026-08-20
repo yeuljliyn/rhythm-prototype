@@ -40,25 +40,56 @@ using UnityEngine.UI;
 ///   - CallDirector.OnCallCueGroup (fires once per Call-role entry spawn): idx 0 = Clown surfaces,
 ///     idx 1 = NormalAnt surfaces, idx 2 = the beat4Cue — shower flips back "on" and Clown/NormalAnt
 ///     dive back down together. Also idx 0 is when the shower sprite flips to "off" (it stays off for
-///     the rest of the cycle).
-///   - CallDirector.OnHoldArmed (fires the instant the player's press claims the live Hold): drives
-///     ONLY the player's own dive (sprite + Y) — decoupled from Clown/NormalAnt/shower, see above.
-///   - CallDirector.OnGroupJudged: Hit -> player surfaces properly (with the same bubble-then-reveal
-///     treatment as Clown/NormalAnt). Miss -> fail sprite, shown at the surfaced Y position if the
-///     miss was an early release (OnHoldEarlyRelease fired first) or at the submerged Y position if
-///     it was a timeout — see Stage1SurviveVisuals v1's reasoning for why only one fail sprite still
-///     needs this position-based distinction (CallDirector.OnHoldArmed/OnHoldEarlyRelease are the
-///     same additive events added for v1, unchanged here).
-///   - CallDirector.OnResponsePress: player Y-scale pulse on every physical press regardless of
-///     judgement, same movement-only pattern used by every other Stage1 minigame this session.
+///     the rest of the cycle), and each case ALSO starts the *next* character's head-bubble one beat
+///     early — see the bubble paragraph below.
+///   - CallDirector.OnResponsePress / OnResponseRelease: Y position is a direct, unconditional,
+///     always-immediate mirror of the held button — press always sets the dive Y, release always sets
+///     the surface Y, full stop, nothing ever delays or blocks it (explicit request: "위치 움직이는건
+///     그냥 플레이어 입력으로만 영향 받았음 좋겠는데"). The sprite normally mirrors position the same
+///     way too, EXCEPT while PlayerFailFlash is running. This replaced an even earlier version driven
+///     by OnHoldArmed (only fires on a *successful* arm) and OnGroupJudged/OnHoldEarlyRelease (only
+///     fire once the note actually resolves): a press or release that didn't land inside that cycle's
+///     live/claimable window fired none of those events, leaving the player stuck in whatever pose its
+///     last successful event left it in — reported as "타이밍 안 맞게 물 밖으로 나오면 다시 물속으로
+///     안 들어가지는."
+///   - CallDirector.OnGroupJudged: Hit -> nothing (position was already correct — the same release
+///     that earned the Hit already moved the player, and its bubble was already hidden by that same
+///     release). Miss -> PlayerFailFlash pins the *sprite* to playerFailSprite for failSpriteHoldTime,
+///     but deliberately never touches Y — an
+///     earlier version routed both dive/surface and fail through one shared state machine that also
+///     locked position for the whole fail duration, so diving/surfacing during that window did nothing
+///     visible until the flash ended (reported: "실패 스프라이트 나올때... 위치가 고정돼?"). Now Y
+///     always tracks input live underneath the fail art, and the sprite just snaps to match wherever
+///     that ended up once the flash's timer runs out.
+///     CallDirector.OnResponseWasted (a press/release that claimed/armed nothing live at all) was
+///     briefly wired to also trigger a fail flash, so off-beat diving/surfacing — not just missing the
+///     one judged response — would read as a mistake too. Reverted: it fires on almost every press/
+///     release during mashing (mash timing rarely lands in a real claimable window), so it kept
+///     re-triggering the fail flash and blotting out the dive/surface toggle almost permanently —
+///     reported as the toggle "disappearing again." Left unsubscribed here; a near-miss press or an
+///     early release still get their own Miss via OnGroupJudged regardless.
 ///
-/// Bubble anticipation cue ("올라오기 직전마다 머리 위에 기포가 뽀로록"): no art asset exists yet, so
-/// this is a fully procedural placeholder (a handful of soft round dots generated at runtime, not
-/// loaded from any Sprite) — see BubbleSprite()/BubbleBurstRoutine(). Every surface transition (Clown,
-/// NormalAnt, and the player's Hit) fires a bubble burst immediately, then waits `bubbleLeadTime`
-/// before actually swapping to the surfaced sprite/position, so the bubbles visually lead the reveal
-/// instead of appearing simultaneously with it. Swap this whole mechanism out once real bubble art
-/// exists — everything reads it through BubbleBurstRoutine, so that's the only place to touch.
+/// Bubble anticipation cue ("올라오기 직전마다 머리 위에 기포가 뽀로록"), v2 — replaces the earlier
+/// procedural placeholder (soft round dots generated at runtime) now that real art exists
+/// (Assets/1-3/1-3 기포.png). Spec from the planner, verbatim behavior:
+///   - Clown/NormalAnt: their bubble appears exactly 1 beat before *their own* surface cue, and
+///     disappears the instant they actually surface.
+///   - PlayerAnt (Response): its bubble appears 1 beat before the beat they need to surface by — but
+///     ONLY if they're still submerged at that moment (they may have already surfaced early on a
+///     mistimed release, in which case there's nothing left to warn them about). It disappears the
+///     instant they surface too, for the same reason a bubble floating above someone already out of
+///     the water would look wrong ("기포가 물밖에 있으면 좀 이상하잖아").
+/// Implementation: each of Clown/NormalAnt/Player surfaces exactly 1 beat after the character *before*
+/// them in the cycle (Clown@beat1, NormalAnt@beat2, Player releases@beat3), and the beat4Cue itself
+/// lands exactly 1 beat before the *next* cycle's Clown@beat1. So instead of computing "beat - 1"
+/// against the chart directly, each OnCallCueGroup case in HandleCallCueGroup does double duty: it
+/// drives its own character's surfacing AND starts the *next* character's bubble, one beat early "for
+/// free," with no new chart entries needed. Clown/NormalAnt's bubble is hidden in DelayedReveal's
+/// completion callback (the exact moment they become visually surfaced); PlayerAnt's bubble is hidden
+/// unconditionally in HandlePlayerResponsePress/Release (covers every way it can surface: on-time
+/// Hit, early-release Miss, everything). Known gap: cycle 0's very first Clown bubble has no earlier
+/// beat4Cue to hang off of, so it's simply never shown — a one-time, likely-unnoticed exception at the
+/// very start of the song; every cycle after that is correct.
 /// </summary>
 public class Stage1SurviveVisuals : MonoBehaviour
 {
@@ -93,7 +124,9 @@ public class Stage1SurviveVisuals : MonoBehaviour
              "잠수라서, 씬에 배치해둔 위치 자체를 잠수 자세 기준으로 잡음 — 물 밖일 때만 이 값만큼 " +
              "위로 올라감.")]
     [SerializeField] float surfaceYOffset = 80f;
-    [Tooltip("실패 스프라이트를 보여준 뒤 다시 물밖(대기) 스프라이트로 돌아가기까지 대기 시간")]
+    [Tooltip("판정 실패(Miss)로 인한 실패 스프라이트를 보여준 뒤 다시 원래 포즈로 돌아가기까지 대기 " +
+             "시간 — 이 동안에도 Y 위치는 플레이어 입력에 따라 계속 그대로 움직임, 스프라이트만 이 " +
+             "시간만큼 고정됨(PlayerFailFlash 참고).")]
     [SerializeField] float failSpriteHoldTime = 0.6f;
     [Tooltip("플레이어가 입력할 때마다(Call 구간 포함) Body Y 스케일이 커지는 목표값 — 판정과 무관한 " +
              "움직임 전용 반응, 다른 Stage1 미니게임과 동일한 패턴")]
@@ -104,30 +137,21 @@ public class Stage1SurviveVisuals : MonoBehaviour
              "실제 박자보다 일찍 잠수해버리던 문제를 보정함. CallPatternData의 hitWindow 값과 " +
              "맞춰서 조절할 것(기본값은 hitWindow 기본값 0.12와 동일).")]
     [SerializeField] float syncDelay = 0.12f;
+    [Tooltip("Clown/NormalAnt 전용: 물 밖 큐가 뜨고 나서 실제로 물 밖 스프라이트로 바뀌기까지 대기 " +
+             "시간 — syncDelay와 같은 이유(OnCallCueGroup이 hitWindow만큼 일찍 발화)의 보정용. " +
+             "이름은 예전 기포 연출 시절 그대로지만 지금은 순수 싱크 보정 값.")]
+    [SerializeField] float surfaceRevealDelay = 0.25f;
 
-    [Header("Tuning — 기포 이펙트 (임시, 아트 리소스 없음)")]
-    [Tooltip("기포가 뜨기 시작해서 실제로 캐릭터가 물 밖 스프라이트로 바뀌기까지 대기 시간 — " +
-             "'올라오기 직전' 예고 역할.")]
-    [SerializeField] float bubbleLeadTime = 0.25f;
-    [SerializeField] int bubbleCount = 4;
-    [SerializeField] float bubbleSpawnInterval = 0.05f;
-    [SerializeField] float bubbleLifetime = 0.5f;
-    [SerializeField] float bubbleRiseHeight = 40f;
-    [SerializeField] float bubbleMinSize = 10f;
-    [SerializeField] float bubbleMaxSize = 18f;
-    [SerializeField] float bubbleSpreadX = 15f;
-    [Tooltip("캐릭터 피벗 기준 기포가 뜨기 시작하는 로컬 Y 오프셋(머리 위쯤)")]
-    [SerializeField] float bubbleHeadOffsetY = 90f;
-
-    static Sprite _bubbleSprite;
+    [Header("머리 위 기포 — 실제 아트 (Assets/1-3/1-3 기포.png). 세 개 다 씬에 미리 배치해둔 " +
+            "오브젝트를 끄고 켜는 방식(런타임 생성 안 함) — 에디터에서 위치를 바로 보고 조정 가능.")]
+    [SerializeField] Sprite bubbleSprite;
+    [SerializeField] Image clownBubbleImage;
+    [SerializeField] Image antBubbleImage;
+    [SerializeField] Image playerBubbleImage;
 
     // groupId -> how many of this group's Call-role entries have fired OnCallCueGroup so far.
     // idx 0 = Clown, idx 1 = NormalAnt — see class doc.
     readonly System.Collections.Generic.Dictionary<int, int> _groupCallCounts = new System.Collections.Generic.Dictionary<int, int>();
-
-    // groupId -> this group's upcoming Miss (about to arrive via OnGroupJudged) was an early release,
-    // not a timeout. Consumed the moment OnGroupJudged actually fires for that groupId.
-    readonly System.Collections.Generic.HashSet<int> _earlyReleaseGroups = new System.Collections.Generic.HashSet<int>();
 
     Coroutine _clownCr;
     Coroutine _antCr;
@@ -135,6 +159,11 @@ public class Stage1SurviveVisuals : MonoBehaviour
     Coroutine _playerFailCr;
     Coroutine _playerScaleCr;
     Vector3   _playerBaseScale;
+
+    // Literal mirror of "is the player currently holding the button" — updated unconditionally by
+    // every press/release, independent of judgement. See class doc's Event wiring section. Only read
+    // by PlayerFailFlash, to know which sprite to snap back to once the fail flash ends.
+    bool _playerSubmerged = true;
 
     float _clownBaseY, _antBaseY, _playerBaseY;
 
@@ -152,21 +181,19 @@ public class Stage1SurviveVisuals : MonoBehaviour
     void OnEnable()
     {
         if (callDirector == null) return;
-        callDirector.OnCallCueGroup     += HandleCallCueGroup;
-        callDirector.OnHoldArmed        += HandleHoldArmed;
-        callDirector.OnHoldEarlyRelease += HandleHoldEarlyRelease;
-        callDirector.OnGroupJudged      += HandleGroupJudged;
-        callDirector.OnResponsePress    += HandlePlayerResponsePress;
+        callDirector.OnCallCueGroup    += HandleCallCueGroup;
+        callDirector.OnGroupJudged     += HandleGroupJudged;
+        callDirector.OnResponsePress   += HandlePlayerResponsePress;
+        callDirector.OnResponseRelease += HandlePlayerResponseRelease;
     }
 
     void OnDisable()
     {
         if (callDirector == null) return;
-        callDirector.OnCallCueGroup     -= HandleCallCueGroup;
-        callDirector.OnHoldArmed        -= HandleHoldArmed;
-        callDirector.OnHoldEarlyRelease -= HandleHoldEarlyRelease;
-        callDirector.OnGroupJudged      -= HandleGroupJudged;
-        callDirector.OnResponsePress    -= HandlePlayerResponsePress;
+        callDirector.OnCallCueGroup    -= HandleCallCueGroup;
+        callDirector.OnGroupJudged     -= HandleGroupJudged;
+        callDirector.OnResponsePress   -= HandlePlayerResponsePress;
+        callDirector.OnResponseRelease -= HandlePlayerResponseRelease;
     }
 
     void Start()
@@ -177,6 +204,13 @@ public class Stage1SurviveVisuals : MonoBehaviour
         if (normalAntImage != null) { normalAntImage.sprite = antDiveSprite; SetY(normalAntImage.rectTransform, _antBaseY); }
         if (playerAntImage != null) { playerAntImage.sprite = playerDiveSprite; SetY(playerAntImage.rectTransform, _playerBaseY); }
         if (showerImage != null) showerImage.sprite = showerOnSprite;
+
+        if (clownBubbleImage != null)  clownBubbleImage.sprite  = bubbleSprite;
+        if (antBubbleImage != null)    antBubbleImage.sprite    = bubbleSprite;
+        if (playerBubbleImage != null) playerBubbleImage.sprite = bubbleSprite;
+        SetBubble(clownBubbleImage, false);
+        SetBubble(antBubbleImage, false);
+        SetBubble(playerBubbleImage, false);
     }
 
     void HandleCallCueGroup(int groupId)
@@ -186,18 +220,24 @@ public class Stage1SurviveVisuals : MonoBehaviour
 
         switch (idx)
         {
-            case 0: // Clown — beat 1. Also the moment the shower shuts off for this cycle.
+            case 0: // Clown — beat 1. Also the moment the shower shuts off for this cycle, and
+                    // NormalAnt's bubble starts (NormalAnt surfaces 1 beat later, at beat 2).
                 if (showerImage != null) showerImage.sprite = showerOffSprite;
                 SurfaceClown();
+                SetBubble(antBubbleImage, true);
                 break;
-            case 1: // NormalAnt — beat 2.
+            case 1: // NormalAnt — beat 2. Also starts PlayerAnt's bubble, but only if they're still
+                    // submerged — they may have already surfaced early on a mistimed release, in which
+                    // case there's nothing left to warn them about.
                 SurfaceAnt();
+                if (_playerSubmerged) SetBubble(playerBubbleImage, true);
                 break;
             case 2: // beat4Cue — shower back on, Clown/NormalAnt dive together. Chart-timed, does NOT
-                    // depend on the player's own press (see class doc) — the player's own dive is
-                    // handled separately in HandleHoldArmed, driven by their actual input.
+                    // depend on the player's own press (see class doc). Also starts the *next* cycle's
+                    // Clown bubble (Clown surfaces 1 beat after this fires, at next cycle's beat 1).
                 if (_submergeCr != null) StopCoroutine(_submergeCr);
                 _submergeCr = StartCoroutine(SubmergeCastNPCsDelayed());
+                SetBubble(clownBubbleImage, true);
                 break;
             // default: more than 3 Call-role fires in one group shouldn't happen for this chart shape.
         }
@@ -206,7 +246,7 @@ public class Stage1SurviveVisuals : MonoBehaviour
     // CallDirector.SpawnDueCalls fires OnCallCueGroup as soon as t >= cueTime - hitWindow — i.e. every
     // Call-role cue (Clown/NormalAnt/this one) actually spawns hitWindow seconds BEFORE its nominal
     // beat, uniformly. Surfacing already happens to land close to the true beat because
-    // bubbleLeadTime (0.25s) outweighs that early fire, but submerging had no such compensation and
+    // surfaceRevealDelay (0.25s) outweighs that early fire, but submerging had no such compensation and
     // was visibly diving before beat 4 actually arrived (reported via play-testing). syncDelay
     // corrects for exactly that lookahead so this lands on the real beat instead.
     IEnumerator SubmergeCastNPCsDelayed()
@@ -227,71 +267,82 @@ public class Stage1SurviveVisuals : MonoBehaviour
     void SurfaceClown()
     {
         if (clownImage == null || _clownCr != null) return;
-        StartCoroutine(BubbleBurstRoutine(clownImage.rectTransform));
-        _clownCr = StartCoroutine(DelayedReveal(clownImage, clownSurfaceSprite, _clownBaseY + surfaceYOffset, () => _clownCr = null));
+        _clownCr = StartCoroutine(DelayedReveal(clownImage, clownSurfaceSprite, _clownBaseY + surfaceYOffset,
+            () => { _clownCr = null; SetBubble(clownBubbleImage, false); }));
     }
 
     void SurfaceAnt()
     {
         if (normalAntImage == null || _antCr != null) return;
-        StartCoroutine(BubbleBurstRoutine(normalAntImage.rectTransform));
-        _antCr = StartCoroutine(DelayedReveal(normalAntImage, antSurfaceSprite, _antBaseY + surfaceYOffset, () => _antCr = null));
+        _antCr = StartCoroutine(DelayedReveal(normalAntImage, antSurfaceSprite, _antBaseY + surfaceYOffset,
+            () => { _antCr = null; SetBubble(antBubbleImage, false); }));
     }
 
     IEnumerator DelayedReveal(Image img, Sprite surfaceSprite, float targetY, Action onComplete)
     {
-        yield return new WaitForSeconds(bubbleLeadTime);
+        yield return new WaitForSeconds(surfaceRevealDelay);
         img.sprite = surfaceSprite;
         SetY(img.rectTransform, targetY);
         onComplete?.Invoke();
     }
 
-    void HandleHoldArmed(int groupId)
-    {
-        // The player's press just claimed the next cycle's Hold — dive immediately. Deliberately
-        // ONLY touches the player: Clown/NormalAnt/shower re-submerge on the chart's own beat4Cue
-        // instead (see SubmergeCastNPCs), not on the player's personal press timing — see class doc.
-        if (playerAntImage != null) { playerAntImage.sprite = playerDiveSprite; SetY(playerAntImage.rectTransform, _playerBaseY); }
-    }
-
-    void HandleHoldEarlyRelease(int groupId)
-    {
-        _earlyReleaseGroups.Add(groupId);
-    }
-
+    // Hit only needs the reward flourish — position is already correct (the release that earned it
+    // already moved the player via HandlePlayerResponseRelease). Miss shows the fail sprite — see
+    // PlayerFailFlash for why this never touches Y.
     void HandleGroupJudged(int groupId, JudgementType j)
     {
         if (playerAntImage == null) return;
 
-        bool wasEarlyRelease = _earlyReleaseGroups.Remove(groupId);
+        if (j == JudgementType.Hit) return; // position/bubble already correct via HandlePlayerResponseRelease
 
-        if (_playerFailCr != null) { StopCoroutine(_playerFailCr); _playerFailCr = null; }
-
-        if (j == JudgementType.Hit)
-        {
-            StartCoroutine(BubbleBurstRoutine(playerAntImage.rectTransform));
-            _playerFailCr = StartCoroutine(DelayedReveal(playerAntImage, playerSurfaceSprite, _playerBaseY + surfaceYOffset, () => _playerFailCr = null));
-        }
-        else
-        {
-            // Only one fail sprite exists — "surfaced too early" vs "still submerged" is carried by Y
-            // position instead: early release shows it up at the surface spot, timeout shows it down
-            // at the dive (base) spot.
-            float failY = wasEarlyRelease ? _playerBaseY + surfaceYOffset : _playerBaseY;
-            _playerFailCr = StartCoroutine(HoldSpriteThenRevert(
-                playerAntImage, playerFailSprite, playerSurfaceSprite, failY, _playerBaseY + surfaceYOffset, failSpriteHoldTime));
-        }
+        if (_playerFailCr != null) StopCoroutine(_playerFailCr);
+        _playerFailCr = StartCoroutine(PlayerFailFlash());
     }
 
-    // Fires on every physical press regardless of judgement (see CallDirector.OnResponsePress) —
-    // movement-only reaction so the player character visibly responds even during the Call-only
-    // portion of a cycle. Never touches sprite (that's HandleHoldArmed/HandleGroupJudged's job).
+    // Fires on every physical press regardless of judgement (see CallDirector.OnResponsePress). Y
+    // position is a direct, unconditional, always-immediate mirror of the held button — nothing, not
+    // even an in-progress fail flash, ever delays or blocks it, per explicit request ("위치 움직이는건
+    // 그냥 플레이어 입력으로만 영향 받았음 좋겠는데"). The sprite normally mirrors position the same
+    // way, EXCEPT while a fail flash is showing (_playerFailCr != null) — that's the one exception, and
+    // it only ever pins the *sprite*, never Y, so diving/surfacing during a fail flash still visibly
+    // moves the character even though the fail art stays on screen until its own timer ends.
     void HandlePlayerResponsePress()
     {
-        if (playerAntImage == null || _playerScaleCr != null) return;
-        _playerScaleCr = StartCoroutine(ScalePulseRoutine(
-            playerAntImage.rectTransform, _playerBaseScale, playerPressScaleY, pressScalePulseTime,
-            () => _playerScaleCr = null));
+        if (playerAntImage == null) return;
+
+        if (_playerScaleCr == null)
+            _playerScaleCr = StartCoroutine(ScalePulseRoutine(
+                playerAntImage.rectTransform, _playerBaseScale, playerPressScaleY, pressScalePulseTime,
+                () => _playerScaleCr = null));
+
+        _playerSubmerged = true;
+        SetY(playerAntImage.rectTransform, _playerBaseY);
+        if (_playerFailCr == null) playerAntImage.sprite = playerDiveSprite;
+        SetBubble(playerBubbleImage, false); // fresh dive — any bubble left over from before is stale
+    }
+
+    // Release counterpart of HandlePlayerResponsePress — same reasoning. Unconditionally hides the
+    // bubble regardless of *why* this release happened (on-time Hit, early-release Miss, anything) —
+    // a bubble floating above a surfaced character would look wrong either way.
+    void HandlePlayerResponseRelease()
+    {
+        if (playerAntImage == null) return;
+
+        _playerSubmerged = false;
+        SetY(playerAntImage.rectTransform, _playerBaseY + surfaceYOffset);
+        if (_playerFailCr == null) playerAntImage.sprite = playerSurfaceSprite;
+        SetBubble(playerBubbleImage, false);
+    }
+
+    // Briefly shows the fail sprite in place — deliberately never touches Y (HandlePlayerResponsePress/
+    // Release already own that unconditionally, see their doc comments) — then snaps the sprite to
+    // match whatever the player is actually doing by the time the hold ends.
+    IEnumerator PlayerFailFlash()
+    {
+        playerAntImage.sprite = playerFailSprite;
+        yield return new WaitForSeconds(failSpriteHoldTime);
+        playerAntImage.sprite = _playerSubmerged ? playerDiveSprite : playerSurfaceSprite;
+        _playerFailCr = null;
     }
 
     static void SetY(RectTransform rect, float y)
@@ -301,13 +352,11 @@ public class Stage1SurviveVisuals : MonoBehaviour
         rect.anchoredPosition = pos;
     }
 
-    IEnumerator HoldSpriteThenRevert(Image img, Sprite hold, Sprite revertTo, float holdY, float revertY, float duration)
+    // Scene-placed, permanently-existing bubble Images (see class doc) — just toggled on/off, never
+    // spawned/destroyed.
+    static void SetBubble(Image bubbleImage, bool visible)
     {
-        img.sprite = hold;
-        SetY(img.rectTransform, holdY);
-        yield return new WaitForSeconds(duration);
-        img.sprite = revertTo;
-        SetY(img.rectTransform, revertY);
+        if (bubbleImage != null) bubbleImage.gameObject.SetActive(visible);
     }
 
     IEnumerator ScalePulseRoutine(RectTransform rect, Vector3 baseScale, float peakY, float duration, Action onComplete)
@@ -322,71 +371,5 @@ public class Stage1SurviveVisuals : MonoBehaviour
         }
         rect.localScale = baseScale;
         onComplete?.Invoke();
-    }
-
-    // ── Placeholder bubble FX (procedural, no art asset — see class doc) ────────────────────────
-
-    static Sprite BubbleSprite()
-    {
-        if (_bubbleSprite != null) return _bubbleSprite;
-
-        const int size = 32;
-        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
-        var center = new Vector2(size / 2f, size / 2f);
-        float radius = size / 2f - 1f;
-        for (int y = 0; y < size; y++)
-        for (int x = 0; x < size; x++)
-        {
-            float dist = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), center);
-            float alpha = Mathf.Clamp01(1f - dist / radius);
-            alpha *= alpha; // soften the edge instead of a hard-edged disc
-            tex.SetPixel(x, y, new Color(0.85f, 0.95f, 1f, alpha));
-        }
-        tex.Apply();
-
-        _bubbleSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
-        return _bubbleSprite;
-    }
-
-    IEnumerator BubbleBurstRoutine(RectTransform parent)
-    {
-        var sprite = BubbleSprite();
-        for (int i = 0; i < bubbleCount; i++)
-        {
-            var go = new GameObject("Bubble(Temp)", typeof(RectTransform), typeof(Image));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(parent, false);
-
-            var img = go.GetComponent<Image>();
-            img.sprite = sprite;
-            img.raycastTarget = false;
-
-            float size = UnityEngine.Random.Range(bubbleMinSize, bubbleMaxSize);
-            rt.sizeDelta = new Vector2(size, size);
-            float xOff = UnityEngine.Random.Range(-bubbleSpreadX, bubbleSpreadX);
-            rt.anchoredPosition = new Vector2(xOff, bubbleHeadOffsetY);
-
-            StartCoroutine(AnimateBubble(rt, img));
-            yield return new WaitForSeconds(bubbleSpawnInterval);
-        }
-    }
-
-    IEnumerator AnimateBubble(RectTransform rt, Image img)
-    {
-        Vector2 start = rt.anchoredPosition;
-        Vector2 end = start + new Vector2(0f, bubbleRiseHeight);
-        Color c = img.color;
-
-        float t = 0f;
-        while (t < bubbleLifetime)
-        {
-            t += Time.deltaTime;
-            float p = Mathf.Clamp01(t / bubbleLifetime);
-            rt.anchoredPosition = Vector2.Lerp(start, end, p);
-            c.a = 1f - p;
-            img.color = c;
-            yield return null;
-        }
-        if (rt != null) Destroy(rt.gameObject);
     }
 }
