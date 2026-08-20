@@ -24,62 +24,52 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 4
+    cueBeat: 4.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 5
+    cueBeat: 4.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 6
+    cueBeat: 5.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 7
+    cueBeat: 5.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 0
-    cueBeat: 8
+    cueBeat: 6.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 11
+    cueBeat: 12.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 12
+    cueBeat: 12.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 13
+    cueBeat: 13.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 14
+    cueBeat: 13.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 1
-    cueBeat: 15
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 2
-    cueBeat: 18
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 2
-    cueBeat: 19
+    cueBeat: 14.25
     releaseBeat: 0
   - type: 0
     role: 1
@@ -89,7 +79,17 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 2
+    cueBeat: 20.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
     cueBeat: 21
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 21.5
     releaseBeat: 0
   - type: 0
     role: 0
@@ -99,125 +99,701 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 25
+    cueBeat: 28.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 26
+    cueBeat: 28.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 27
+    cueBeat: 29.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 28
+    cueBeat: 29.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 3
-    cueBeat: 29
+    cueBeat: 30.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 32
+    cueBeat: 36.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 33
+    cueBeat: 36.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 34
+    cueBeat: 37.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 35
+    cueBeat: 37.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 4
-    cueBeat: 36
+    cueBeat: 38.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 39
+    cueBeat: 40.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 40
+    cueBeat: 40.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 41
+    cueBeat: 41.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 42
+    cueBeat: 41.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 5
-    cueBeat: 43
+    cueBeat: 42.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 46
+    cueBeat: 46.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 47
+    cueBeat: 47.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 48
+    cueBeat: 47.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 49
+    cueBeat: 48.25
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 6
-    cueBeat: 50
+    cueBeat: 48.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 53
+    cueBeat: 52.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 54
+    cueBeat: 52.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 55
+    cueBeat: 53.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 56
+    cueBeat: 53.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 7
-    cueBeat: 57
+    cueBeat: 54.25
     releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 56.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 56.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 57.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 57.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 8
+    cueBeat: 58.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 64.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 64.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 65.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 65.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 9
+    cueBeat: 66.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 68.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 68.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 69.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 69.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 10
+    cueBeat: 70.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 74.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 74.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 75.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 75.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 11
+    cueBeat: 76.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 12
+    cueBeat: 80.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 12
+    cueBeat: 80.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 12
+    cueBeat: 81.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 12
+    cueBeat: 81.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 12
+    cueBeat: 82.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 13
+    cueBeat: 86.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 13
+    cueBeat: 86.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 13
+    cueBeat: 87.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 13
+    cueBeat: 87.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 13
+    cueBeat: 88.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 92.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 92.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 93.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 93.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 14
+    cueBeat: 94.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 96.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 96.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 97.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 97.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 15
+    cueBeat: 98.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 100.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 100.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 101.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 101.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 32
+    cueBeat: 102.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 17
+    cueBeat: 104.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 17
+    cueBeat: 104.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 17
+    cueBeat: 105.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 17
+    cueBeat: 105.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 17
+    cueBeat: 106.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 18
+    cueBeat: 106.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 18
+    cueBeat: 107
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 18
+    cueBeat: 107.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 18
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 18
+    cueBeat: 108.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 110.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 111
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 111.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 112
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 31
+    cueBeat: 112.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 20
+    cueBeat: 116
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 20
+    cueBeat: 116.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 20
+    cueBeat: 117
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 20
+    cueBeat: 117.5
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 20
+    cueBeat: 118
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 21
+    cueBeat: 120.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 21
+    cueBeat: 120.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 21
+    cueBeat: 121.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 21
+    cueBeat: 121.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 21
+    cueBeat: 122.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 22
+    cueBeat: 126.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 22
+    cueBeat: 126.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 22
+    cueBeat: 127.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 22
+    cueBeat: 127.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 22
+    cueBeat: 128.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 23
+    cueBeat: 132.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 23
+    cueBeat: 132.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 23
+    cueBeat: 133.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 23
+    cueBeat: 133.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 23
+    cueBeat: 134.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 140.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 140.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 141.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 141.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 24
+    cueBeat: 142.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 144
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 144.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 145
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 145.5
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 25
+    cueBeat: 146
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 148
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 148.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 149
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 149.5
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 26
+    cueBeat: 150
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 150.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 151.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 151.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 152.25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 27
+    cueBeat: 152.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 156.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 156.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 157.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 157.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 28
+    cueBeat: 158.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 161
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 161.5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 162
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 162.5
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 29
+    cueBeat: 163
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 168.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 168.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 169.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 169.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 30
+    cueBeat: 170.25
+    releaseBeat: 0
+  phases: []
