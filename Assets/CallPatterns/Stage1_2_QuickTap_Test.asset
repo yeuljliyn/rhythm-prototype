@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stage1_2_QuickTap_Test
   m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
   chartName: Stage1-2 Quick Tap Test
-  music: {fileID: 8300000, guid: 58e18d14a2a2bfd4c9b10b2457434d2b, type: 3}
+  music: {fileID: 8300000, guid: bd346c83b7551204081ab0fd2ce9e728, type: 3}
   bpm: 122
   introDelay: 2
   hitWindow: 0.12
@@ -24,30 +24,91 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 0.25
+    cueBeat: 4
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 3.5
+    cueBeat: 5
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 4.75
+    cueBeat: 6
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 6
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 6
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 7
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 7.5
+    cueBeat: 7
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 7
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 8
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 8.75
+    cueBeat: 8
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 8
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 9
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 9
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 0
+    cueBeat: 9
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 10
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 1
+    cueBeat: 10
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 2
     cueBeat: 11
     releaseBeat: 0
+  phases: []

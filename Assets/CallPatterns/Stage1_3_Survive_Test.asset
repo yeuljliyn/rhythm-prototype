@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stage1_3_Survive_Test
   m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
   chartName: 1-3 Survive Test
-  music: {fileID: 8300000, guid: 93861d541ed922046a2faadcc6b94a53, type: 3}
+  music: {fileID: 8300000, guid: 78dafec7ec4f26247a76b59062638e70, type: 3}
   bpm: 128
   introDelay: 2
   hitWindow: 0.12
