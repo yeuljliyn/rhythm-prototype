@@ -303,6 +303,20 @@ public class Stage1WaveRideVisuals : MonoBehaviour
 
         if (antImages != null && antImages.Length > 0)
         {
+            // Cancel any still-running call-cue raise pulses first. Ant4's call is the very last one
+            // right before the response note, so its 0.25s raise-pulse (PulseAntRoutine) is often
+            // still mid-flight when the response gets judged — left alone, that pulse's own
+            // revert-to-idle line fires moments later and silently stomps the fail sprite this
+            // routine is about to set, before missPoseDuration elapses. Ant1-3's pulses have already
+            // finished by then (their calls happened earlier in the group), which is why only Ant4's
+            // fail pose was going missing.
+            for (int i = 0; i < _antPulses.Length; i++)
+            {
+                if (_antPulses[i] == null) continue;
+                StopCoroutine(_antPulses[i]);
+                _antPulses[i] = null;
+            }
+
             if (_antFailCr != null) StopCoroutine(_antFailCr);
             _antFailCr = StartCoroutine(AntFailPoseRoutine());
         }
