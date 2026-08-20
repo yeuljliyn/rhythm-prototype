@@ -8,21 +8,6 @@ TextureImporter:
   - first:
       213: -4867720692944348638
     second: "1-3\uAD11\uB300_1"
-  - first:
-      213: 8921182081330943412
-    second: "1-3\uAD11\uB300_2"
-  - first:
-      213: 8542825442279887677
-    second: "1-3\uAD11\uB300_3"
-  - first:
-      213: 7372828170613867145
-    second: "1-3\uAD11\uB300_4"
-  - first:
-      213: -3461611583926801432
-    second: "1-3\uAD11\uB300_5"
-  - first:
-      213: -4806434697983254036
-    second: "1-3\uAD11\uB300_6"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -118,15 +103,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "1-3\uAD11\uB300_2"
+      name: "1-3\uAD11\uB300_0"
       rect:
         serializedVersion: 2
-        x: 637
-        y: 366
+        x: 663
+        y: 387
         width: 503
-        height: 761
+        height: 708
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -143,20 +128,20 @@ TextureImporter:
       name: "1-3\uAD11\uB300_1"
       rect:
         serializedVersion: 2
-        x: 1587
-        y: 358
-        width: 484
-        height: 724
+        x: 1639
+        y: 387
+        width: 503
+        height: 708
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 982ce63882c815660800000000000000
-      internalID: 7372828170613867145
+      spriteID: 22adb3fe1d1627cb0800000000000000
+      internalID: -4867720692944348638
       vertices: []
       indices: 
       edges: []
@@ -165,7 +150,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 24b6a06b7692c9e44abf2f7b96c4ebda
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -175,11 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "1-3\uAD11\uB300_1": 7372828170613867145
-      "1-3\uAD11\uB300_2": 159862324487942223
-      "1-3\uAD11\uB300_3": 8542825442279887677
-      "1-3\uAD11\uB300_5": -3461611583926801432
-      "1-3\uAD11\uB300_6": -4806434697983254036
+      "1-3\uAD11\uB300_0": 159862324487942223
+      "1-3\uAD11\uB300_1": -4867720692944348638
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
