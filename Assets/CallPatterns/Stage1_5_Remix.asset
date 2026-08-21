@@ -1,0 +1,367 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a52a79781a00b2740886c3ec182da70a, type: 3}
+  m_Name: Stage1_5_Remix
+  m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
+  chartName: Stage1_5_Remix
+  music: {fileID: 8300000, guid: 78dafec7ec4f26247a76b59062638e70, type: 3}
+  bpm: 120
+  introDelay: 2
+  hitWindow: 0.12
+  missWindow: 0.38
+  minInputIntervalSeconds: 0.5
+  liveInputStartBeat: 0
+  calls:
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 4.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 4.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 5.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 5.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 0
+    cueBeat: 6.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 12.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 12.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 13.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 13.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 1
+    cueBeat: 14.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 20.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 20.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 21.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 21.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 2
+    cueBeat: 22.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 32
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 3
+    cueBeat: 33
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 4
+    cueBeat: 37
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 5
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 6
+    cueBeat: 48
+    releaseBeat: 54
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 7
+    cueBeat: 56
+    releaseBeat: 62
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 8
+    cueBeat: 64
+    releaseBeat: 70
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 77
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 78
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 79
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 9
+    cueBeat: 81
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 85
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 86
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 87
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 10
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 10
+    cueBeat: 89
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 93
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 94
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 95
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
+    cueBeat: 96
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 11
+    cueBeat: 97
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 12
+    cueBeat: 104
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 12
+    cueBeat: 105
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 13
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 13
+    cueBeat: 109
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 116.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 116.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 117.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 117.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 14
+    cueBeat: 118.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 124.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 124.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 125.25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 125.75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 15
+    cueBeat: 126.25
+    releaseBeat: 0
+  phases:
+  - styleId: 1-1
+    startBeat: -4
+    endBeat: 28
+  - styleId: 1-4
+    startBeat: 28
+    endBeat: 44
+  - styleId: 1-3
+    startBeat: 44
+    endBeat: 74
+  - styleId: 1-2
+    startBeat: 74
+    endBeat: 100
+  - styleId: 1-4
+    startBeat: 100
+    endBeat: 112
+  - styleId: 1-1
+    startBeat: 112
+    endBeat: 136
