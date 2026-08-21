@@ -1095,7 +1095,9 @@ public class Stage1ChartEditorWindow : EditorWindow
                 float deltaBeat   = deltaPixels / (_zoom * _pattern.BeatInterval);
                 float rawTarget = _phaseDragHandle == PhaseDragHandle.End ? _phaseDragOriginEnd + deltaBeat : _phaseDragOriginStart + deltaBeat;
                 float anchorRef = _phaseDragHandle == PhaseDragHandle.End ? _phaseDragOriginEnd : _phaseDragOriginStart;
-                _phaseDragBeatDelta = SnapBeat(Mathf.Max(0f, rawTarget)) - anchorRef;
+                // No floor at 0 here — phases must be draggable into the intro-delay region (negative
+                // beats), same as they can already be created there by clicking.
+                _phaseDragBeatDelta = SnapBeat(rawTarget) - anchorRef;
                 e.Use();
                 Repaint();
             }
@@ -1200,14 +1202,16 @@ public class Stage1ChartEditorWindow : EditorWindow
             switch (_phaseDragHandle)
             {
                 case PhaseDragHandle.Start:
-                    _selectedPhase.startBeat = Mathf.Min(Mathf.Max(0f, _phaseDragOriginStart + _phaseDragBeatDelta), _phaseDragOriginEnd - 0.1f);
+                    // No floor at 0 — dragging a phase's start earlier than beat 0 (into the intro
+                    // delay) must be allowed, not silently clamped back to M1.
+                    _selectedPhase.startBeat = Mathf.Min(_phaseDragOriginStart + _phaseDragBeatDelta, _phaseDragOriginEnd - 0.1f);
                     break;
                 case PhaseDragHandle.End:
                     _selectedPhase.endBeat = Mathf.Max(_phaseDragOriginEnd + _phaseDragBeatDelta, _phaseDragOriginStart + 0.1f);
                     break;
                 case PhaseDragHandle.Body:
-                    _selectedPhase.startBeat = Mathf.Max(0f, _phaseDragOriginStart + _phaseDragBeatDelta);
-                    _selectedPhase.endBeat   = Mathf.Max(0f, _phaseDragOriginEnd + _phaseDragBeatDelta);
+                    _selectedPhase.startBeat = _phaseDragOriginStart + _phaseDragBeatDelta;
+                    _selectedPhase.endBeat   = _phaseDragOriginEnd + _phaseDragBeatDelta;
                     break;
             }
             EditorUtility.SetDirty(_pattern);
