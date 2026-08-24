@@ -29,6 +29,10 @@ public class Stage1TitleCard : MonoBehaviour
 
     void Awake()
     {
+        // 이전 플레이 세션(다른 씬의 일시정지 등)에서 Time.timeScale이 0으로 남아있으면
+        // Sequence()의 WaitForSeconds가 영원히 멈춤 — CallClock.Awake()의 방어 로직과 동일한 이유.
+        Time.timeScale = 1f;
+
         if (titleText != null) titleText.text = titleString;
 
         if (oneShotSfx != null)
