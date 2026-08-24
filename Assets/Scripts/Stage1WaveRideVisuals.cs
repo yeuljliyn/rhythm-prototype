@@ -31,8 +31,10 @@ public class Stage1WaveRideVisuals : MonoBehaviour
 
     [Header("Ant1..Ant4 = Call, Ant5 (last) = Response")]
     [SerializeField] Image[] antImages = new Image[5];
-    [SerializeField] Sprite callAntIdleSprite;
-    [SerializeField] Sprite callAntRaisedSprite;
+    [Tooltip("Ant1..Ant4가 각자 다른 리소스를 쓰기 위한 개별 idle/raised/fail 스프라이트 — 인덱스 0~3이 " +
+             "antImages[0..3]과 1:1 대응. 예전엔 4마리가 callAntIdleSprite 하나를 공유했음.")]
+    [SerializeField] Sprite[] callAntIdleSprites = new Sprite[4];
+    [SerializeField] Sprite[] callAntRaisedSprites = new Sprite[4];
     [SerializeField] Sprite responseAntIdleSprite;
     [SerializeField] Sprite responseAntRaisedSprite;
 
@@ -54,8 +56,8 @@ public class Stage1WaveRideVisuals : MonoBehaviour
     [Tooltip("넘어지는 포즈가 유지되다가 원래 모습으로 돌아오기까지 걸리는 시간")]
     [SerializeField] float missPoseDuration = 0.4f;
 
-    [Header("Ants — glare pose on Miss (Ant1-4 share one look, Ant5 has its own)")]
-    [SerializeField] Sprite antFailSprite;
+    [Header("Ants — glare pose on Miss (Ant1-4 each have their own, Ant5 has its own)")]
+    [SerializeField] Sprite[] callAntFailSprites = new Sprite[4];
     [SerializeField] Sprite ant5FailSprite;
 
     [SerializeField] float antPulseDuration = 0.25f;
@@ -330,7 +332,7 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         _missPoseCr = null;
     }
 
-    // Ant1..Ant4 share one "glaring" look on Miss, Ant5 has its own — same brief swap-then-revert
+    // Ant1..Ant4 each glare with their own look on Miss, Ant5 has its own — same brief swap-then-revert
     // shape as the clown's fall pose, on the same missPoseDuration so every reaction to a single
     // Miss lands and clears together.
     IEnumerator AntFailPoseRoutine()
@@ -338,7 +340,7 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         for (int i = 0; i < antImages.Length; i++)
         {
             if (antImages[i] == null) continue;
-            antImages[i].sprite = i == 4 ? ant5FailSprite : antFailSprite;
+            antImages[i].sprite = i == 4 ? ant5FailSprite : callAntFailSprites[i];
         }
 
         yield return new WaitForSeconds(missPoseDuration);
@@ -372,10 +374,10 @@ public class Stage1WaveRideVisuals : MonoBehaviour
         _antPulses[index] = null;
     }
 
-    // Ant1..Ant4 (index 0-3, Call role) share one look; Ant5 (index 4, Response role) is the
-    // player's own distinct character.
-    Sprite IdleSpriteFor(int index)   => index == 4 ? responseAntIdleSprite   : callAntIdleSprite;
-    Sprite RaisedSpriteFor(int index) => index == 4 ? responseAntRaisedSprite : callAntRaisedSprite;
+    // Ant1..Ant4 (index 0-3, Call role) each have their own look; Ant5 (index 4, Response role) is
+    // the player's own distinct character.
+    Sprite IdleSpriteFor(int index)   => index == 4 ? responseAntIdleSprite   : callAntIdleSprites[index];
+    Sprite RaisedSpriteFor(int index) => index == 4 ? responseAntRaisedSprite : callAntRaisedSprites[index];
 
     float AntX(int index) => antImages[index].rectTransform.anchoredPosition.x;
 

@@ -378,7 +378,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8726197632694386588, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
+  m_Sprite: {fileID: 8613360606801151919, guid: 132a6c1cfb5b9554f8cdb0b3e836ed4a, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -453,7 +453,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8726197632694386588, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
+  m_Sprite: {fileID: -3065474543044070092, guid: e5393128830dddc459e42a7dca103a19, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -603,7 +603,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8726197632694386588, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
+  m_Sprite: {fileID: -2907085112882583670, guid: 629880c786b906648be6fd00d9a30ff8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -732,7 +732,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8726197632694386588, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
+  m_Sprite: {fileID: -4117437934129188258, guid: a403e5a823f852d499236ab4ad1a024e, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1179,8 +1179,16 @@ MonoBehaviour:
   - {fileID: 733658130}
   - {fileID: 1124142192}
   - {fileID: 300055629}
-  callAntIdleSprite: {fileID: -8726197632694386588, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
-  callAntRaisedSprite: {fileID: -7834580098799559431, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
+  callAntIdleSprites:
+  - {fileID: -3065474543044070092, guid: e5393128830dddc459e42a7dca103a19, type: 3}
+  - {fileID: 8613360606801151919, guid: 132a6c1cfb5b9554f8cdb0b3e836ed4a, type: 3}
+  - {fileID: -2907085112882583670, guid: 629880c786b906648be6fd00d9a30ff8, type: 3}
+  - {fileID: -4117437934129188258, guid: a403e5a823f852d499236ab4ad1a024e, type: 3}
+  callAntRaisedSprites:
+  - {fileID: -9135825131138311507, guid: e5393128830dddc459e42a7dca103a19, type: 3}
+  - {fileID: 2271251547137655914, guid: 132a6c1cfb5b9554f8cdb0b3e836ed4a, type: 3}
+  - {fileID: 1915638331532352433, guid: 629880c786b906648be6fd00d9a30ff8, type: 3}
+  - {fileID: 6875898520502008039, guid: a403e5a823f852d499236ab4ad1a024e, type: 3}
   responseAntIdleSprite: {fileID: -3009115056872166845, guid: cd7c122a128c874429e1d326c3badb83, type: 3}
   responseAntRaisedSprite: {fileID: 3724725486868500343, guid: cd7c122a128c874429e1d326c3badb83, type: 3}
   clownRect: {fileID: 424127496}
@@ -1193,7 +1201,11 @@ MonoBehaviour:
   clownNormalSprite: {fileID: -7010641452084873675, guid: 8c647a2fdd72b8046b380ec224cf447d, type: 3}
   clownFallSprite: {fileID: -4525839075153415978, guid: 8c647a2fdd72b8046b380ec224cf447d, type: 3}
   missPoseDuration: 0.4
-  antFailSprite: {fileID: -5681938358222106337, guid: 6983cb9491c8a4a41897ab1d8bf4d49b, type: 3}
+  callAntFailSprites:
+  - {fileID: -7711269072700239511, guid: e5393128830dddc459e42a7dca103a19, type: 3}
+  - {fileID: -7330794105997844257, guid: 132a6c1cfb5b9554f8cdb0b3e836ed4a, type: 3}
+  - {fileID: -1261571813303572444, guid: 629880c786b906648be6fd00d9a30ff8, type: 3}
+  - {fileID: -3383599055789547862, guid: a403e5a823f852d499236ab4ad1a024e, type: 3}
   ant5FailSprite: {fileID: 5498171288194459904, guid: 0e8edc0d0a52f48448043ac614aca4d2, type: 3}
   antPulseDuration: 0.25
   clock: {fileID: 1605954058}
