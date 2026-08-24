@@ -60,7 +60,7 @@ using UnityEngine.UI;
 /// does play completes its full up-and-down cycle, so the rate is naturally capped by the
 /// animation's own length instead of by the input cooldown.
 /// </summary>
-public class Stage1QuickTapVisuals : MonoBehaviour
+public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
 {
     [SerializeField] CallDirector callDirector;
 
@@ -183,29 +183,38 @@ public class Stage1QuickTapVisuals : MonoBehaviour
                 : null;
     }
 
-    void OnEnable()
+    void OnEnable()  => Bind(callDirector);
+    void OnDisable() => Unbind(callDirector);
+
+    void Bind(CallDirector d)
     {
-        if (callDirector != null)
-        {
-            callDirector.OnCallCueGroup  += HandleCallCueGroup;
-            callDirector.OnGroupJudged   += HandleGroupJudged;
-            // Fires on every physical press regardless of whether it landed on a live/judged note
-            // (see CallDirector.OnResponsePress) — used here purely so PlayerAnt visually reacts to
-            // every input attempt, including ones during the Call phase before its own Response note
-            // has even spawned. Actual Hit/Miss judgement is untouched by this — that still only
-            // happens inside CallDirector's Hit/Miss windows via HandleGroupJudged below.
-            callDirector.OnResponsePress += HandlePlayerResponsePress;
-        }
+        if (d == null) return;
+        d.OnCallCueGroup  += HandleCallCueGroup;
+        d.OnGroupJudged   += HandleGroupJudged;
+        // Fires on every physical press regardless of whether it landed on a live/judged note
+        // (see CallDirector.OnResponsePress) — used here purely so PlayerAnt visually reacts to
+        // every input attempt, including ones during the Call phase before its own Response note
+        // has even spawned. Actual Hit/Miss judgement is untouched by this — that still only
+        // happens inside CallDirector's Hit/Miss windows via HandleGroupJudged below.
+        d.OnResponsePress += HandlePlayerResponsePress;
     }
 
-    void OnDisable()
+    void Unbind(CallDirector d)
     {
-        if (callDirector != null)
-        {
-            callDirector.OnCallCueGroup  -= HandleCallCueGroup;
-            callDirector.OnGroupJudged   -= HandleGroupJudged;
-            callDirector.OnResponsePress -= HandlePlayerResponsePress;
-        }
+        if (d == null) return;
+        d.OnCallCueGroup  -= HandleCallCueGroup;
+        d.OnGroupJudged   -= HandleGroupJudged;
+        d.OnResponsePress -= HandlePlayerResponsePress;
+    }
+
+    /// Switches which CallDirector drives these visuals — see Stage1WaveRideVisuals.BindDirector
+    /// (same rebind pattern). Used by Stage1PracticeGate to hand this stage's Visuals script off
+    /// from a practice segment's Director to another segment's, or to the main Director.
+    public void BindDirector(CallDirector newDirector)
+    {
+        Unbind(callDirector);
+        callDirector = newDirector;
+        Bind(callDirector);
     }
 
     void Start()

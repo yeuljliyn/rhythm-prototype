@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// same style as Stage1SurviveVisuals. CallDirector stays completely unaware of
 /// Hand/PlayerAnt/Clown, same as every other Stage1 minigame glue script.
 /// </summary>
-public class Stage1AntPourVisuals : MonoBehaviour
+public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
 {
     [SerializeField] CallDirector callDirector;
 
@@ -67,20 +67,31 @@ public class Stage1AntPourVisuals : MonoBehaviour
 
     Coroutine _handCr, _playerCr, _clownCr;
 
-    void OnEnable()
+    void OnEnable()  => Bind(callDirector);
+    void OnDisable() => Unbind(callDirector);
+
+    void Bind(CallDirector d)
     {
-        if (callDirector == null) return;
-        callDirector.OnCallCueGroup += HandleCallCue;
-        callDirector.OnGroupJudged  += HandleGroupJudged;
-        callDirector.OnResponsePress += HandlePlayerPress;
+        if (d == null) return;
+        d.OnCallCueGroup  += HandleCallCue;
+        d.OnGroupJudged   += HandleGroupJudged;
+        d.OnResponsePress += HandlePlayerPress;
     }
 
-    void OnDisable()
+    void Unbind(CallDirector d)
     {
-        if (callDirector == null) return;
-        callDirector.OnCallCueGroup -= HandleCallCue;
-        callDirector.OnGroupJudged  -= HandleGroupJudged;
-        callDirector.OnResponsePress -= HandlePlayerPress;
+        if (d == null) return;
+        d.OnCallCueGroup  -= HandleCallCue;
+        d.OnGroupJudged   -= HandleGroupJudged;
+        d.OnResponsePress -= HandlePlayerPress;
+    }
+
+    /// Switches which CallDirector drives these visuals — see Stage1WaveRideVisuals.BindDirector.
+    public void BindDirector(CallDirector newDirector)
+    {
+        Unbind(callDirector);
+        callDirector = newDirector;
+        Bind(callDirector);
     }
 
     void Start()

@@ -93,7 +93,7 @@ using UnityEngine.UI;
 /// the very first Call-role entry's cueBeat, then waits until exactly 1 beat before it — same "1 beat
 /// before" rule as everywhere else, just computed once instead of cascaded from an event.
 /// </summary>
-public class Stage1SurviveVisuals : MonoBehaviour
+public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
 {
     [SerializeField] CallDirector callDirector;
     [Tooltip("cycle 0의 첫 광대 기포 타이밍 계산에만 씀 — ShowFirstClownBubble() 참고.")]
@@ -182,22 +182,33 @@ public class Stage1SurviveVisuals : MonoBehaviour
         }
     }
 
-    void OnEnable()
+    void OnEnable()  => Bind(callDirector);
+    void OnDisable() => Unbind(callDirector);
+
+    void Bind(CallDirector d)
     {
-        if (callDirector == null) return;
-        callDirector.OnCallCueGroup    += HandleCallCueGroup;
-        callDirector.OnGroupJudged     += HandleGroupJudged;
-        callDirector.OnResponsePress   += HandlePlayerResponsePress;
-        callDirector.OnResponseRelease += HandlePlayerResponseRelease;
+        if (d == null) return;
+        d.OnCallCueGroup    += HandleCallCueGroup;
+        d.OnGroupJudged     += HandleGroupJudged;
+        d.OnResponsePress   += HandlePlayerResponsePress;
+        d.OnResponseRelease += HandlePlayerResponseRelease;
     }
 
-    void OnDisable()
+    void Unbind(CallDirector d)
     {
-        if (callDirector == null) return;
-        callDirector.OnCallCueGroup    -= HandleCallCueGroup;
-        callDirector.OnGroupJudged     -= HandleGroupJudged;
-        callDirector.OnResponsePress   -= HandlePlayerResponsePress;
-        callDirector.OnResponseRelease -= HandlePlayerResponseRelease;
+        if (d == null) return;
+        d.OnCallCueGroup    -= HandleCallCueGroup;
+        d.OnGroupJudged     -= HandleGroupJudged;
+        d.OnResponsePress   -= HandlePlayerResponsePress;
+        d.OnResponseRelease -= HandlePlayerResponseRelease;
+    }
+
+    /// Switches which CallDirector drives these visuals — see Stage1WaveRideVisuals.BindDirector.
+    public void BindDirector(CallDirector newDirector)
+    {
+        Unbind(callDirector);
+        callDirector = newDirector;
+        Bind(callDirector);
     }
 
     void Start()

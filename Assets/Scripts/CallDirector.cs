@@ -148,6 +148,38 @@ public class CallDirector : MonoBehaviour
         _calls.Sort((a, b) => a.cueBeat.CompareTo(b.cueBeat));
     }
 
+    /// Appends more entries to the end of the live spawn list — for a practice loop that keeps
+    /// re-feeding copies of its one authored cycle so the note stream never runs dry (see
+    /// PracticeLoopExtender). Judgement state (_judgedEntries/_failedGroups) is keyed by reference/
+    /// groupId, not by index, and _nextSpawnIdx only ever walks forward, so appending is safe —
+    /// but the caller MUST pass entries already sorted ascending by cueBeat, all greater than every
+    /// cueBeat already in the list, or SpawnDueCalls' forward walk breaks.
+    public void AppendCalls(List<CallEntry> entries)
+    {
+        if (entries == null || entries.Count == 0) return;
+        _calls.AddRange(entries);
+    }
+
+    /// Wholesale-replaces the live spawn list and resets every piece of per-run state (spawn
+    /// pointer, live calls, judged/failed tracking, song-end latch, phase-change tracking) —
+    /// exactly what Awake() does, just callable after Awake has already run. For
+    /// PracticeLoopExtender: Awake() already snapshotted the asset's `calls` as-authored (which
+    /// would judge the very first cycle instead of demoing it), so the extender calls this once
+    /// in its own Start() — guaranteed to run before this director's first Update() — to swap in
+    /// its synthesized [demo cycle, then real judged cycles...] list before anything spawns.
+    /// Never touches the CallPatternData asset itself.
+    public void ReplaceCalls(List<CallEntry> entries)
+    {
+        _calls = entries != null ? new List<CallEntry>(entries) : new List<CallEntry>();
+        _calls.Sort((a, b) => a.cueBeat.CompareTo(b.cueBeat));
+        _nextSpawnIdx = 0;
+        _live.Clear();
+        _judgedEntries.Clear();
+        _failedGroups.Clear();
+        _songEndFired = false;
+        _currentPhaseIsResponse = null;
+    }
+
     void Update()
     {
         if (clock == null || pattern == null) return;
@@ -173,7 +205,13 @@ public class CallDirector : MonoBehaviour
             var lc = BuildLiveCall(entry);
             _live.Add(lc);
 
-            bool isResponsePhase = !lc.isDemo;
+            // Driven by the entry's own authored role, not by isDemo — a Response entry that's
+            // being demoed (PracticeLoopExtender's forceDemo) still visually reads as "the
+            // response phase" (e.g. the clown/boss visiting the response character) even though
+            // it isn't judged. For every non-practice chart today isDemo is only ever true when
+            // role==Call anyway (liveInputStartBeat is 0 everywhere), so this is a no-op change
+            // for existing charts — see CallEntry.forceDemo's doc comment.
+            bool isResponsePhase = entry.role == CallRole.Response;
             if (_currentPhaseIsResponse != isResponsePhase)
             {
                 _currentPhaseIsResponse = isResponsePhase;
@@ -182,7 +220,10 @@ public class CallDirector : MonoBehaviour
 
             var indicator = entry.type == CallType.Tap ? tapIndicator : holdIndicator;
             indicator?.ShowOpen(lc.isDemo);
-            if (lc.isDemo)
+            // Only a genuine Call-role demo fires OnCallCue/OnCallCueGroup — a demoed Response
+            // entry (forceDemo) must NOT, or minigames that count Call cues to know whose turn it
+            // is (Stage1WaveRideVisuals) would see one extra cue and desync every rep after.
+            if (lc.isDemo && entry.role == CallRole.Call)
             {
                 OnCallCue?.Invoke();
                 OnCallCueGroup?.Invoke(entry.groupId);
@@ -195,7 +236,7 @@ public class CallDirector : MonoBehaviour
     LiveCall BuildLiveCall(CallEntry entry)
     {
         float cueTime = pattern.BeatToTime(entry.cueBeat);
-        bool  isDemo  = entry.role == CallRole.Call || entry.cueBeat < pattern.liveInputStartBeat;
+        bool  isDemo  = entry.role == CallRole.Call || entry.cueBeat < pattern.liveInputStartBeat || entry.forceDemo;
 
         if (entry.type == CallType.Tap)
         {
@@ -389,7 +430,7 @@ public class CallDirector : MonoBehaviour
         float failRadius = pattern.hitWindow + pattern.missWindow;
         foreach (var entry in _calls)
         {
-            bool isDemo = entry.role == CallRole.Call || entry.cueBeat < pattern.liveInputStartBeat;
+            bool isDemo = entry.role == CallRole.Call || entry.cueBeat < pattern.liveInputStartBeat || entry.forceDemo;
             if (isDemo) continue;
             if (_judgedEntries.Contains(entry)) continue; // already used its one judgement attempt
 

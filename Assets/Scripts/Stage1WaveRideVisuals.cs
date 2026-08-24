@@ -25,7 +25,7 @@ using UnityEngine.UI;
 /// only *how* it looks while getting there: overshoots past the target and wobbles back into place
 /// like a marionette being tugged by a puppeteer's hand, instead of a perfectly-eased UI tween.
 /// </summary>
-public class Stage1WaveRideVisuals : MonoBehaviour
+public class Stage1WaveRideVisuals : MonoBehaviour, IPracticeRebindable
 {
     [SerializeField] CallDirector callDirector;
 

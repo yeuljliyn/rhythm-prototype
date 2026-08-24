@@ -43,6 +43,12 @@ public class CallPatternData : ScriptableObject
              "툴이 자동으로 재정렬함.")]
     public List<CallEntry> calls = new List<CallEntry>();
 
+    [Tooltip("0보다 크면 이 차트는 '연습 루프 한 사이클'이다 — PracticeLoopExtender가 calls 전체를 " +
+             "이 박자 길이만큼씩 뒤로 밀어서 계속 이어붙여 무한 반복시킨다. 실제 음악 파일의 길이(초) " +
+             "== loopLengthBeats * BeatInterval이어야 AudioSource.loop가 노트 반복과 어긋나지 않는다. " +
+             "0(기본값)이면 일반 차트 — 아무 영향 없음.")]
+    public float loopLengthBeats = 0f;
+
     [Tooltip("1-5(리믹스)처럼 곡 하나 안에서 여러 미니게임 스타일을 오갈 때, 어느 구간이 어느 " +
              "스타일인지 표시하는 목록. 비어있으면(기본값) '파일 전체가 하나의 스타일'이라는 " +
              "뜻이라 1-1/1-2/1-4처럼 phase 개념이 필요 없는 기존 채보는 전혀 영향 없음. 같은 " +
@@ -118,4 +124,14 @@ public class CallEntry
 
     /// Hold only. The judged release beat (window = releaseBeat ± hitWindow). Must be > cueBeat.
     public float releaseBeat;
+
+    /// Runtime-only (never authored, never serialized — deliberately [NonSerialized] so it never
+    /// clutters the Call Map Editor's Inspector for real chart entries). Set true only by
+    /// PracticeLoopExtender's synthesized demo cycle (rep 0): marks an entry as shown-but-not-
+    /// judged the same way CallRole.Call already does, WITHOUT changing its role — so a Response
+    /// entry demoed this way still drives CallDirector.OnPhaseChanged(true) (the clown/boss
+    /// visiting the response character) while still not reading input or firing OnCallCue (which
+    /// would desync minigames that count Call cues to know whose turn it is — see
+    /// Stage1WaveRideVisuals). See CallDirector.BuildLiveCall/SpawnDueCalls.
+    [System.NonSerialized] public bool forceDemo;
 }
