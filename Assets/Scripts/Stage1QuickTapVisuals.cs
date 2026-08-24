@@ -87,8 +87,11 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
     [SerializeField] GameObject questionMark;
 
     [Header("떠다니는 컵 풀 — 콜이 겹칠 수 있어서 컵도 동시에 여러 개 날아올 수 있음")]
-    [Tooltip("동시에 날아다닐 수 있는 컵 최대 개수. 겹치는 콜이 이보다 많으면 슬롯을 재사용함.")]
-    [SerializeField] Image[] cupPool = new Image[6];
+    [Tooltip("동시에 날아다닐 수 있는 컵 최대 개수. 겹치는 콜이 이보다 많으면 슬롯을 재사용함(실제 " +
+             "동시 최대치보다 여유 있게 잡아둘 것 — FindFreeCupSlot이 꽉 찼을 때 slot 0을 강제로 " +
+             "재활용하는데, 그 순간 slot 0을 쓰던 다른 그룹의 컵이 비행 중 다른 목적지로 튕기는 " +
+             "버그가 실제로 있었음).")]
+    [SerializeField] Image[] cupPool = new Image[8];
     [Tooltip("평소(대기) 상태 스프라이트")]
     [SerializeField] Sprite cupIdleSprite;
     [Tooltip("옆으로 튈 때(비행 중) 스프라이트")]

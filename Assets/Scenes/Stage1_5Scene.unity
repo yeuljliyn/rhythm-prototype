@@ -2652,8 +2652,18 @@ MonoBehaviour:
   - {fileID: 1195389086}
   - {fileID: 107988913}
   - {fileID: 2382952}
-  antIdleSprite: {fileID: 4629439963947442937, guid: da36b30eba960ce4fb03e6d232c7f9ca, type: 3}
-  antPassSprite: {fileID: -4806309049629411899, guid: da36b30eba960ce4fb03e6d232c7f9ca, type: 3}
+  antIdleSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  antPassSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   playerAntImage: {fileID: 1911824830}
   playerAntIdleSprite: {fileID: -5108938560043293378, guid: 14c6afb3df8efa64f807b664622d74a4, type: 3}
   playerAntPassSprite: {fileID: 305466028049666763, guid: 14c6afb3df8efa64f807b664622d74a4, type: 3}
@@ -2670,6 +2680,8 @@ MonoBehaviour:
   - {fileID: 1593586679}
   - {fileID: 1347493479}
   - {fileID: 28287857}
+  - {fileID: 1923502664}
+  - {fileID: 1576176918}
   cupIdleSprite: {fileID: -9172921835963719910, guid: 0f8d8bfcfbfdf6a4bad05d1b3848a599, type: 3}
   cupThrownSprite: {fileID: -4829362353171116884, guid: 0f8d8bfcfbfdf6a4bad05d1b3848a599, type: 3}
   cupSuccessSprite: {fileID: 4914466492803797733, guid: 18661cfdb603d7c40858ec323a933615, type: 3}
@@ -5320,8 +5332,16 @@ MonoBehaviour:
   - {fileID: 447548855}
   - {fileID: 423605501}
   - {fileID: 1683969020}
-  callAntIdleSprite: {fileID: -8726197632694386588, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
-  callAntRaisedSprite: {fileID: -7834580098799559431, guid: 4fe1989b575afad46a11bef426b0f41f, type: 3}
+  callAntIdleSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  callAntRaisedSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   responseAntIdleSprite: {fileID: -3009115056872166845, guid: cd7c122a128c874429e1d326c3badb83, type: 3}
   responseAntRaisedSprite: {fileID: 3724725486868500343, guid: cd7c122a128c874429e1d326c3badb83, type: 3}
   clownRect: {fileID: 541968577}
@@ -5334,7 +5354,11 @@ MonoBehaviour:
   clownNormalSprite: {fileID: -7010641452084873675, guid: 8c647a2fdd72b8046b380ec224cf447d, type: 3}
   clownFallSprite: {fileID: -4525839075153415978, guid: 8c647a2fdd72b8046b380ec224cf447d, type: 3}
   missPoseDuration: 0.4
-  antFailSprite: {fileID: -5681938358222106337, guid: 6983cb9491c8a4a41897ab1d8bf4d49b, type: 3}
+  callAntFailSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   ant5FailSprite: {fileID: 5498171288194459904, guid: 0e8edc0d0a52f48448043ac614aca4d2, type: 3}
   antPulseDuration: 0.25
   clock: {fileID: 168644088}
@@ -5544,6 +5568,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1551618724}
   m_CullTransparentMesh: 1
+--- !u!1 &1576176917
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1576176920}
+  - component: {fileID: 1576176919}
+  - component: {fileID: 1576176918}
+  m_Layer: 0
+  m_Name: Cup (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1576176918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576176917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -9172921835963719910, guid: 0f8d8bfcfbfdf6a4bad05d1b3848a599, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1576176919
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576176917}
+  m_CullTransparentMesh: 1
+--- !u!224 &1576176920
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576176917}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.7424, y: 1.7424, z: 1.7424}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1697676517}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -805, y: 285}
+  m_SizeDelta: {x: 82, y: 90}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1593586678
 GameObject:
   m_ObjectHideFlags: 0
@@ -5956,6 +6055,8 @@ RectTransform:
   - {fileID: 285802660}
   - {fileID: 1982919209}
   - {fileID: 28287859}
+  - {fileID: 1923502666}
+  - {fileID: 1576176920}
   - {fileID: 1347493481}
   - {fileID: 1593586681}
   - {fileID: 1384314551}
@@ -6435,6 +6536,81 @@ RectTransform:
   m_AnchoredPosition: {x: 0.000009889361, y: -15}
   m_SizeDelta: {x: 64, y: 130}
   m_Pivot: {x: 0.5, y: 0}
+--- !u!1 &1923502663
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1923502666}
+  - component: {fileID: 1923502665}
+  - component: {fileID: 1923502664}
+  m_Layer: 0
+  m_Name: Cup (6)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1923502664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1923502663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -9172921835963719910, guid: 0f8d8bfcfbfdf6a4bad05d1b3848a599, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1923502665
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1923502663}
+  m_CullTransparentMesh: 1
+--- !u!224 &1923502666
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1923502663}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.7424, y: 1.7424, z: 1.7424}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1697676517}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -805, y: 285}
+  m_SizeDelta: {x: 82, y: 90}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1954524342
 GameObject:
   m_ObjectHideFlags: 0
