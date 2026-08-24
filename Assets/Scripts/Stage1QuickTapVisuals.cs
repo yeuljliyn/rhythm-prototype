@@ -66,8 +66,10 @@ public class Stage1QuickTapVisuals : MonoBehaviour
 
     [Header("Normal ants — cup passes hand to hand in Call order (exactly 5 Call notes/group)")]
     [SerializeField] Image[] normalAntImages = new Image[5];
-    [SerializeField] Sprite antIdleSprite;
-    [SerializeField] Sprite antPassSprite;
+    [Tooltip("일반 개미 5마리가 각자 다른 리소스를 쓰기 위한 개별 idle/pass 스프라이트 — 인덱스 0~4가 " +
+             "normalAntImages[0..4]와 1:1 대응.")]
+    [SerializeField] Sprite[] antIdleSprites = new Sprite[5];
+    [SerializeField] Sprite[] antPassSprites = new Sprite[5];
 
     [Header("Player ant — Response note")]
     [SerializeField] Image playerAntImage;
@@ -215,8 +217,8 @@ public class Stage1QuickTapVisuals : MonoBehaviour
                 if (icon != null) icon.gameObject.SetActive(false);
 
         if (normalAntImages != null)
-            foreach (var img in normalAntImages)
-                if (img != null) img.sprite = antIdleSprite;
+            for (int i = 0; i < normalAntImages.Length; i++)
+                if (normalAntImages[i] != null) normalAntImages[i].sprite = antIdleSprites[i];
 
         if (playerAntImage != null) playerAntImage.sprite = playerAntIdleSprite;
         if (clownImage != null) clownImage.sprite = clownNormalSprite;
@@ -355,9 +357,9 @@ public class Stage1QuickTapVisuals : MonoBehaviour
     // param there) since the clown still uses the plain sprite-only pulse.
     IEnumerator AntPulseRoutine(int index, Image img, float duration, Action onComplete)
     {
-        img.sprite = antPassSprite;
+        img.sprite = antPassSprites[index];
         yield return ScalePulseRoutine(img.rectTransform, _antBaseScale[index], antPassScaleY, duration, null);
-        img.sprite = antIdleSprite;
+        img.sprite = antIdleSprites[index];
         onComplete?.Invoke();
     }
 
