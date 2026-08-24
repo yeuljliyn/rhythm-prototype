@@ -424,9 +424,9 @@ MonoBehaviour:
   handPourSprite: {fileID: -4793205535858711587, guid: 6767a210b9d53764a87dae196f9bcf9d, type: 3}
   handPourHoldTime: 0.35
   playerAntImage: {fileID: 1434951816}
-  playerAntIdleSprite: {fileID: 8089625523488579851, guid: 306758fb0d5d04e49a036d096b9786d4, type: 3}
-  playerAntPourSprite: {fileID: 7173194312469301564, guid: 306758fb0d5d04e49a036d096b9786d4, type: 3}
-  playerAntFailSprite: {fileID: 1825269344655549066, guid: 306758fb0d5d04e49a036d096b9786d4, type: 3}
+  playerAntIdleSprite: {fileID: -1680408715981427188, guid: 9b66c117d7f1e7d42b5f205438a2761f, type: 3}
+  playerAntPourSprite: {fileID: -1652785189501156754, guid: 9b66c117d7f1e7d42b5f205438a2761f, type: 3}
+  playerAntFailSprite: {fileID: 868209002786973695, guid: 9b66c117d7f1e7d42b5f205438a2761f, type: 3}
   playerReactHoldTime: 0.35
   clock: {fileID: 1507358176}
   playerBopScaleMultiplier: 1.08
@@ -780,7 +780,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 7173194312469301564, guid: 306758fb0d5d04e49a036d096b9786d4, type: 3}
+  m_Sprite: {fileID: -1652785189501156754, guid: 9b66c117d7f1e7d42b5f205438a2761f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
