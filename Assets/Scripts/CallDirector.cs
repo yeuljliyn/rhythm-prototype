@@ -96,6 +96,13 @@ public class CallDirector : MonoBehaviour
     /// flag when OnGroupJudged fires for the same groupId right after.
     public System.Action<int> OnHoldEarlyRelease;
 
+    /// Fires for a group that's being torn down mid-flight without ever having a Response note to
+    /// judge — see ForceResolvePending. Carries just the groupId, no JudgementType: unlike
+    /// OnGroupJudged this was never a real Hit or Miss, so minigame visuals should react by silently
+    /// hiding/resetting whatever they've got for this group (no success/fail animation), not by
+    /// treating it as a verdict.
+    public System.Action<int> OnGroupAbandoned;
+
     class LiveCall
     {
         public CallEntry data;
@@ -146,6 +153,58 @@ public class CallDirector : MonoBehaviour
         if (pattern == null && clock != null) pattern = clock.Pattern;
         _calls = pattern != null ? new List<CallEntry>(pattern.calls) : new List<CallEntry>();
         _calls.Sort((a, b) => a.cueBeat.CompareTo(b.cueBeat));
+    }
+
+    /// Force-resolves every still-live (spawned, not yet resolved), non-demo entry as a Hit, then
+    /// drops it from `_live`. For a practice segment about to be torn down (Stage1PracticeGate,
+    /// once requiredHits lands or skip is pressed): CallDirector's calls are explicitly allowed to
+    /// overlap (see class doc), so it's entirely normal for a NEXT relay/cycle to already be
+    /// mid-flight (some of its Call-role notes already spawned, cup already hopping) at the exact
+    /// moment the player's Nth Hit satisfies practice completion — that in-flight cycle's own
+    /// Response note is still in the future and would otherwise never get to fire OnGroupJudged
+    /// once this CallDirector stops ticking (segment deactivated), stranding any visual glue keyed
+    /// off that event mid-animation (e.g. Stage1QuickTapVisuals' cup, confirmed reported: "A 패턴
+    /// 3번 다 맞췄는데 컵이 하나 더 나와서 B 시작하며 멈춤"). Calling this right before disabling
+    /// the segment lets any such stranded relay finish its journey instead. Practice segments don't
+    /// care about score (GameManager.ResetGame() wipes it before the main chart starts either way),
+    /// so treating every leftover as a Hit is safe and simplest — demo entries are skipped since
+    /// Resolve() doesn't know about isDemo and they're not judged by design.
+    ///
+    /// That first pass alone still leaves one hole: a group whose Call-role/demo notes already
+    /// spawned (so its relay visuals already started reacting to OnCallCueGroup — e.g. the cup
+    /// hopping ant-to-ant in Stage1QuickTapVisuals) but whose own Response note hasn't spawned into
+    /// `_live` yet — it's still ahead of its cueBeat-hitWindow threshold. That group has no live
+    /// non-demo entry for the loop below to Resolve(), so it never got an OnGroupJudged at all, and
+    /// its relay visuals are left permanently stranded wherever they last hopped once this
+    /// CallDirector goes disabled (confirmed reported: 3 hits already landed, yet one more cup
+    /// appeared and froze mid-relay instead of ever reaching the player ant).
+    ///
+    /// First attempt fired a synthetic OnGroupJudged(Hit) for these leftovers so the visual would
+    /// play out its full "success" journey (cup hops on to the player ant, then the clown) — but
+    /// that note was never actually presented to the player as something to respond to, so playing
+    /// its success animation reads as a whole extra, uncontrolled cup appearing right as the next
+    /// segment is already spinning up (confirmed reported: the just-completed cup visibly reversing
+    /// back to the first ant — that pooled Image getting reclaimed by the new segment's first relay
+    /// while the forced "success" flight was still mid-air). A group that got torn down before ever
+    /// having a real judgement isn't a Hit — it's abandoned — so this now fires the dedicated
+    /// OnGroupAbandoned(groupId) instead, carrying no JudgementType, letting bound visuals silently
+    /// hide/reset whatever they claimed for it instead of animating a verdict that never happened.
+    public void ForceResolvePending()
+    {
+        var groupsInFlight = new HashSet<int>();
+        foreach (var lc in _live)
+            if (!lc.resolved) groupsInFlight.Add(lc.data.groupId);
+
+        foreach (var lc in _live)
+        {
+            if (lc.resolved || lc.isDemo) continue;
+            Resolve(lc, JudgementType.Hit); // fires OnGroupJudged itself
+            groupsInFlight.Remove(lc.data.groupId);
+        }
+        _live.RemoveAll(lc => lc.resolved);
+
+        foreach (var groupId in groupsInFlight)
+            OnGroupAbandoned?.Invoke(groupId);
     }
 
     /// Appends more entries to the end of the live spawn list — for a practice loop that keeps
@@ -267,7 +326,20 @@ public class CallDirector : MonoBehaviour
 
             if (lc.isDemo)
             {
-                if (t > lc.deadline) lc.resolved = true; // just cleanup, no judgement
+                if (t > lc.deadline)
+                {
+                    lc.resolved = true;
+
+                    // 데모(role=Response, forceDemo)는 실제로 판정받지 않지만, 데모 자체가 "완벽한
+                    // 성공"을 보여주는 연출이므로 그 성공을 시각적으로 완결할 신호가 필요하다 —
+                    // Resolve()를 거치지 않으므로 점수/GameManager/_judgedEntries/_failedGroups엔
+                    // 전혀 영향 없이 OnGroupJudged(Hit)만 쏴준다. 이게 없으면 이 이벤트로만 마지막
+                    // 동작을 트리거하는 비주얼(예: Stage1QuickTapVisuals의 컵이 플레이어 개미->광대로
+                    // 넘어가는 마지막 두 홉)은 데모 중 절대 완결되지 못하고 마지막 Call 위치에 멈춘다
+                    // — 실제 겪은 버그("1-2 해보십시오 나오기 전 데모에서 컵이 개미4에서 멈춤").
+                    if (lc.data.role == CallRole.Response)
+                        OnGroupJudged?.Invoke(lc.data.groupId, JudgementType.Hit);
+                }
                 continue;
             }
 

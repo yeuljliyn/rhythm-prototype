@@ -144,7 +144,9 @@ public class Stage1PracticeGate : MonoBehaviour
         if (_hits >= requiredHits)
         {
             _segmentLocked = true;
-            StartCoroutine(AdvanceAfterFade(segments[_segmentIndex].directorRoot));
+            var directorRoot = segments[_segmentIndex].directorRoot;
+            StopSegmentSpawning(directorRoot);
+            StartCoroutine(AdvanceAfterFade(directorRoot));
         }
     }
 
@@ -154,7 +156,26 @@ public class Stage1PracticeGate : MonoBehaviour
         _segmentLocked = true;
         speechBubble?.CancelWait(); // in case the intro line's still up waiting for a confirm press
         var current = _segmentIndex < segments.Length ? segments[_segmentIndex].directorRoot : null;
+        StopSegmentSpawning(current);
         StartCoroutine(SkipToMainAfterFade(current));
+    }
+
+    // Called the instant a segment is decided to be done (enough hits landed, or skipped) —
+    // BEFORE the ~audioFadeSeconds-long fade coroutine runs. Immediately stops the segment's
+    // CallDirector from spawning any further calls (no brand-new relay can start after this point)
+    // and force-finishes whatever relay/cycle is already mid-flight (see
+    // CallDirector.ForceResolvePending) so nothing is left stranded once the segment deactivates.
+    void StopSegmentSpawning(GameObject directorRoot)
+    {
+        if (directorRoot == null) return;
+        var cd = directorRoot.GetComponent<CallDirector>();
+        if (cd != null)
+        {
+            cd.ForceResolvePending();
+            cd.enabled = false;
+        }
+        var extender = directorRoot.GetComponent<PracticeLoopExtender>();
+        if (extender != null) extender.enabled = false;
     }
 
     IEnumerator AdvanceAfterFade(GameObject segmentRoot)
@@ -171,8 +192,7 @@ public class Stage1PracticeGate : MonoBehaviour
         }
         else
         {
-            if (!string.IsNullOrEmpty(mainTransitionCaption) && speechBubble != null)
-                speechBubble.ShowFor(mainTransitionCaption, captionHoldSeconds);
+            yield return ShowMainTransitionCaption();
             SwitchToMain();
         }
     }
@@ -184,9 +204,21 @@ public class Stage1PracticeGate : MonoBehaviour
         if (segmentRoot != null) segmentRoot.SetActive(false);
         UnsubscribeCurrentExtender();
 
-        if (!string.IsNullOrEmpty(mainTransitionCaption) && speechBubble != null)
-            speechBubble.ShowFor(mainTransitionCaption, captionHoldSeconds);
+        yield return ShowMainTransitionCaption();
         SwitchToMain();
+    }
+
+    // Shows mainTransitionCaption and actually waits for the player to read it before returning —
+    // SwitchToMain() unconditionally calls speechBubble.Hide(), so calling it right after ShowFor()
+    // in the same frame (the old code) hid the caption the instant it appeared, making it invisible
+    // in practice (confirmed reported: "이제 진짜입니다" line never showing before the main game
+    // cuts in). Waiting the same captionHoldSeconds the bubble itself uses to auto-hide means
+    // SwitchToMain()'s Hide() call lands right as it would've disappeared anyway, not before.
+    IEnumerator ShowMainTransitionCaption()
+    {
+        if (string.IsNullOrEmpty(mainTransitionCaption) || speechBubble == null) yield break;
+        speechBubble.ShowFor(mainTransitionCaption, captionHoldSeconds);
+        yield return new WaitForSeconds(captionHoldSeconds);
     }
 
     IEnumerator FadeOutSegmentAudio(GameObject segmentRoot)

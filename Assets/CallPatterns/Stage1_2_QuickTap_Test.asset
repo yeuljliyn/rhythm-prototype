@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stage1_2_QuickTap_Test
   m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
   chartName: Stage1-2 Quick Tap Test
-  music: {fileID: 8300000, guid: bd346c83b7551204081ab0fd2ce9e728, type: 3}
+  music: {fileID: 8300000, guid: f583f7666023c5543a4662765aa2afbd, type: 3}
   bpm: 122
   introDelay: 2
   hitWindow: 0.12
@@ -681,4 +681,5 @@ MonoBehaviour:
     groupId: 22
     cueBeat: 36
     releaseBeat: 0
+  loopLengthBeats: 0
   phases: []

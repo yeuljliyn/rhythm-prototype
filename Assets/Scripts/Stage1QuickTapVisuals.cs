@@ -145,6 +145,17 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
     // Per-group state, keyed by the real groupId (not a shared running counter — see class doc).
     readonly Dictionary<int, int> _groupCallCounts = new Dictionary<int, int>(); // groupId -> calls seen so far
     readonly Dictionary<int, int> _groupCupSlot     = new Dictionary<int, int>(); // groupId -> pool slot claimed
+    // groupIds already judged (HandleGroupJudged) or abandoned (HandleGroupAbandoned) — CallDirector
+    // fires a group's judgement off the Response note alone, but that group's own Call-role relay
+    // notes are separate, independently-scheduled LiveCalls that keep spawning on their own timeline
+    // regardless (see CallDirector.SpawnDueCalls). A mistimed/early press (near-miss, see
+    // CallDirector.HandleInput) can resolve a group as Miss before all its ants have even finished
+    // relaying — and once judged, any Call-role cue that still arrives late for that same group must
+    // NOT touch the cup again, or HandleCallCueGroup below would yank it back from wherever it ended
+    // up (mid-flight to the pile, or already gone) onto whichever ant's cue just fired, stranding it
+    // there forever since no further judgement is ever coming (confirmed reported: mashing into an
+    // early Miss left the cup parked on the 5th ant).
+    readonly HashSet<int> _finishedGroups = new HashSet<int>();
     Coroutine _questionMarkCr;
 
     // "Busy" handles — non-null while that part's animation is still playing. A new trigger while
@@ -192,8 +203,9 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
     void Bind(CallDirector d)
     {
         if (d == null) return;
-        d.OnCallCueGroup  += HandleCallCueGroup;
-        d.OnGroupJudged   += HandleGroupJudged;
+        d.OnCallCueGroup   += HandleCallCueGroup;
+        d.OnGroupJudged    += HandleGroupJudged;
+        d.OnGroupAbandoned += HandleGroupAbandoned;
         // Fires on every physical press regardless of whether it landed on a live/judged note
         // (see CallDirector.OnResponsePress) — used here purely so PlayerAnt visually reacts to
         // every input attempt, including ones during the Call phase before its own Response note
@@ -205,19 +217,68 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
     void Unbind(CallDirector d)
     {
         if (d == null) return;
-        d.OnCallCueGroup  -= HandleCallCueGroup;
-        d.OnGroupJudged   -= HandleGroupJudged;
-        d.OnResponsePress -= HandlePlayerResponsePress;
+        d.OnCallCueGroup   -= HandleCallCueGroup;
+        d.OnGroupJudged    -= HandleGroupJudged;
+        d.OnGroupAbandoned -= HandleGroupAbandoned;
+        d.OnResponsePress  -= HandlePlayerResponsePress;
     }
 
     /// Switches which CallDirector drives these visuals — see Stage1WaveRideVisuals.BindDirector
     /// (same rebind pattern). Used by Stage1PracticeGate to hand this stage's Visuals script off
     /// from a practice segment's Director to another segment's, or to the main Director.
+    ///
+    /// Each practice segment's CallPatternData authors its own groupId numbering starting fresh
+    /// from 0 (the Call Map Editor's group counter is scoped to that one asset) — but
+    /// _groupCallCounts/_groupCupSlot live on this single shared Visuals instance across every
+    /// segment it gets rebound to, and normal (non-abandoned) group completion never removes its
+    /// entries from either dictionary. So once segment A finishes its own group 0, 1, 2..., those
+    /// entries just sit there — and the next segment's own group 0 collides with segment A's old
+    /// group 0: isFirstCallOfGroup reads A's stale non-zero count instead of a real "first call",
+    /// so it skips claiming a fresh pool slot and instead reuses A's stale (and likely wrong-
+    /// position) _groupCupSlot entry. Confirmed reported: B's cup visibly hopping from A's last
+    /// resting spot (ant 2) over to ant 1 as B starts instead of popping in fresh there, and a real
+    /// Miss in B leaving its cup stranded on ant 5 because the Miss's BounceCupChainSlot ends up
+    /// acting on A's stale slot reference rather than the cup actually sitting on ant 5. Wiping both
+    /// dictionaries (and hard-resetting the whole cup pool) on every rebind keeps each segment's
+    /// group numbering isolated, exactly like _judgedEntries/_failedGroups already reset per
+    /// CallDirector (see CallDirector.ReplaceCalls).
     public void BindDirector(CallDirector newDirector)
     {
         Unbind(callDirector);
         callDirector = newDirector;
+        ResetGroupState();
         Bind(callDirector);
+    }
+
+    // Clears all per-group cup-relay bookkeeping and forces every pooled cup back to idle/hidden —
+    // see BindDirector's doc comment for why this must happen on every segment switch, not just once
+    // at startup (Start() below does the same pool reset for the very first bind).
+    //
+    // Also wipes the failed-cup pile (_successStackCount + cupStackBaseImage/cupStackTopImages) for
+    // the same reason: it's a running tally of Misses within the CURRENT segment/round, not a
+    // lifetime score, so it must not carry over — most visibly, misses racked up during practice
+    // (A/B) must not still be sitting there once the player reaches the real song (confirmed
+    // reported: "본편 가서는 튜토 때 틀린 컵 스택 초기화 해줘야지").
+    void ResetGroupState()
+    {
+        _groupCallCounts.Clear();
+        _groupCupSlot.Clear();
+        _finishedGroups.Clear();
+
+        _successStackCount = 0;
+        if (cupStackBaseImage != null) cupStackBaseImage.gameObject.SetActive(false);
+        if (cupStackTopImages != null)
+            foreach (var icon in cupStackTopImages)
+                if (icon != null) icon.gameObject.SetActive(false);
+
+        if (cupPool == null) return;
+        for (int i = 0; i < cupPool.Length; i++)
+        {
+            if (_cupCrs[i] != null) { StopCoroutine(_cupCrs[i]); _cupCrs[i] = null; }
+            if (cupPool[i] == null) continue;
+            cupPool[i].sprite = cupIdleSprite;
+            cupPool[i].gameObject.SetActive(false);
+        }
     }
 
     void Start()
@@ -246,6 +307,12 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
 
     void HandleCallCueGroup(int groupId)
     {
+        // This group's Response was already judged (or the whole thing got abandoned) before all of
+        // its own Call-role ants finished relaying — a late-arriving cue for it must not touch the
+        // cup at all, or it gets yanked from wherever it ended up onto whichever ant just cued (see
+        // _finishedGroups' doc comment). The ant itself doesn't get its pulse either: the round for
+        // this group is already over, so nothing about it should still visibly react.
+        if (_finishedGroups.Contains(groupId)) return;
         if (normalAntImages == null || normalAntImages.Length == 0) return;
 
         _groupCallCounts.TryGetValue(groupId, out int countSoFar);
@@ -301,6 +368,11 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
 
     void HandleGroupJudged(int groupId, JudgementType j)
     {
+        // Marks this group closed for any later, still-unspawned Call-role cue of its own — see
+        // _finishedGroups' doc comment. Must happen before anything below so a same-frame re-entrant
+        // call cue (shouldn't happen, but cheap insurance) can never slip through.
+        _finishedGroups.Add(groupId);
+
         bool isHit = j == JudgementType.Hit;
 
         if (playerAntImage != null && _playerCr == null)
@@ -341,6 +413,30 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
             RevealNextStackCup();
             ShowQuestionMark();
         }
+    }
+
+    // A group that got torn down (practice segment locking in early — see CallDirector.
+    // ForceResolvePending) before its Response note ever spawned, so it was never actually judged.
+    // Its cup already claimed a pool slot and hopped partway across the ants off HandleCallCueGroup
+    // above, but there's no verdict to animate here — just silently drop whatever that slot was mid-
+    // way through instead of playing a Hit/Miss journey for a note the player was never even asked
+    // to respond to (that's what the old OnGroupJudged(Hit)-based version did, and it looked like a
+    // just-completed cup reversing back to the first ant once the next segment's own first relay
+    // reclaimed the same pooled Image mid-flight).
+    void HandleGroupAbandoned(int groupId)
+    {
+        _finishedGroups.Add(groupId); // same reasoning as HandleGroupJudged — see _finishedGroups' doc comment
+
+        if (_groupCupSlot.TryGetValue(groupId, out int slot) &&
+            cupPool != null && slot >= 0 && slot < cupPool.Length && cupPool[slot] != null)
+        {
+            if (_cupCrs[slot] != null) { StopCoroutine(_cupCrs[slot]); _cupCrs[slot] = null; }
+            cupPool[slot].sprite = cupIdleSprite;
+            cupPool[slot].gameObject.SetActive(false);
+        }
+
+        _groupCupSlot.Remove(groupId);
+        _groupCallCounts.Remove(groupId);
     }
 
     // Fired from BounceCupChainRoutine the instant the cup's second hop actually lands at the
