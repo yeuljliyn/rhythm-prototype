@@ -262,6 +262,36 @@ public class CallDirector : MonoBehaviour
             if (t < cueTime - pattern.hitWindow) break;
 
             var lc = BuildLiveCall(entry);
+
+            // A stall between this segment activating and this Update() actually running (a frame
+            // hitch, or CallClock's introDelay buffer getting eaten by activation cost — see
+            // CallClock.Start()) can mean SongTime has already raced past this entry's ENTIRE
+            // judged window by the moment the while loop above finally reaches it — every note the
+            // stall skipped over gets spawned in one instantaneous burst. Left alone, a real
+            // (non-demo) Response entry spawned already-dead like this would sail straight into
+            // ResolveTimeouts (which runs right after this method, same Update() call) and get
+            // timeout-failed before the player ever had one real frame to see or respond to it —
+            // confirmed reported: intermittent instant-fail right at tutorial start, still inside
+            // what's supposed to be the judgement-free preview.
+            //
+            // First attempt dropped it from `_live` entirely (never spawned at all) — but that also
+            // silently skipped its OnPhaseChanged/OnCallCue below, so the visuals stopped matching
+            // the chart mid-burst (confirmed reported: "미리보기 때도 데이터대로 움직이긴 해야 해,
+            // 판정만 안 하면 되는 것" — the clown no longer reaching ant5 during preview at all).
+            // Forcing this one LiveCall instance's own isDemo flag to true instead keeps it flowing
+            // through the exact same spawn path as a real demo entry below (so every visual event —
+            // OnPhaseChanged, OnCallCue, indicator — still fires exactly as authored), while
+            // ResolveTimeouts's isDemo branch cleans it up as a harmless no-score Hit instead of a
+            // real timeout-Miss. Only this LiveCall's flag changes — the underlying CallEntry
+            // (role/forceDemo) is untouched, so it still reads as a genuine judged entry everywhere
+            // else; _judgedEntries marks it spent so a later stray press can't near-miss-claim it via
+            // FindNearMissEntry (which recomputes isDemo from the CallEntry itself, not this LiveCall).
+            if (!lc.isDemo && t > lc.deadline)
+            {
+                lc.isDemo = true;
+                _judgedEntries.Add(entry);
+            }
+
             _live.Add(lc);
 
             // Driven by the entry's own authored role, not by isDemo — a Response entry that's

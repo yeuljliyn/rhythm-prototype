@@ -62,6 +62,13 @@ public class Stage1WaveRideVisuals : MonoBehaviour, IPracticeRebindable
 
     [SerializeField] float antPulseDuration = 0.25f;
 
+    [Header("Ant1..Ant5 차례 사운드 — 각 개미가 콜(또는 응답 구간 진입)될 때 순서대로 재생. " +
+            "인덱스 0~4가 Ant1~Ant5(1-1_가~마.mp3)와 1:1 대응. 플레이어 입력이 아니라 차트 자체의 " +
+            "박자(OnCallCue/OnPhaseChanged)로 트리거되므로 데모든 실제든, 몰아서 캐치업되는 경우든 " +
+            "상관없이 항상 실제로 그 개미 차례가 된 순간에만 울림.")]
+    [SerializeField] AudioSource antTurnSfxSource;
+    [SerializeField] AudioClip[] antTurnSfx = new AudioClip[5];
+
     [Header("Ants — Scale-Y \"둠칫둠칫\" bop continuously in time with the song's BPM (reads bpm " +
             "live off clock.Pattern each frame, not a fixed number, so swapping in a different " +
             "song/chart just works without touching this script)")]
@@ -222,6 +229,7 @@ public class Stage1WaveRideVisuals : MonoBehaviour, IPracticeRebindable
         PulseAnt(antIndex);
         _targetAntIndex = antIndex; // same event that pulses the ant also retargets the clown
         PulseSea();
+        PlayAntTurnSfx(antIndex);
 
         if (_returnToStartCr != null) { StopCoroutine(_returnToStartCr); _returnToStartCr = null; }
     }
@@ -231,9 +239,17 @@ public class Stage1WaveRideVisuals : MonoBehaviour, IPracticeRebindable
         if (!isResponsePhase) return;
 
         _targetAntIndex = 4;
+        PlayAntTurnSfx(4);
 
         if (_returnToStartCr != null) StopCoroutine(_returnToStartCr);
         _returnToStartCr = StartCoroutine(ReturnToStartAfterDelay());
+    }
+
+    void PlayAntTurnSfx(int index)
+    {
+        if (antTurnSfxSource == null || antTurnSfx == null) return;
+        if (index < 0 || index >= antTurnSfx.Length || antTurnSfx[index] == null) return;
+        antTurnSfxSource.PlayOneShot(antTurnSfx[index]);
     }
 
     // Cosmetic head-start for the ant5->ant1 wrap — see returnToStartDelay's tooltip.

@@ -125,6 +125,14 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
     [SerializeField] Image cupStackBaseImage;
     [SerializeField] Image[] cupStackTopImages = new Image[6];
 
+    [Header("사운드 (Assets/Sound/1-2_*) — 차트 자체 박자(OnCallCueGroup)로 트리거, 플레이어 입력이 " +
+            "아니라 '그 캐릭터 차례가 실제로 된 순간'에만 재생 — Stage1WaveRideVisuals 1-1 사운드와 " +
+            "동일한 철학. NormalAnt1(첫 번째 개미) 차례일 때만 재생하고 나머지 개미(2~5)와 " +
+            "PlayerAnt는 효과음 없음(확인 요청).")]
+    [SerializeField] AudioSource sfxSource;
+    [Tooltip("NormalAnt1 차례일 때만 재생(1-2_개미효과음.wav) — antIndex==0 한정, 2~5번 개미는 무음.")]
+    [SerializeField] AudioClip normalAntTurnSfx;
+
     [Header("Tuning")]
     [Tooltip("개미/플레이어/광대가 pass·drink·fail 스프라이트로 바뀐 채 유지되는 시간")]
     [SerializeField] float spritePulseTime  = 0.18f;
@@ -320,6 +328,8 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
         bool isFirstCallOfGroup = countSoFar == 0;
         _groupCallCounts[groupId] = countSoFar + 1;
 
+        if (antIndex == 0) PlaySfx(normalAntTurnSfx); // NormalAnt1 only — see normalAntTurnSfx's tooltip
+
         var img = normalAntImages[antIndex];
         if (img != null && _antCrs[antIndex] == null)
         {
@@ -350,6 +360,12 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
 
         if (_groupCupSlot.TryGetValue(groupId, out int cupSlot))
             BounceCupToSlot(cupSlot, img.rectTransform, cupThrownSprite);
+    }
+
+    void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource == null || clip == null) return;
+        sfxSource.PlayOneShot(clip);
     }
 
     // Fires on every physical press, independent of whether CallDirector actually judged it — see

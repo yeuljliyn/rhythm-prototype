@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
   chartName: Stage1-2 Quick Tap Test
   music: {fileID: 8300000, guid: f583f7666023c5543a4662765aa2afbd, type: 3}
-  bpm: 122
+  bpm: 131
   introDelay: 2
   hitWindow: 0.12
   missWindow: 0.38
@@ -38,6 +38,11 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
+    groupId: 1
+    cueBeat: 12
+    releaseBeat: 0
+  - type: 0
+    role: 1
     groupId: 3
     cueBeat: 12
     releaseBeat: 0
@@ -48,22 +53,7 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 1
-    cueBeat: 12
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 1
-    cueBeat: 13
-    releaseBeat: 0
-  - type: 0
-    role: 1
     groupId: 2
-    cueBeat: 13
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 3
     cueBeat: 13
     releaseBeat: 0
   - type: 0
@@ -73,12 +63,17 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 2
-    cueBeat: 14
+    groupId: 3
+    cueBeat: 13
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 4
+    groupId: 1
+    cueBeat: 13
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
     cueBeat: 14
     releaseBeat: 0
   - type: 0
@@ -88,7 +83,7 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 1
+    groupId: 4
     cueBeat: 14
     releaseBeat: 0
   - type: 0
@@ -98,13 +93,8 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 6
-    cueBeat: 15
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 5
-    cueBeat: 15
+    groupId: 2
+    cueBeat: 14
     releaseBeat: 0
   - type: 0
     role: 0
@@ -113,6 +103,11 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
+    groupId: 5
+    cueBeat: 15
+    releaseBeat: 0
+  - type: 0
+    role: 1
     groupId: 4
     cueBeat: 15
     releaseBeat: 0
@@ -123,8 +118,18 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
+    groupId: 6
+    cueBeat: 15
+    releaseBeat: 0
+  - type: 0
+    role: 1
     groupId: 3
     cueBeat: 15
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 16
     releaseBeat: 0
   - type: 0
     role: 1
@@ -134,6 +139,11 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 6
+    cueBeat: 16
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
     cueBeat: 16
     releaseBeat: 0
   - type: 0
@@ -148,13 +158,13 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 4
-    cueBeat: 16
+    groupId: 5
+    cueBeat: 17
     releaseBeat: 0
   - type: 0
-    role: 1
-    groupId: 5
-    cueBeat: 16
+    role: 0
+    groupId: 3
+    cueBeat: 17
     releaseBeat: 0
   - type: 0
     role: 1
@@ -164,11 +174,6 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 17
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 3
     cueBeat: 17
     releaseBeat: 0
   - type: 0
@@ -179,11 +184,6 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 17
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 5
     cueBeat: 17
     releaseBeat: 0
   - type: 0
@@ -202,13 +202,13 @@ MonoBehaviour:
     cueBeat: 18
     releaseBeat: 0
   - type: 0
-    role: 0
-    groupId: 4
+    role: 1
+    groupId: 8
     cueBeat: 18
     releaseBeat: 0
   - type: 0
-    role: 1
-    groupId: 8
+    role: 0
+    groupId: 4
     cueBeat: 18
     releaseBeat: 0
   - type: 0
@@ -217,8 +217,8 @@ MonoBehaviour:
     cueBeat: 18
     releaseBeat: 0
   - type: 0
-    role: 1
-    groupId: 9
+    role: 0
+    groupId: 5
     cueBeat: 19
     releaseBeat: 0
   - type: 0
@@ -232,8 +232,8 @@ MonoBehaviour:
     cueBeat: 19
     releaseBeat: 0
   - type: 0
-    role: 0
-    groupId: 5
+    role: 1
+    groupId: 8
     cueBeat: 19
     releaseBeat: 0
   - type: 0
@@ -243,22 +243,12 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 8
+    groupId: 9
     cueBeat: 19
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 8
-    cueBeat: 20
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 6
-    cueBeat: 20
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 10
+    groupId: 7
     cueBeat: 20
     releaseBeat: 0
   - type: 0
@@ -268,17 +258,27 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
+    groupId: 10
+    cueBeat: 20
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 8
+    cueBeat: 20
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 6
+    cueBeat: 20
+    releaseBeat: 0
+  - type: 0
+    role: 1
     groupId: 9
     cueBeat: 20
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 7
-    cueBeat: 20
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 7
+    groupId: 10
     cueBeat: 21
     releaseBeat: 0
   - type: 0
@@ -288,7 +288,17 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 10
+    groupId: 11
+    cueBeat: 21
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 7
+    cueBeat: 21
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
     cueBeat: 21
     releaseBeat: 0
   - type: 0
@@ -298,17 +308,12 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 11
-    cueBeat: 21
+    groupId: 10
+    cueBeat: 22
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 9
-    cueBeat: 21
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 8
+    groupId: 11
     cueBeat: 22
     releaseBeat: 0
   - type: 0
@@ -323,23 +328,13 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 10
-    cueBeat: 22
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 11
-    cueBeat: 22
-    releaseBeat: 0
-  - type: 0
-    role: 1
     groupId: 9
     cueBeat: 22
     releaseBeat: 0
   - type: 0
-    role: 1
-    groupId: 13
-    cueBeat: 23
+    role: 0
+    groupId: 8
+    cueBeat: 22
     releaseBeat: 0
   - type: 0
     role: 1
@@ -353,7 +348,12 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 10
+    groupId: 13
+    cueBeat: 23
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 11
     cueBeat: 23
     releaseBeat: 0
   - type: 0
@@ -363,13 +363,8 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 11
+    groupId: 10
     cueBeat: 23
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 11
-    cueBeat: 24
     releaseBeat: 0
   - type: 0
     role: 1
@@ -383,12 +378,7 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 13
-    cueBeat: 24
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 14
+    groupId: 11
     cueBeat: 24
     releaseBeat: 0
   - type: 0
@@ -398,23 +388,13 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 14
-    cueBeat: 25
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 15
-    cueBeat: 25
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 11
-    cueBeat: 25
-    releaseBeat: 0
-  - type: 0
-    role: 1
     groupId: 13
-    cueBeat: 25
+    cueBeat: 24
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 24
     releaseBeat: 0
   - type: 0
     role: 1
@@ -429,16 +409,46 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 13
+    cueBeat: 25
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 11
+    cueBeat: 25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 25
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 26
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 12
+    cueBeat: 26
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 13
+    cueBeat: 26
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 16
     cueBeat: 26
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 14
-    cueBeat: 26
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 15
     cueBeat: 26
     releaseBeat: 0
   - type: 0
@@ -447,64 +457,34 @@ MonoBehaviour:
     cueBeat: 26
     releaseBeat: 0
   - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 27
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 17
+    cueBeat: 27
+    releaseBeat: 0
+  - type: 0
     role: 0
-    groupId: 12
-    cueBeat: 26
+    groupId: 13
+    cueBeat: 27
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 27
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 16
-    cueBeat: 26
+    cueBeat: 27
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 18
     cueBeat: 27
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 16
-    cueBeat: 27
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 15
-    cueBeat: 27
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 14
-    cueBeat: 27
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 13
-    cueBeat: 27
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 17
-    cueBeat: 27
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 17
-    cueBeat: 28
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 14
-    cueBeat: 28
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 15
-    cueBeat: 28
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 16
-    cueBeat: 28
     releaseBeat: 0
   - type: 0
     role: 1
@@ -513,22 +493,42 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 18
+    groupId: 17
+    cueBeat: 28
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 16
+    cueBeat: 28
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 14
     cueBeat: 28
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 18
+    cueBeat: 28
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 15
+    cueBeat: 28
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 15
     cueBeat: 29
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 17
+    groupId: 19
     cueBeat: 29
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 16
+    groupId: 18
     cueBeat: 29
     releaseBeat: 0
   - type: 0
@@ -538,32 +538,17 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 19
+    groupId: 16
     cueBeat: 29
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 15
-    cueBeat: 29
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 19
-    cueBeat: 30
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 20
-    cueBeat: 30
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 17
-    cueBeat: 30
+    cueBeat: 29
     releaseBeat: 0
   - type: 0
-    role: 0
-    groupId: 16
+    role: 1
+    groupId: 17
     cueBeat: 30
     releaseBeat: 0
   - type: 0
@@ -572,19 +557,24 @@ MonoBehaviour:
     cueBeat: 30
     releaseBeat: 0
   - type: 0
+    role: 0
+    groupId: 16
+    cueBeat: 30
+    releaseBeat: 0
+  - type: 0
     role: 1
-    groupId: 18
+    groupId: 20
+    cueBeat: 30
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 19
     cueBeat: 30
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 18
-    cueBeat: 31
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 21
-    cueBeat: 31
+    cueBeat: 30
     releaseBeat: 0
   - type: 0
     role: 1
@@ -594,11 +584,6 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 19
-    cueBeat: 31
-    releaseBeat: 0
-  - type: 0
-    role: 0
-    groupId: 17
     cueBeat: 31
     releaseBeat: 0
   - type: 0
@@ -607,13 +592,23 @@ MonoBehaviour:
     cueBeat: 31
     releaseBeat: 0
   - type: 0
-    role: 1
-    groupId: 22
-    cueBeat: 32
+    role: 0
+    groupId: 17
+    cueBeat: 31
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 19
+    groupId: 18
+    cueBeat: 31
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 21
+    cueBeat: 31
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 22
     cueBeat: 32
     releaseBeat: 0
   - type: 0
@@ -623,13 +618,28 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 20
+    groupId: 23
+    cueBeat: 32
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 19
     cueBeat: 32
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 21
     cueBeat: 32
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 20
+    cueBeat: 32
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 20
+    cueBeat: 33
     releaseBeat: 0
   - type: 0
     role: 1
@@ -638,18 +648,38 @@ MonoBehaviour:
     releaseBeat: 0
   - type: 0
     role: 1
-    groupId: 21
-    cueBeat: 33
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 20
+    groupId: 23
     cueBeat: 33
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 19
     cueBeat: 33
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 33
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 21
+    cueBeat: 33
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 34
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 23
+    cueBeat: 34
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 34
     releaseBeat: 0
   - type: 0
     role: 1
@@ -665,6 +695,21 @@ MonoBehaviour:
     role: 0
     groupId: 20
     cueBeat: 34
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 35
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 21
+    cueBeat: 35
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 23
+    cueBeat: 35
     releaseBeat: 0
   - type: 0
     role: 1
@@ -672,14 +717,4319 @@ MonoBehaviour:
     cueBeat: 35
     releaseBeat: 0
   - type: 0
-    role: 0
-    groupId: 21
+    role: 1
+    groupId: 26
+    cueBeat: 35
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
     cueBeat: 35
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 22
     cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 23
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 37
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 24
+    cueBeat: 37
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 37
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 23
+    cueBeat: 37
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 37
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 37
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 25
+    cueBeat: 38
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 38
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 38
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 38
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 38
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 24
+    cueBeat: 38
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 26
+    cueBeat: 39
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 39
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 39
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 25
+    cueBeat: 39
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 39
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 39
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 27
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 26
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 27
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 28
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 41
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 33
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 28
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 29
+    cueBeat: 42
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 34
+    cueBeat: 43
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 33
+    cueBeat: 43
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 43
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 43
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 30
+    cueBeat: 43
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 29
+    cueBeat: 43
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 33
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 31
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 35
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 30
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 34
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 34
+    cueBeat: 45
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 36
+    cueBeat: 45
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 31
+    cueBeat: 45
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 33
+    cueBeat: 45
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 32
+    cueBeat: 45
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 35
+    cueBeat: 45
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 32
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 37
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 33
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 34
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 35
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 36
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 37
+    cueBeat: 47
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 34
+    cueBeat: 47
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 36
+    cueBeat: 47
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 38
+    cueBeat: 47
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 35
+    cueBeat: 47
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 33
+    cueBeat: 47
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 36
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 34
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 37
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 35
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 39
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 38
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 36
+    cueBeat: 49
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 39
+    cueBeat: 49
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 40
+    cueBeat: 49
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 38
+    cueBeat: 49
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 35
+    cueBeat: 49
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 37
+    cueBeat: 49
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 39
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 40
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 37
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 36
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 38
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 41
+    cueBeat: 50
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 37
+    cueBeat: 51
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 38
+    cueBeat: 51
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 39
+    cueBeat: 51
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 42
+    cueBeat: 51
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 40
+    cueBeat: 51
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 41
+    cueBeat: 51
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 38
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 39
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 43
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 41
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 40
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 42
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 42
+    cueBeat: 53
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 41
+    cueBeat: 53
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 43
+    cueBeat: 53
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 39
+    cueBeat: 53
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 40
+    cueBeat: 53
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 44
+    cueBeat: 53
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 40
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 44
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 42
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 45
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 41
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 43
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 41
+    cueBeat: 55
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 45
+    cueBeat: 55
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 46
+    cueBeat: 55
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 44
+    cueBeat: 55
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 43
+    cueBeat: 55
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 42
+    cueBeat: 55
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 44
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 42
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 45
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 46
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 47
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 43
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 48
+    cueBeat: 57
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 46
+    cueBeat: 57
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 43
+    cueBeat: 57
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 47
+    cueBeat: 57
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 45
+    cueBeat: 57
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 44
+    cueBeat: 57
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 48
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 45
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 49
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 47
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 44
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 46
+    cueBeat: 58
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 46
+    cueBeat: 59
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 49
+    cueBeat: 59
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 45
+    cueBeat: 59
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 50
+    cueBeat: 59
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 47
+    cueBeat: 59
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 48
+    cueBeat: 59
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 47
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 49
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 51
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 48
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 46
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 50
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 51
+    cueBeat: 61
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 48
+    cueBeat: 61
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 47
+    cueBeat: 61
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 52
+    cueBeat: 61
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 50
+    cueBeat: 61
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 49
+    cueBeat: 61
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 49
+    cueBeat: 62
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 51
+    cueBeat: 62
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 52
+    cueBeat: 62
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 50
+    cueBeat: 62
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 48
+    cueBeat: 62
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 53
+    cueBeat: 62
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 52
+    cueBeat: 63
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 50
+    cueBeat: 63
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 53
+    cueBeat: 63
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 51
+    cueBeat: 63
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 49
+    cueBeat: 63
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 54
+    cueBeat: 63
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 53
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 50
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 52
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 55
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 54
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 51
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 55
+    cueBeat: 65
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 51
+    cueBeat: 65
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 52
+    cueBeat: 65
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 53
+    cueBeat: 65
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 56
+    cueBeat: 65
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 54
+    cueBeat: 65
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 57
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 52
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 55
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 56
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 54
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 53
+    cueBeat: 66
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 56
+    cueBeat: 67
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 53
+    cueBeat: 67
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 54
+    cueBeat: 67
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 57
+    cueBeat: 67
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 58
+    cueBeat: 67
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 55
+    cueBeat: 67
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 59
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 55
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 56
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 57
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 54
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 58
+    cueBeat: 68
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 56
+    cueBeat: 69
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 59
+    cueBeat: 69
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 58
+    cueBeat: 69
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 60
+    cueBeat: 69
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 57
+    cueBeat: 69
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 55
+    cueBeat: 69
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 59
+    cueBeat: 70
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 57
+    cueBeat: 70
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 56
+    cueBeat: 70
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 60
+    cueBeat: 70
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 61
+    cueBeat: 70
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 58
+    cueBeat: 70
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 61
+    cueBeat: 71
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 59
+    cueBeat: 71
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 60
+    cueBeat: 71
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 58
+    cueBeat: 71
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 57
+    cueBeat: 71
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 62
+    cueBeat: 71
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 60
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 59
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 63
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 58
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 62
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 61
+    cueBeat: 72
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 59
+    cueBeat: 73
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 62
+    cueBeat: 73
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 63
+    cueBeat: 73
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 61
+    cueBeat: 73
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 64
+    cueBeat: 73
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 60
+    cueBeat: 73
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 61
+    cueBeat: 74
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 63
+    cueBeat: 74
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 64
+    cueBeat: 74
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 60
+    cueBeat: 74
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 65
+    cueBeat: 74
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 62
+    cueBeat: 74
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 63
+    cueBeat: 75
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 61
+    cueBeat: 75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 65
+    cueBeat: 75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 64
+    cueBeat: 75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 66
+    cueBeat: 75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 62
+    cueBeat: 75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 66
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 64
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 67
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 62
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 63
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 65
+    cueBeat: 76
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 68
+    cueBeat: 77
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 65
+    cueBeat: 77
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 66
+    cueBeat: 77
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 63
+    cueBeat: 77
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 67
+    cueBeat: 77
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 64
+    cueBeat: 77
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 68
+    cueBeat: 78
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 65
+    cueBeat: 78
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 69
+    cueBeat: 78
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 66
+    cueBeat: 78
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 67
+    cueBeat: 78
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 64
+    cueBeat: 78
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 70
+    cueBeat: 79
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 65
+    cueBeat: 79
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 69
+    cueBeat: 79
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 67
+    cueBeat: 79
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 68
+    cueBeat: 79
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 66
+    cueBeat: 79
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 69
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 71
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 67
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 70
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 66
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 68
+    cueBeat: 80
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 71
+    cueBeat: 81
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 68
+    cueBeat: 81
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 70
+    cueBeat: 81
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 72
+    cueBeat: 81
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 69
+    cueBeat: 81
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 67
+    cueBeat: 81
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 71
+    cueBeat: 82
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 73
+    cueBeat: 82
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 69
+    cueBeat: 82
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 72
+    cueBeat: 82
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 70
+    cueBeat: 82
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 68
+    cueBeat: 82
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 74
+    cueBeat: 83
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 69
+    cueBeat: 83
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 72
+    cueBeat: 83
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 73
+    cueBeat: 83
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 71
+    cueBeat: 83
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 70
+    cueBeat: 83
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 70
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 75
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 73
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 74
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 71
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 72
+    cueBeat: 84
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 74
+    cueBeat: 85
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 73
+    cueBeat: 85
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 72
+    cueBeat: 85
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 75
+    cueBeat: 85
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 76
+    cueBeat: 85
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 71
+    cueBeat: 85
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 76
+    cueBeat: 86
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 75
+    cueBeat: 86
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 77
+    cueBeat: 86
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 74
+    cueBeat: 86
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 73
+    cueBeat: 86
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 72
+    cueBeat: 86
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 74
+    cueBeat: 87
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 78
+    cueBeat: 87
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 73
+    cueBeat: 87
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 76
+    cueBeat: 87
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 77
+    cueBeat: 87
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 75
+    cueBeat: 87
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 79
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 76
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 74
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 78
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 77
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 75
+    cueBeat: 88
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 78
+    cueBeat: 89
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 79
+    cueBeat: 89
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 77
+    cueBeat: 89
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 75
+    cueBeat: 89
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 76
+    cueBeat: 89
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 80
+    cueBeat: 89
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 80
+    cueBeat: 90
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 79
+    cueBeat: 90
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 81
+    cueBeat: 90
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 77
+    cueBeat: 90
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 76
+    cueBeat: 90
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 78
+    cueBeat: 90
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 79
+    cueBeat: 91
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 80
+    cueBeat: 91
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 82
+    cueBeat: 91
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 81
+    cueBeat: 91
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 77
+    cueBeat: 91
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 78
+    cueBeat: 91
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 82
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 79
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 81
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 78
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 80
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 83
+    cueBeat: 92
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 80
+    cueBeat: 93
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 79
+    cueBeat: 93
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 83
+    cueBeat: 93
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 82
+    cueBeat: 93
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 84
+    cueBeat: 93
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 81
+    cueBeat: 93
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 81
+    cueBeat: 94
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 83
+    cueBeat: 94
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 84
+    cueBeat: 94
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 82
+    cueBeat: 94
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 80
+    cueBeat: 94
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 85
+    cueBeat: 94
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 83
+    cueBeat: 95
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 84
+    cueBeat: 95
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 82
+    cueBeat: 95
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 85
+    cueBeat: 95
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 81
+    cueBeat: 95
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 86
+    cueBeat: 95
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 86
+    cueBeat: 96
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 87
+    cueBeat: 96
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 84
+    cueBeat: 96
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 85
+    cueBeat: 96
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 82
+    cueBeat: 96
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 83
+    cueBeat: 96
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 83
+    cueBeat: 97
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 86
+    cueBeat: 97
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 87
+    cueBeat: 97
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 88
+    cueBeat: 97
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 84
+    cueBeat: 97
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 85
+    cueBeat: 97
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 88
+    cueBeat: 98
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 84
+    cueBeat: 98
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 85
+    cueBeat: 98
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 87
+    cueBeat: 98
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 86
+    cueBeat: 98
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 89
+    cueBeat: 98
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 85
+    cueBeat: 99
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 89
+    cueBeat: 99
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 87
+    cueBeat: 99
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 88
+    cueBeat: 99
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 86
+    cueBeat: 99
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 90
+    cueBeat: 99
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 87
+    cueBeat: 100
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 90
+    cueBeat: 100
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 89
+    cueBeat: 100
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 88
+    cueBeat: 100
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 91
+    cueBeat: 100
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 86
+    cueBeat: 100
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 87
+    cueBeat: 101
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 90
+    cueBeat: 101
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 92
+    cueBeat: 101
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 89
+    cueBeat: 101
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 88
+    cueBeat: 101
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 91
+    cueBeat: 101
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 90
+    cueBeat: 102
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 91
+    cueBeat: 102
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 92
+    cueBeat: 102
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 89
+    cueBeat: 102
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 88
+    cueBeat: 102
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 93
+    cueBeat: 102
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 90
+    cueBeat: 103
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 89
+    cueBeat: 103
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 93
+    cueBeat: 103
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 94
+    cueBeat: 103
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 92
+    cueBeat: 103
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 91
+    cueBeat: 103
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 91
+    cueBeat: 104
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 92
+    cueBeat: 104
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 95
+    cueBeat: 104
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 90
+    cueBeat: 104
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 94
+    cueBeat: 104
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 93
+    cueBeat: 104
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 93
+    cueBeat: 105
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 95
+    cueBeat: 105
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 94
+    cueBeat: 105
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 96
+    cueBeat: 105
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 92
+    cueBeat: 105
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 91
+    cueBeat: 105
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 94
+    cueBeat: 106
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 92
+    cueBeat: 106
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 97
+    cueBeat: 106
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 93
+    cueBeat: 106
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 96
+    cueBeat: 106
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 95
+    cueBeat: 106
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 93
+    cueBeat: 107
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 97
+    cueBeat: 107
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 98
+    cueBeat: 107
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 95
+    cueBeat: 107
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 94
+    cueBeat: 107
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 96
+    cueBeat: 107
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 98
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 96
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 95
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 97
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 94
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 99
+    cueBeat: 108
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 95
+    cueBeat: 109
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 96
+    cueBeat: 109
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 100
+    cueBeat: 109
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 98
+    cueBeat: 109
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 99
+    cueBeat: 109
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 97
+    cueBeat: 109
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 96
+    cueBeat: 110
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 99
+    cueBeat: 110
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 98
+    cueBeat: 110
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 101
+    cueBeat: 110
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 97
+    cueBeat: 110
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 100
+    cueBeat: 110
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 99
+    cueBeat: 111
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 98
+    cueBeat: 111
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 101
+    cueBeat: 111
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 100
+    cueBeat: 111
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 102
+    cueBeat: 111
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 97
+    cueBeat: 111
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 101
+    cueBeat: 112
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 102
+    cueBeat: 112
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 100
+    cueBeat: 112
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 103
+    cueBeat: 112
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 99
+    cueBeat: 112
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 98
+    cueBeat: 112
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 102
+    cueBeat: 113
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 100
+    cueBeat: 113
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 104
+    cueBeat: 113
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 99
+    cueBeat: 113
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 103
+    cueBeat: 113
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 101
+    cueBeat: 113
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 103
+    cueBeat: 114
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 101
+    cueBeat: 114
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 104
+    cueBeat: 114
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 105
+    cueBeat: 114
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 102
+    cueBeat: 114
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 100
+    cueBeat: 114
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 103
+    cueBeat: 115
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 106
+    cueBeat: 115
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 101
+    cueBeat: 115
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 105
+    cueBeat: 115
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 104
+    cueBeat: 115
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 102
+    cueBeat: 115
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 104
+    cueBeat: 116
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 105
+    cueBeat: 116
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 103
+    cueBeat: 116
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 102
+    cueBeat: 116
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 107
+    cueBeat: 116
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 106
+    cueBeat: 116
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 104
+    cueBeat: 117
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 106
+    cueBeat: 117
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 107
+    cueBeat: 117
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 108
+    cueBeat: 117
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 103
+    cueBeat: 117
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 105
+    cueBeat: 117
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 108
+    cueBeat: 118
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 109
+    cueBeat: 118
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 104
+    cueBeat: 118
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 106
+    cueBeat: 118
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 105
+    cueBeat: 118
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 107
+    cueBeat: 118
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 107
+    cueBeat: 119
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 106
+    cueBeat: 119
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 110
+    cueBeat: 119
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 109
+    cueBeat: 119
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 108
+    cueBeat: 119
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 105
+    cueBeat: 119
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 107
+    cueBeat: 120
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 110
+    cueBeat: 120
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 111
+    cueBeat: 120
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 109
+    cueBeat: 120
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 106
+    cueBeat: 120
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 108
+    cueBeat: 120
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 110
+    cueBeat: 121
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 111
+    cueBeat: 121
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 107
+    cueBeat: 121
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 112
+    cueBeat: 121
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 109
+    cueBeat: 121
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 108
+    cueBeat: 121
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 113
+    cueBeat: 122
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 109
+    cueBeat: 122
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 112
+    cueBeat: 122
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 108
+    cueBeat: 122
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 110
+    cueBeat: 122
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 111
+    cueBeat: 122
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 110
+    cueBeat: 123
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 114
+    cueBeat: 123
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 113
+    cueBeat: 123
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 109
+    cueBeat: 123
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 111
+    cueBeat: 123
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 112
+    cueBeat: 123
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 113
+    cueBeat: 124
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 114
+    cueBeat: 124
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 112
+    cueBeat: 124
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 110
+    cueBeat: 124
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 111
+    cueBeat: 124
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 115
+    cueBeat: 124
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 112
+    cueBeat: 125
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 114
+    cueBeat: 125
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 113
+    cueBeat: 125
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 115
+    cueBeat: 125
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 111
+    cueBeat: 125
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 116
+    cueBeat: 125
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 113
+    cueBeat: 126
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 116
+    cueBeat: 126
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 115
+    cueBeat: 126
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 112
+    cueBeat: 126
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 117
+    cueBeat: 126
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 114
+    cueBeat: 126
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 115
+    cueBeat: 127
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 116
+    cueBeat: 127
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 114
+    cueBeat: 127
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 113
+    cueBeat: 127
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 117
+    cueBeat: 127
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 118
+    cueBeat: 127
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 114
+    cueBeat: 128
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 116
+    cueBeat: 128
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 117
+    cueBeat: 128
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 119
+    cueBeat: 128
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 115
+    cueBeat: 128
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 118
+    cueBeat: 128
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 119
+    cueBeat: 129
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 118
+    cueBeat: 129
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 116
+    cueBeat: 129
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 117
+    cueBeat: 129
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 120
+    cueBeat: 129
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 115
+    cueBeat: 129
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 117
+    cueBeat: 130
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 121
+    cueBeat: 130
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 119
+    cueBeat: 130
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 116
+    cueBeat: 130
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 120
+    cueBeat: 130
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 118
+    cueBeat: 130
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 122
+    cueBeat: 131
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 118
+    cueBeat: 131
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 117
+    cueBeat: 131
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 121
+    cueBeat: 131
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 120
+    cueBeat: 131
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 119
+    cueBeat: 131
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 122
+    cueBeat: 132
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 123
+    cueBeat: 132
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 121
+    cueBeat: 132
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 119
+    cueBeat: 132
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 118
+    cueBeat: 132
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 120
+    cueBeat: 132
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 120
+    cueBeat: 133
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 119
+    cueBeat: 133
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 124
+    cueBeat: 133
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 121
+    cueBeat: 133
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 123
+    cueBeat: 133
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 122
+    cueBeat: 133
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 120
+    cueBeat: 134
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 123
+    cueBeat: 134
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 125
+    cueBeat: 134
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 124
+    cueBeat: 134
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 122
+    cueBeat: 134
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 121
+    cueBeat: 134
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 126
+    cueBeat: 135
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 122
+    cueBeat: 135
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 124
+    cueBeat: 135
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 123
+    cueBeat: 135
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 125
+    cueBeat: 135
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 121
+    cueBeat: 135
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 126
+    cueBeat: 136
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 124
+    cueBeat: 136
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 122
+    cueBeat: 136
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 125
+    cueBeat: 136
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 127
+    cueBeat: 136
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 123
+    cueBeat: 136
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 125
+    cueBeat: 137
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 127
+    cueBeat: 137
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 126
+    cueBeat: 137
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 123
+    cueBeat: 137
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 124
+    cueBeat: 137
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 128
+    cueBeat: 137
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 129
+    cueBeat: 138
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 128
+    cueBeat: 138
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 126
+    cueBeat: 138
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 125
+    cueBeat: 138
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 127
+    cueBeat: 138
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 124
+    cueBeat: 138
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 127
+    cueBeat: 139
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 126
+    cueBeat: 139
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 130
+    cueBeat: 139
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 128
+    cueBeat: 139
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 129
+    cueBeat: 139
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 125
+    cueBeat: 139
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 131
+    cueBeat: 140
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 128
+    cueBeat: 140
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 126
+    cueBeat: 140
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 127
+    cueBeat: 140
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 129
+    cueBeat: 140
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 130
+    cueBeat: 140
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 129
+    cueBeat: 141
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 132
+    cueBeat: 141
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 130
+    cueBeat: 141
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 128
+    cueBeat: 141
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 127
+    cueBeat: 141
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 131
+    cueBeat: 141
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 130
+    cueBeat: 142
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 128
+    cueBeat: 142
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 129
+    cueBeat: 142
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 133
+    cueBeat: 142
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 132
+    cueBeat: 142
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 131
+    cueBeat: 142
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 130
+    cueBeat: 143
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 134
+    cueBeat: 143
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 131
+    cueBeat: 143
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 132
+    cueBeat: 143
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 129
+    cueBeat: 143
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 133
+    cueBeat: 143
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 134
+    cueBeat: 144
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 135
+    cueBeat: 144
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 131
+    cueBeat: 144
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 132
+    cueBeat: 144
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 130
+    cueBeat: 144
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 133
+    cueBeat: 144
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 135
+    cueBeat: 145
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 131
+    cueBeat: 145
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 132
+    cueBeat: 145
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 133
+    cueBeat: 145
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 136
+    cueBeat: 145
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 134
+    cueBeat: 145
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 133
+    cueBeat: 146
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 137
+    cueBeat: 146
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 135
+    cueBeat: 146
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 134
+    cueBeat: 146
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 136
+    cueBeat: 146
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 132
+    cueBeat: 146
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 133
+    cueBeat: 147
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 138
+    cueBeat: 147
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 137
+    cueBeat: 147
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 134
+    cueBeat: 147
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 135
+    cueBeat: 147
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 136
+    cueBeat: 147
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 136
+    cueBeat: 148
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 139
+    cueBeat: 148
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 134
+    cueBeat: 148
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 138
+    cueBeat: 148
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 137
+    cueBeat: 148
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 135
+    cueBeat: 148
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 136
+    cueBeat: 149
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 135
+    cueBeat: 149
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 140
+    cueBeat: 149
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 139
+    cueBeat: 149
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 138
+    cueBeat: 149
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 137
+    cueBeat: 149
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 137
+    cueBeat: 150
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 136
+    cueBeat: 150
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 141
+    cueBeat: 150
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 140
+    cueBeat: 150
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 139
+    cueBeat: 150
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 138
+    cueBeat: 150
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 142
+    cueBeat: 151
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 139
+    cueBeat: 151
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 141
+    cueBeat: 151
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 140
+    cueBeat: 151
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 138
+    cueBeat: 151
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 137
+    cueBeat: 151
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 138
+    cueBeat: 152
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 142
+    cueBeat: 152
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 139
+    cueBeat: 152
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 141
+    cueBeat: 152
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 143
+    cueBeat: 152
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 140
+    cueBeat: 152
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 142
+    cueBeat: 153
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 139
+    cueBeat: 153
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 140
+    cueBeat: 153
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 143
+    cueBeat: 153
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 144
+    cueBeat: 153
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 141
+    cueBeat: 153
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 141
+    cueBeat: 154
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 140
+    cueBeat: 154
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 143
+    cueBeat: 154
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 142
+    cueBeat: 154
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 144
+    cueBeat: 154
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 145
+    cueBeat: 154
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 146
+    cueBeat: 155
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 141
+    cueBeat: 155
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 145
+    cueBeat: 155
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 144
+    cueBeat: 155
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 142
+    cueBeat: 155
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 143
+    cueBeat: 155
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 146
+    cueBeat: 156
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 147
+    cueBeat: 156
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 142
+    cueBeat: 156
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 144
+    cueBeat: 156
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 143
+    cueBeat: 156
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 145
+    cueBeat: 156
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 147
+    cueBeat: 157
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 148
+    cueBeat: 157
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 146
+    cueBeat: 157
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 143
+    cueBeat: 157
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 144
+    cueBeat: 157
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 145
+    cueBeat: 157
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 148
+    cueBeat: 158
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 149
+    cueBeat: 158
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 146
+    cueBeat: 158
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 144
+    cueBeat: 158
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 147
+    cueBeat: 158
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 145
+    cueBeat: 158
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 149
+    cueBeat: 159
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 146
+    cueBeat: 159
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 148
+    cueBeat: 159
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 150
+    cueBeat: 159
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 145
+    cueBeat: 159
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 147
+    cueBeat: 159
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 146
+    cueBeat: 160
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 148
+    cueBeat: 160
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 151
+    cueBeat: 160
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 149
+    cueBeat: 160
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 147
+    cueBeat: 160
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 150
+    cueBeat: 160
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 151
+    cueBeat: 161
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 149
+    cueBeat: 161
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 150
+    cueBeat: 161
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 147
+    cueBeat: 161
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 152
+    cueBeat: 161
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 148
+    cueBeat: 161
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 150
+    cueBeat: 162
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 152
+    cueBeat: 162
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 151
+    cueBeat: 162
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 149
+    cueBeat: 162
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 148
+    cueBeat: 162
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 153
+    cueBeat: 162
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 154
+    cueBeat: 163
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 151
+    cueBeat: 163
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 153
+    cueBeat: 163
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 152
+    cueBeat: 163
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 150
+    cueBeat: 163
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 149
+    cueBeat: 163
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 154
+    cueBeat: 164
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 155
+    cueBeat: 164
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 153
+    cueBeat: 164
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 152
+    cueBeat: 164
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 151
+    cueBeat: 164
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 150
+    cueBeat: 164
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 156
+    cueBeat: 165
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 151
+    cueBeat: 165
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 153
+    cueBeat: 165
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 154
+    cueBeat: 165
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 152
+    cueBeat: 165
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 155
+    cueBeat: 165
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 155
+    cueBeat: 166
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 157
+    cueBeat: 166
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 154
+    cueBeat: 166
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 156
+    cueBeat: 166
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 152
+    cueBeat: 166
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 153
+    cueBeat: 166
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 155
+    cueBeat: 167
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 156
+    cueBeat: 167
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 153
+    cueBeat: 167
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 157
+    cueBeat: 167
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 154
+    cueBeat: 167
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 158
+    cueBeat: 167
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 155
+    cueBeat: 168
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 158
+    cueBeat: 168
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 154
+    cueBeat: 168
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 159
+    cueBeat: 168
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 157
+    cueBeat: 168
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 156
+    cueBeat: 168
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 158
+    cueBeat: 169
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 157
+    cueBeat: 169
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 160
+    cueBeat: 169
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 156
+    cueBeat: 169
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 155
+    cueBeat: 169
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 159
+    cueBeat: 169
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 157
+    cueBeat: 170
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 160
+    cueBeat: 170
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 156
+    cueBeat: 170
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 161
+    cueBeat: 170
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 158
+    cueBeat: 170
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 159
+    cueBeat: 170
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 157
+    cueBeat: 171
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 161
+    cueBeat: 171
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 158
+    cueBeat: 171
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 162
+    cueBeat: 171
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 159
+    cueBeat: 171
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 160
+    cueBeat: 171
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 162
+    cueBeat: 172
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 163
+    cueBeat: 172
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 161
+    cueBeat: 172
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 158
+    cueBeat: 172
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 159
+    cueBeat: 172
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 160
+    cueBeat: 172
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 160
+    cueBeat: 173
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 163
+    cueBeat: 173
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 164
+    cueBeat: 173
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 159
+    cueBeat: 173
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 161
+    cueBeat: 173
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 162
+    cueBeat: 173
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 160
+    cueBeat: 174
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 165
+    cueBeat: 174
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 161
+    cueBeat: 174
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 162
+    cueBeat: 174
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 164
+    cueBeat: 174
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 163
+    cueBeat: 174
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 161
+    cueBeat: 175
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 163
+    cueBeat: 175
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 164
+    cueBeat: 175
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 165
+    cueBeat: 175
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 166
+    cueBeat: 175
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 162
+    cueBeat: 175
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 167
+    cueBeat: 176
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 165
+    cueBeat: 176
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 162
+    cueBeat: 176
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 163
+    cueBeat: 176
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 164
+    cueBeat: 176
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 166
+    cueBeat: 176
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 165
+    cueBeat: 177
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 167
+    cueBeat: 177
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 166
+    cueBeat: 177
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 164
+    cueBeat: 177
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 163
+    cueBeat: 177
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 164
+    cueBeat: 178
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 167
+    cueBeat: 178
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 165
+    cueBeat: 178
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 166
+    cueBeat: 178
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 166
+    cueBeat: 179
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 167
+    cueBeat: 179
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 165
+    cueBeat: 179
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 167
+    cueBeat: 180
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 166
+    cueBeat: 180
+    releaseBeat: 0
+  - type: 0
+    role: 0
+    groupId: 167
+    cueBeat: 181
     releaseBeat: 0
   loopLengthBeats: 0
   phases: []

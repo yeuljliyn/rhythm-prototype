@@ -192,8 +192,7 @@ public class Stage1PracticeGate : MonoBehaviour
         }
         else
         {
-            yield return ShowMainTransitionCaption();
-            SwitchToMain();
+            ShowMainTransitionCaptionThenSwitch();
         }
     }
 
@@ -204,21 +203,21 @@ public class Stage1PracticeGate : MonoBehaviour
         if (segmentRoot != null) segmentRoot.SetActive(false);
         UnsubscribeCurrentExtender();
 
-        yield return ShowMainTransitionCaption();
-        SwitchToMain();
+        ShowMainTransitionCaptionThenSwitch();
     }
 
-    // Shows mainTransitionCaption and actually waits for the player to read it before returning —
-    // SwitchToMain() unconditionally calls speechBubble.Hide(), so calling it right after ShowFor()
-    // in the same frame (the old code) hid the caption the instant it appeared, making it invisible
-    // in practice (confirmed reported: "이제 진짜입니다" line never showing before the main game
-    // cuts in). Waiting the same captionHoldSeconds the bubble itself uses to auto-hide means
-    // SwitchToMain()'s Hide() call lands right as it would've disappeared anyway, not before.
-    IEnumerator ShowMainTransitionCaption()
+    // Shows mainTransitionCaption and waits for the player to confirm (Space/click — same
+    // ShowUntilConfirm convention every segment's own introCaption already uses) before switching to
+    // the main chart, instead of auto-advancing after a fixed timer — confirmed requested: "이제
+    // 진짜입니다 하고 클릭하면 본편으로 넘어가게, 자동으로 넘어가지 말고". SwitchToMain is the
+    // confirm callback itself, so this never yields/returns early — the caller's coroutine ends here
+    // and SwitchToMain fires later, whenever the player actually confirms.
+    void ShowMainTransitionCaptionThenSwitch()
     {
-        if (string.IsNullOrEmpty(mainTransitionCaption) || speechBubble == null) yield break;
-        speechBubble.ShowFor(mainTransitionCaption, captionHoldSeconds);
-        yield return new WaitForSeconds(captionHoldSeconds);
+        if (!string.IsNullOrEmpty(mainTransitionCaption) && speechBubble != null)
+            speechBubble.ShowUntilConfirm(mainTransitionCaption, SwitchToMain);
+        else
+            SwitchToMain();
     }
 
     IEnumerator FadeOutSegmentAudio(GameObject segmentRoot)

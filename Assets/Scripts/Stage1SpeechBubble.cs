@@ -24,12 +24,13 @@ public class Stage1SpeechBubble : MonoBehaviour
     [Header("씬에 미리 배치된 오브젝트 (Bubble/Panel/Tail/Text) — Play 없이 에디터에서 위치·크기 조정 가능")]
     [Tooltip("말풍선 전체(패널+꼬리)를 담는 최상위 RectTransform. Update()에서 이 오브젝트가 target을 따라 움직임.")]
     [SerializeField] RectTransform root;
-    [Tooltip("배경 패널의 RectTransform — Show()가 텍스트 길이에 맞춰 sizeDelta를 자동 조정함.")]
+    [Tooltip("배경 패널의 RectTransform — 크기는 에디터에서 배치한 그대로 고정. Show()가 더 이상 텍스트 " +
+             "길이에 맞춰 sizeDelta를 자동 조정하지 않음(원래는 더미 리소스 시절 텍스트에 맞춰 패널을 " +
+             "동적으로 늘리던 로직이었는데, 실제 말풍선 아트가 들어온 뒤로는 에디터에서 잡아둔 패널/텍스트 " +
+             "크기·위치가 Play하면 이 계산값으로 덮어써져 반영이 안 되는 문제가 있었음 — 확인 리포트: " +
+             "\"씬에서 크기 조정해도 Play하면 그대로 반영이 안 됨\").")]
     [SerializeField] RectTransform panelRect;
     [SerializeField] TMP_Text text;
-
-    [SerializeField] Vector2 padding = new Vector2(28f, 18f);
-    [SerializeField] float maxWidth = 520f;
 
     Coroutine _hideCr;
     Coroutine _waitCr;
@@ -69,11 +70,8 @@ public class Stage1SpeechBubble : MonoBehaviour
 
         text.text = message;
         root.gameObject.SetActive(true);
-
-        // Resize panel to fit the text (single-line word-wrap up to maxWidth).
-        text.ForceMeshUpdate();
-        Vector2 pref = text.GetPreferredValues(message, maxWidth - padding.x * 2f, 0f);
-        panelRect.sizeDelta = new Vector2(Mathf.Min(maxWidth, pref.x + padding.x * 2f), pref.y + padding.y * 2f);
+        // panelRect/text keep whatever size and position were authored in the scene — see
+        // panelRect's field doc comment for why this no longer auto-resizes.
     }
 
     public void Hide()

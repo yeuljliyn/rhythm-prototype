@@ -1,0 +1,205 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a52a79781a00b2740886c3ec182da70a, type: 3}
+  m_Name: 1-3 test
+  m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
+  chartName: Segment 1
+  music: {fileID: 8300000, guid: 78dafec7ec4f26247a76b59062638e70, type: 3}
+  bpm: 128
+  introDelay: 2
+  hitWindow: 0.12
+  missWindow: 0.38
+  minInputIntervalSeconds: 0
+  liveInputStartBeat: 0
+  calls:
+  - type: 1
+    role: 0
+    groupId: 0
+    cueBeat: 0
+    releaseBeat: 3
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 1
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 2
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 0
+    cueBeat: 4
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 1
+    cueBeat: 4
+    releaseBeat: 10
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 6
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 8
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 2
+    cueBeat: 12
+    releaseBeat: 18
+  - type: 0
+    role: 1
+    groupId: 1
+    cueBeat: 12
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 14
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 16
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 3
+    cueBeat: 20
+    releaseBeat: 26
+  - type: 0
+    role: 1
+    groupId: 2
+    cueBeat: 20
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 22
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 24
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 4
+    cueBeat: 28
+    releaseBeat: 34
+  - type: 0
+    role: 1
+    groupId: 3
+    cueBeat: 28
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 30
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 32
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 5
+    cueBeat: 36
+    releaseBeat: 42
+  - type: 0
+    role: 1
+    groupId: 4
+    cueBeat: 36
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 38
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 40
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 5
+    cueBeat: 44
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 6
+    cueBeat: 44
+    releaseBeat: 50
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 46
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 48
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 6
+    cueBeat: 52
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 7
+    cueBeat: 52
+    releaseBeat: 58
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 54
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 56
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 7
+    cueBeat: 60
+    releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 9
+    cueBeat: 60
+    releaseBeat: 66
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 62
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 64
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 9
+    cueBeat: 68
+    releaseBeat: 0
+  loopLengthBeats: 0
+  phases: []
