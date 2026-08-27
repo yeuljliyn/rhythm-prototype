@@ -309,8 +309,8 @@ RectTransform:
   m_Children:
   - {fileID: 14954136}
   - {fileID: 361710960}
-  - {fileID: 696463885}
   - {fileID: 2022282334}
+  - {fileID: 696463885}
   - {fileID: 418952215}
   - {fileID: 428721238}
   m_Father: {fileID: 0}
@@ -825,7 +825,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveDriftAnimation
   fromPosition: {x: 600, y: 0, z: 0}
-  toPosition: {x: -600, y: 0, z: 0}
+  toPosition: {x: -939, y: 0, z: 0}
   driftDuration: 5
   delay: 0
   driftEase:
