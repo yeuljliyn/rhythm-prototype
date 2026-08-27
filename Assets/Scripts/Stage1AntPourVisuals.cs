@@ -12,11 +12,22 @@ public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
 {
     [SerializeField] CallDirector callDirector;
 
+    [Header("SFX")]
+    [SerializeField] AudioSource sfxSource;
+    [Tooltip("Hand이 물 붓는 펄스마다(콜마다) 재생.")]
+    [SerializeField] AudioClip handPourSfx;
+    [Tooltip("PlayerAnt가 물 붓는 스프라이트를 보여줄 때마다(입력 성공/일반 탭 모두) 재생.")]
+    [SerializeField] AudioClip playerPourSfx;
+
     [Header("Hand (Call)")]
     [SerializeField] Image handImage;
     [SerializeField] Sprite handIdleSprite;
     [SerializeField] Sprite handPourSprite;
     [SerializeField] float handPourHoldTime = 0.35f;
+    [Tooltip("연속 콜이 몰려있을 때(같은 프레임에 여러 개가 한꺼번에 스폰될 만큼 빽빽한 경우 포함) " +
+             "각 펄스를 큐에 순서대로 재생 — pour->idle 사이 잠깐의 간격. 이게 0이면 pour->pour로 " +
+             "바로 이어져서 몇 번 부었는지 안 보임(HandPulseQueue 참고).")]
+    [SerializeField] float handPulseGapTime = 0.08f;
 
     [Header("Player Ant (Response)")]
     [SerializeField] Image playerAntImage;
@@ -127,10 +138,22 @@ public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
         rect.localScale = scale;
     }
 
+    // CallDirector.SpawnDueCalls can spawn several due entries in the SAME Update() call (its while
+    // loop drains everything already due — see CallDirector's own frame-hitch-burst comment; a chart
+    // with 3 calls packed tighter than hitWindow apart hits this even with zero hitching, since all 3
+    // become "due" before the loop yields back to Unity at all). A cancel-and-restart coroutine can't
+    // show 3 distinct pulses for that: every StopCoroutine+StartCoroutine in that burst happens before
+    // a single frame ever renders, so only the LAST call's pulse ever becomes visible — reported
+    // (still, even after adding an idle-flash-first coroutine) as "여전히 3번 연속 붓는거 안보여".
+    // Queueing instead — count how many pulses are owed, and let one running coroutine drain them one
+    // at a time — guarantees every call gets its own real, rendered pour->idle cycle regardless of how
+    // many arrive in a single C# call stack.
+    int _handPulsesPending;
+
     void HandleCallCue(int groupId)
     {
-        if (_handCr != null) StopCoroutine(_handCr);
-        _handCr = StartCoroutine(HandPulse());
+        _handPulsesPending++;
+        if (_handCr == null) _handCr = StartCoroutine(HandPulseQueue());
     }
 
     void HandleGroupJudged(int groupId, JudgementType j)
@@ -165,19 +188,39 @@ public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
         _playerCr = StartCoroutine(PlayerReact(hit: true));
     }
 
-    IEnumerator HandPulse()
+    IEnumerator HandPulseQueue()
     {
-        if (handImage == null) yield break;
-        handImage.sprite = handPourSprite;
-        yield return new WaitForSeconds(handPourHoldTime);
-        handImage.sprite = handIdleSprite;
+        while (_handPulsesPending > 0)
+        {
+            _handPulsesPending--;
+
+            if (handImage != null)
+            {
+                handImage.sprite = handPourSprite;
+                PlaySfx(handPourSfx);
+                yield return new WaitForSeconds(handPourHoldTime);
+                handImage.sprite = handIdleSprite;
+            }
+
+            // A brief idle gap between queued pulses even when the next one is already waiting —
+            // without it, pulse N ending (idle) and pulse N+1 starting (pour) happen in the same
+            // instant, which reads as one continuous pour instead of two distinct ones.
+            if (_handPulsesPending > 0 && handPulseGapTime > 0f)
+                yield return new WaitForSeconds(handPulseGapTime);
+        }
         _handCr = null;
+    }
+
+    void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
     }
 
     IEnumerator PlayerReact(bool hit)
     {
         if (playerAntImage == null) yield break;
         playerAntImage.sprite = hit ? playerAntPourSprite : playerAntFailSprite;
+        if (hit) PlaySfx(playerPourSfx);
         yield return new WaitForSeconds(playerReactHoldTime);
         playerAntImage.sprite = playerAntIdleSprite;
         _playerCr = null;

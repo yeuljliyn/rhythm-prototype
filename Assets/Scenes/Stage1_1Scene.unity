@@ -1811,7 +1811,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stage1SkipHold
   skipKey: 19
-  holdSeconds: 2
+  holdSeconds: 1
   root: {fileID: 1636755725}
   fillImage: {fileID: 2112707125}
   hintText: {fileID: 1106373411}
