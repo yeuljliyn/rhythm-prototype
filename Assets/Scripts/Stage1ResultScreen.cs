@@ -85,18 +85,31 @@ public class Stage1ResultScreen : MonoBehaviour
         cvGO.AddComponent<GraphicRaycaster>();
         var root = cvGO.transform;
 
+        // Dim은 화면 전체를 덮어야 하니 풀스트레치 그대로 — 팝업 그림들만 SafeFrame(고정
+        // 1672x941, 항상 캔버스 중앙)에 넣어서, 와이드/울트라와이드에서 캔버스 자체가 기준
+        // 해상도보다 넓어져도(matchWidthOrHeight=1이라 세로 기준 고정) 늘어나지 않고 원래 비율
+        // 그대로 중앙에 표시되게 함 — 다른 씬들의 SafeFrame과 동일한 이유/방식.
         MakeImg(root, "Dim", null, new Color(0f, 0f, 0f, 0.6f));
-        MakeImg(root, "Popup",    _sprPopup);
-        MakeImg(root, "RankText", _sprRankText);
+
+        var safeFrameGO = new GameObject("SafeFrame", typeof(RectTransform));
+        safeFrameGO.transform.SetParent(root, false);
+        var safeFrameRt = (RectTransform)safeFrameGO.transform;
+        safeFrameRt.anchorMin = safeFrameRt.anchorMax = new Vector2(0.5f, 0.5f);
+        safeFrameRt.pivot = new Vector2(0.5f, 0.5f);
+        safeFrameRt.sizeDelta = new Vector2(1672f, 941f);
+        safeFrameRt.anchoredPosition = Vector2.zero;
+
+        MakeImg(safeFrameRt, "Popup",    _sprPopup);
+        MakeImg(safeFrameRt, "RankText", _sprRankText);
 
         Sprite rankSpr = rank == "S" ? _sprRankS
                        : rank == "A" ? _sprRankA
                        : rank == "B" ? _sprRankB
                        :               _sprRankC;
-        MakeImg(root, "RankIcon", rankSpr);
+        MakeImg(safeFrameRt, "RankIcon", rankSpr);
 
-        MakeImg(root, unlockedNext ? "UnlockText" : "RetryText", unlockedNext ? _sprUnlockText : _sprRetryText);
-        MakeArrowBtn(root, GoUndergroundLobby);
+        MakeImg(safeFrameRt, unlockedNext ? "UnlockText" : "RetryText", unlockedNext ? _sprUnlockText : _sprRetryText);
+        MakeArrowBtn(safeFrameRt, GoUndergroundLobby);
 
         yield return null;
     }

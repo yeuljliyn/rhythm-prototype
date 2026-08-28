@@ -120,6 +120,14 @@ public class Stage1SpeechBubble : MonoBehaviour
             (Keyboard.current != null && Keyboard.current[Key.Space].isPressed) ||
             (Mouse.current != null && Mouse.current.leftButton.isPressed);
 
+        // 이 코루틴은 yield return null(매 프레임)만 쓰기 때문에 Time.timeScale=0(일시정지)이어도
+        // 계속 프레임이 돌아서 매 프레임 실제 입력 상태를 그대로 읽어버림 — CallDirector가
+        // clock.IsPaused를 체크 안 하면 판정이 계속 도는 것과 완전히 같은 버그 계열. 실제로 겪은
+        // 신고: "일시정지 패널이 떠있는데도 그 상태에서 스페이스/클릭하면 대사가 넘어감." 일시정지 중엔
+        // 입력 자체를 안 보고, prevPressed도 갱신 안 함 — 그래야 일시정지 도중 눌렀다 뗀 입력이
+        // 재개 후에 "새 입력"으로 오인되지 않음(재개 시점에 안 눌려있으면 자연히 무시됨).
+        bool IsPaused() => Stage1PauseMenuManager.Instance != null && Stage1PauseMenuManager.Instance.IsPaused;
+
         // Wait a frame first so the very same press that triggered this segment's entry (e.g. a
         // press that landed a Hit and advanced us here) can't also insta-confirm this new line.
         yield return null;
@@ -127,6 +135,8 @@ public class Stage1SpeechBubble : MonoBehaviour
 
         while (true)
         {
+            if (IsPaused()) { yield return null; continue; }
+
             bool pressedNow = PressedNow();
             if (pressedNow && !prevPressed) break;
             prevPressed = pressedNow;
