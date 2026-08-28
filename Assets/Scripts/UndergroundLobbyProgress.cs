@@ -11,6 +11,7 @@ using UnityEngine;
 public static class UndergroundLobbyProgress
 {
     const string UnlockedIndexKey = "underground_unlocked_index";
+    const string LastIndexKey     = "underground_last_index";
 
     /// <summary>현재 입장 가능한 마지막 인덱스(0-based). 저장된 값이 없으면 0(1-1만 해금).</summary>
     public static int GetUnlockedIndex() => PlayerPrefs.GetInt(UnlockedIndexKey, 0);
@@ -23,12 +24,23 @@ public static class UndergroundLobbyProgress
         PlayerPrefs.Save();
     }
 
+    /// <summary>마지막으로 스크롤해서 멈춰있던 슬롯(0-based) — 스테이지 플레이 후 지하 로비로
+    /// 돌아왔을 때 항상 1-1로 리셋되지 않고 그 자리 그대로 보이게 하는 데 씀. 저장된 값이 없으면 0.</summary>
+    public static int GetLastIndex() => PlayerPrefs.GetInt(LastIndexKey, 0);
+
+    public static void SaveLastIndex(int index)
+    {
+        PlayerPrefs.SetInt(LastIndexKey, index);
+        PlayerPrefs.Save();
+    }
+
 #if UNITY_EDITOR
     [UnityEditor.MenuItem("RhythmGame/지하 로비 진행도 초기화(1-1만 해금)")]
     static void ResetProgress()
     {
         PlayerPrefs.DeleteKey(UnlockedIndexKey);
-        Debug.Log("[UndergroundLobbyProgress] 초기화 완료 — 1-1만 해금된 상태로 되돌아감.");
+        PlayerPrefs.DeleteKey(LastIndexKey);
+        Debug.Log("[UndergroundLobbyProgress] 초기화 완료 — 1-1만 해금 + 마지막 위치도 1-1로 되돌아감.");
     }
 #endif
 }

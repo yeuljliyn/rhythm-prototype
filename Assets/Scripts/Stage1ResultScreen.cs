@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -31,10 +32,23 @@ public class Stage1ResultScreen : MonoBehaviour
 
     bool _triggered;
 
-    void Start()      { if (director != null) director.OnSongEnded += Trigger; }
-    void OnDestroy()  { if (director != null) director.OnSongEnded -= Trigger; }
+    void Start()      { if (director != null) director.OnSongEnded += HandleSongEnded; }
+    void OnDestroy()  { if (director != null) director.OnSongEnded -= HandleSongEnded; }
 
-    void Trigger()
+    // 테스트용 강제 랭크 치트 — BattleResultScreen(구)의 F1(S강제)/F2(C강제)와 동일한 패턴. 새 결과창
+    // (Stage1ResultScreen)엔 이게 빠져있어서 안 되던 것 — 여기 추가.
+    void Update()
+    {
+        if (_triggered) return;
+        var kb = Keyboard.current;
+        if (kb == null) return;
+        if (kb.f1Key.wasPressedThisFrame) { Trigger("S"); return; }
+        if (kb.f2Key.wasPressedThisFrame) { Trigger("C"); return; }
+    }
+
+    void HandleSongEnded() => Trigger(null);
+
+    void Trigger(string forcedRank)
     {
         if (_triggered) return;
         _triggered = true;
@@ -43,19 +57,20 @@ public class Stage1ResultScreen : MonoBehaviour
         foreach (var src in FindObjectsOfType<AudioSource>())
             if (src.isPlaying) src.Pause();
 
-        var    gm    = GameManager.Instance;
-        string rank  = gm != null ? gm.GetRank() : "C";
-        bool   clear = gm != null && gm.IsClear;
+        var    gm   = GameManager.Instance;
+        string rank = forcedRank ?? (gm != null ? gm.GetRank() : "C");
+        // UnlockText/RetryText 표시 기준은 gm.IsClear(기존 무구 경제의 B 이상 "클리어")가 아니라
+        // 실제 다음 스테이지 해금 기준(A 이상)과 정확히 맞춤 — B일 때 "해금됨" 텍스트가 뜨는데 실제로는
+        // 아무 것도 안 열리는 불일치가 있었음(신고받은 버그). S/A일 때만 UnlockText, B/C는 RetryText.
+        bool unlockedNext = rank == "S" || rank == "A";
 
-        // 다음 스테이지 해금 기준은 "클리어"(B 이상, 기존 무구 경제 기준)보다 엄격한 A 이상 — 사용자
-        // 확정 요구사항.
-        if (rank == "S" || rank == "A")
+        if (unlockedNext)
             UndergroundLobbyProgress.UnlockUpTo(stageIndex + 1);
 
-        StartCoroutine(ShowResult(rank, clear));
+        StartCoroutine(ShowResult(rank, unlockedNext));
     }
 
-    IEnumerator ShowResult(string rank, bool clear)
+    IEnumerator ShowResult(string rank, bool unlockedNext)
     {
         var cvGO = new GameObject("Stage1ResultCanvas");
         var cv   = cvGO.AddComponent<Canvas>();
@@ -80,7 +95,7 @@ public class Stage1ResultScreen : MonoBehaviour
                        :               _sprRankC;
         MakeImg(root, "RankIcon", rankSpr);
 
-        MakeImg(root, clear ? "UnlockText" : "RetryText", clear ? _sprUnlockText : _sprRetryText);
+        MakeImg(root, unlockedNext ? "UnlockText" : "RetryText", unlockedNext ? _sprUnlockText : _sprRetryText);
         MakeArrowBtn(root, GoUndergroundLobby);
 
         yield return null;

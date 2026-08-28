@@ -101,16 +101,17 @@ public class SettingsManager : MonoBehaviour
 
     // ── Input ─────────────────────────────────────────────────────────────
 
+    // ESC로 설정창을 "여는" 건 더 이상 여기서 전역으로 안 함 — 스테이지 씬 이외의 모든 씬에서 ESC
+    // 누르면 설정창이 뜨던 문제(신고받음). 이제 설정창을 여는 진입점은 각 씬의 UI 버튼(스테이지
+    // 일시정지 패널의 SETTINGS 버튼 등)뿐이고, ESC는 그렇게 이미 열려있는 패널을 닫는 것만 함
+    // — 씬별 ESC 동작(지하 로비→지상, 지상→StartScene, 스테이지 씬→일시정지 등)은 각 씬의 매니저가
+    // 직접 처리.
     void Update()
     {
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        if (kb.escapeKey.wasPressedThisFrame)
-        {
-            if (IsPanelOpen) Close();
-            else if (PauseMenuManager.Instance == null && Stage1PauseMenuManager.Instance == null) Open();
-        }
+        if (kb.escapeKey.wasPressedThisFrame && IsPanelOpen) Close();
     }
 
     // ── Public API ────────────────────────────────────────────────────────

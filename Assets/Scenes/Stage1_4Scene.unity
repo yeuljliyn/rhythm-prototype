@@ -421,8 +421,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stage1AntPourVisuals
   callDirector: {fileID: 1507358175}
   sfxSource: {fileID: 272465004}
-  handPourSfx: {fileID: 8300000, guid: 219d797f691df264cb7b1712966feec9, type: 3}
-  playerPourSfx: {fileID: 8300000, guid: d00a48d439ffa884fbfba6bb0209ec7e, type: 3}
+  handPourSfx: {fileID: 8300000, guid: 788078a3d601db44f978e08ed6a143f2, type: 3}
+  playerPourSfx: {fileID: 8300000, guid: 9b82815134740af4985d7c737553a401, type: 3}
   handImage: {fileID: 1586661929}
   handIdleSprite: {fileID: 7219212827918029610, guid: 6767a210b9d53764a87dae196f9bcf9d, type: 3}
   handPourSprite: {fileID: -4793205535858711587, guid: 6767a210b9d53764a87dae196f9bcf9d, type: 3}
@@ -1321,6 +1321,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 677726066}
   m_CullTransparentMesh: 1
+--- !u!1001 &698311880
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4270588081882696530, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_Name
+      value: Stage1PauseMenuManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015776799928432297, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cb4abe586486caf409640ef8cf3feec9, type: 3}
 --- !u!1 &783586947
 GameObject:
   m_ObjectHideFlags: 0
@@ -2869,3 +2926,4 @@ SceneRoots:
   - {fileID: 272465003}
   - {fileID: 510179306}
   - {fileID: 1019499771}
+  - {fileID: 698311880}

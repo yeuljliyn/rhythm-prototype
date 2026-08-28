@@ -130,7 +130,8 @@ public class Stage1PauseMenuManager : MonoBehaviour
     void OnLobby()
     {
         Time.timeScale = 1f;
-        SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
+        // 구 LobbyScene은 이제 안 쓰는 씬 — 새 플로우에서는 지하 로비로.
+        SceneTransitionManager.Instance.LoadSceneWithFade("UndergroundLobbyScene");
     }
 
     // ── UI Builder ────────────────────────────────────────────────────────

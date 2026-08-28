@@ -78,6 +78,7 @@ public class SurfaceLobbyManager : MonoBehaviour
             if (kb.rightArrowKey.wasPressedThisFrame) MoveTo(_targetIndex + 1);
             else if (kb.leftArrowKey.wasPressedThisFrame) MoveTo(_targetIndex - 1);
             else if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) TrySelect();
+            else if (kb.escapeKey.wasPressedThisFrame) GoStartScene();
         }
 
         float targetX = -_targetIndex * cellWidth;
@@ -105,10 +106,22 @@ public class SurfaceLobbyManager : MonoBehaviour
 
     void MoveTo(int index) => _targetIndex = Mathf.Clamp(index, 0, stageCount - 1);
 
+    /// <summary>ESC — StartScene(타이틀 화면)으로.</summary>
+    void GoStartScene()
+    {
+        SceneTransitionManager.Instance.LoadSceneWithFade("StartScene");
+    }
+
     void TrySelect()
     {
         if (_targetIndex > maxEnterableIndex) return; // 아직 안 열린 스테이지 — 조용히 무시
         // 지금은 스테이지1 하나뿐이라 분기 없음 — 스테이지가 늘어나면 _targetIndex별로 목적지를 나눌 것.
+
+        // 지하 로비는 평소엔 "마지막으로 있던 자리"를 기억하지만(스테이지 플레이 후 복귀 시), 지상에서
+        // 새로 내려올 때는 항상 1-1부터 시작해야 함(요청) — 여기서 명시적으로 리셋. Stage1DialogueScene을
+        // 거쳐가는 경로도 결국 여기서 결정된 선택이므로 분기 없이 여기 한 곳에서만 처리.
+        UndergroundLobbyProgress.SaveLastIndex(0);
+
         bool introSeen = PlayerPrefs.GetInt(Stage1IntroSeenKey, 0) == 1;
         string next = introSeen ? "UndergroundLobbyScene" : "Stage1DialogueScene";
         SceneTransitionManager.Instance.LoadSceneWithFade(next);

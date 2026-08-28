@@ -52,6 +52,12 @@ public class UndergroundLobbyManager : MonoBehaviour
         // 클리어 시 UndergroundLobbyProgress.UnlockUpTo(...)로 갱신한 값.
         maxEnterableIndex = UndergroundLobbyProgress.GetUnlockedIndex();
         ApplyUnlockState();
+
+        // 스테이지 플레이하고 돌아왔을 때 항상 1-1로 리셋되지 않고 마지막으로 있던 자리 그대로
+        // 보이게 함(요청: "다시 지하로돌아올때 마지막에 있던 위치로 돌아와야지"). 해금 범위를 벗어난
+        // 저장값(예: 진행도 초기화 등으로 어긋난 경우)은 방어적으로 clamp.
+        _targetIndex = Mathf.Clamp(UndergroundLobbyProgress.GetLastIndex(), 0, stageCount - 1);
+        _fgX = -_targetIndex * cellWidth; // 애니메이션 없이 그 자리에서 바로 시작(1-1을 거쳐가지 않음)
     }
 
     // 씬 빌드 시점엔 아직 안 열린 슬롯(1-2~1-5)마다 가림벽(Blocker2~5) 오브젝트를 미리 다 심어놨음 —
@@ -82,6 +88,7 @@ public class UndergroundLobbyManager : MonoBehaviour
             if (kb.rightArrowKey.wasPressedThisFrame) MoveTo(_targetIndex + 1);
             else if (kb.leftArrowKey.wasPressedThisFrame) MoveTo(_targetIndex - 1);
             else if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) TrySelect();
+            else if (kb.escapeKey.wasPressedThisFrame) GoSurfaceLobby();
         }
 
         float targetX = -_targetIndex * cellWidth;
@@ -92,7 +99,11 @@ public class UndergroundLobbyManager : MonoBehaviour
         SetX(backgroundLayer, _fgX); // 원근감 없이 벽과 완전히 같은 위치로 고정
     }
 
-    void MoveTo(int index) => _targetIndex = Mathf.Clamp(index, 0, stageCount - 1);
+    void MoveTo(int index)
+    {
+        _targetIndex = Mathf.Clamp(index, 0, stageCount - 1);
+        UndergroundLobbyProgress.SaveLastIndex(_targetIndex); // 다음에 돌아왔을 때 이 자리부터 시작
+    }
 
     // Stage1Scene(구 물타기 프로토타입)은 이제 안 쓰는 씬이라 여기서 목적지로 안 씀(사용자 확인 완료).
     // 인덱스 순서 = 1-1,1-2,1-3,1-4,1-5.
