@@ -65,6 +65,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Stage1_5IntroScene.unity
     guid: eb3c9be519da6d94fa5ab179f9f2e862
+  - enabled: 1
+    path: Assets/Scenes/SurfaceLobbyScene.unity
+    guid: f8c8fd113b2c3ab4399a3eafedff051e
+  - enabled: 1
+    path: Assets/Scenes/UndergroundLobbyScene.unity
+    guid: b3f30b1846ddce14a8ccb4756acdfb28
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

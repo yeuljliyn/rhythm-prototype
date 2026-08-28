@@ -318,24 +318,20 @@ MonoBehaviour:
   - {fileID: 1676027560}
   _voice: {fileID: 1364043454}
   _emotions:
-  - key: "\uC7AD\uB450_\uBD84\uB178"
-    sprite: {fileID: 21300000, guid: 7bcf71d1e74c66848a8f6d0fae226e02, type: 3}
   - key: "\uC7AD\uB450_\uBB34\uD45C\uC8152_\uD654\uB0A8"
     sprite: {fileID: 21300000, guid: 42150820a0c2de748a5370241e0da5be, type: 3}
+  - key: "\uC7AD\uB450_\uBB34\uD45C\uC815"
+    sprite: {fileID: 21300000, guid: df2abf19c9a529e448ca497f008bf28f, type: 3}
+  - key: "\uC7AD\uB450_\uB180\uB78C_\uB2F9\uD669"
+    sprite: {fileID: 21300000, guid: 4733557abea1d7f45a0c69ba27b86231, type: 3}
+  - key: "\uC7AD\uB450_\uC2AC\uD5142"
+    sprite: {fileID: 21300000, guid: 0bfc084e2a4a1e64fadb4f842ca274eb, type: 3}
+  - key: "\uC7AD\uB450_\uC6C3\uC74C1"
+    sprite: {fileID: 21300000, guid: 2d29a0d6f75a67643a6647239f533c4f, type: 3}
   - key: "\uBB3C\uADC0\uC2E0_\uC2AC\uD514"
     sprite: {fileID: 21300000, guid: 90c2129e8b5db6842a4514757b916c63, type: 3}
   - key: "\uBB3C\uADC0\uC2E0_\uBD84\uB178"
     sprite: {fileID: 21300000, guid: 184a71de269f8094397dc411896f7ab1, type: 3}
-  - key: "\uC7AD\uB450_\uB180\uB78C_\uB2F9\uD669"
-    sprite: {fileID: 21300000, guid: 4733557abea1d7f45a0c69ba27b86231, type: 3}
-  - key: "\uC7AD\uB450_\uC6C3\uC74C1"
-    sprite: {fileID: 21300000, guid: 2d29a0d6f75a67643a6647239f533c4f, type: 3}
-  - key: "\uC7AD\uB450_\uC6C3\uC74C2"
-    sprite: {fileID: 21300000, guid: 14911fddc8b858f45a9c25129c629bba, type: 3}
-  - key: "\uC7AD\uB450_\uC2AC\uD5142"
-    sprite: {fileID: 21300000, guid: 0bfc084e2a4a1e64fadb4f842ca274eb, type: 3}
-  - key: "\uC7AD\uB450_\uBB34\uD45C\uC815"
-    sprite: {fileID: 21300000, guid: df2abf19c9a529e448ca497f008bf28f, type: 3}
 --- !u!1 &294591970
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,8 +504,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.06, y: 0.2}
   m_AnchorMax: {x: 0.38, y: 0.98}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 118}
+  m_SizeDelta: {x: 0, y: -178.702}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &443605136
 MonoBehaviour:
@@ -531,7 +527,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 42150820a0c2de748a5370241e0da5be, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -833,8 +829,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.62, y: 0.2}
   m_AnchorMax: {x: 0.94, y: 0.98}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 118}
+  m_SizeDelta: {x: 0, y: -178.702}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1114795104
 MonoBehaviour:
@@ -856,7 +852,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: f244183d975b00248a80df97649b1a79, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1053,7 +1049,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!223 &1333603854
 Canvas:
   m_ObjectHideFlags: 0

@@ -5,11 +5,25 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// §0. 오프닝 — 사이버 신당 (잭두-신령님 첫 만남). StartScene 직후, 게임을 통틀어 딱 한 번만
+/// 재생됨 — PlayerPrefs "opening_seen" 플래그로 게이팅(StartSceneManager.OnStart()이 이 플래그를
+/// 보고 아예 이 씬을 스킵하고 바로 SurfaceLobbyScene으로 감; 여기서는 완주했을 때 그 플래그를
+/// 세팅만 함 — Stage1TutorialGate의 "stage1_tutorial_seen"과 동일한 패턴).
+///
+/// UI는 Stage1DialogueSceneManager와 완전히 동일한 필드 레이아웃(에디터에서 직접 배치 — Play 없이도
+/// Hierarchy에서 보임, BuildUI()로 런타임 절차 생성하던 예전 방식 폐기)을 그대로 따름 — 실제로 이
+/// 씬(Assets/Scenes/DialogueScene.unity)의 Hierarchy 자체가 Stage1DialogueScene.unity를 복제해서
+/// 만든 것이라, 필드 이름을 이 스크립트와 똑같이 맞춰두면 기존 오브젝트 참조가 그대로 유지됨.
+///
+/// 이 오프닝엔 신령님이 화면 밖 존재로만 등장(초상화 없음, 대사도 전부 선택지로만 표현)해서
+/// CharB(물귀신 자리였던 초상화 슬롯)를 아예 숨김 — 이 씬에서는 안 씀.
+/// </summary>
 public class DialogueSceneManager : MonoBehaviour
 {
     // ── Node types ─────────────────────────────────────────────────────
     enum NodeType { Line, Choice, End }
-    enum Speaker  { A, B } // A = 잭두(좌), B = 물귀신(우)
+    enum Speaker  { A, B } // A = 잭두(좌). B(물귀신)는 이 씬에서 안 씀 — CharB는 숨김.
 
     class Node
     {
@@ -29,38 +43,55 @@ public class DialogueSceneManager : MonoBehaviour
     }
 
     static readonly string NameA = "잭두";
-    static readonly string NameB = "물귀신";
 
     static readonly Node[] Nodes = new Node[]
     {
-        // 0: 물귀신
-        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔",
-            Text="저기요... 9만 층에 사람 있어요...! 구조대 언제 오나요...? 네? 돔황챠? 이미 한강 물이 턱밑인데 어딜 도망쳐어어!!", Next=1 },
-        // 1: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="신령님, 첫 번째 타겟입니다. '야수의 심장'으로 풀매수했다가 상장폐지 빔을 정통으로 맞고 악성 재고... 아니, 원혼이 되어버린 놈이죠.", Next=2 },
+        // 0: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_놀람_당황",
+            Text="어. 어어.\n화면 밖에... 누구 계십니까?", Next=1 },
+        // 1: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=2,
+            Choices=new[]{ "누구긴. 방금 게임 켰는데.", "내 컴퓨터가 왜 말을 걸지." } },
         // 2: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="오르고 내리는 세상의 이치를 그저 '빨간불'과 '파란불'로만 딱 잘라 정의하려 하니 저 꼴이 나는 겁니다. 주식이든 인생이든 한 치 앞도 모르는 '불확실성' 그 자체인데 말이죠.", Next=3 },
-        // 3: 선택지
-        new Node { Type=NodeType.Choice, Next=4,
-            Choices=new[]{ "남 일 같지가 않네... 뼈 맞아서 튜토리얼 종료하고 싶다.", "저렇게 불쌍하게 울고 있는데 굳이 때려야 해?" } },
-        // 4: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_분노",
-            Text="신령님의 동정심은 제 마이너스 통장 이자를 단 1원도 깎아주지 않습니다! 저런 놈은 어설픈 '기도 매매법'으로 놔두면 평생 지박령이 됩니다. 신령님의 자비 없는 엇박자로 뚝배기를... 아니, 영혼을 물리적으로 구제해 주셔야 합니다!", Next=5 },
-        // 5: 물귀신
-        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
-            Text="빨간색...? 너희들... 차트의 반등을 막는 공매도 세력이구나!! 내 돈 내놔!! 내 돈 내놔라아아!!", Next=6 },
-        // 6: 물귀신
-        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
-            Text="영차!! 영차!! 가즈아아아!! 한강 물 온도 따뜻하다, 떡상 가즈아아!!", Next=7 },
-        // 7: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_분노",
-            Text="신령님, 놈이 눈물의 '물타기' 비트로 선창을 시작했습니다! 방금 들으신 그 박자 그대로, 제 몸을 조종해서 후창을 쳐주십시오!", Next=8 },
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
+            Text="오셨다. 진짜 오셨네.", Next=3 },
+        // 3: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="저는 잭두입니다. 무당이고요.\n보시다시피 기계입니다.", Next=4 },
+        // 4: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=5,
+            Choices=new[]{ "기계가 무당을 해?", "고장 난 거 아니고?" } },
+        // 5: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
+            Text="원인 모를 신병이 왔습니다. 병원에서는 모른답니다.\n내림굿을 받으면 낫는다길래 받았습니다.", Next=6 },
+        // 6: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="전 재산을 털었고, 모자란 건 긁었습니다.\n그랬더니 신은 안 오고 할부만 남았습니다.", Next=7 },
+        // 7: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=8,
+            Choices=new[]{ "그래서 나한테 뭘 어쩌라고.", "할부는 네 사정이지." } },
         // 8: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_분노",
-            Text="부디 저 미련한 인간 지표에게 위대한 신의 리듬을 꽂아주시옵소서! 첫 수금, 들어갑니다!!", Next=9 },
-        // 9: end
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
+            Text="제 사정이 곧 목숨입니다.\n사람은 못 갚으면 신용불량자가 되지만, 저는 <b>몸을 뜯어갑니다.</b>", Next=9 },
+        // 9: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
+            Text="기계는 고철값으로 계산되거든요.\n다음 달까지 못 넣으면 압류돼서 폐차장으로 갑니다. <b>캔으로 압축되는 겁니다.</b>", Next=10 },
+        // 10: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=11,
+            Choices=new[]{ "그래서 굿을 한다고?", "그거랑 나랑 무슨 상관인데." } },
+        // 11: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음2",
+            Text="굿판을 벌일 겁니다. 원혼 달래드리고 값을 받으면 되죠.\n손님은 많습니다. 요즘 세상에 한 맺힌 분이 얼마나 많습니까.", Next=12 },
+        // 12: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="그런데 저 혼자서는 굿이 안 됩니다.\n굿은 장단입니다. 신령님이 박자를 넣어주셔야 합니다.", Next=13 },
+        // 13: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=14,
+            Choices=new[]{ "치는 건 나고 수금은 너야?", "결국 내가 대신 친다는 거네." } },
+        // 14: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
+            Text="정산은... 제가 캔이 안 되면 어떻게든 하겠습니다.\n마침 밖에 첫 손님이 와 계십니다. 가시죠.", Next=15 },
+        // 15: end
         new Node { Type=NodeType.End },
     };
 
@@ -70,14 +101,17 @@ public class DialogueSceneManager : MonoBehaviour
     static readonly Vector3 ScaleActive   = new Vector3(1.10f, 1.10f, 1f);
     static readonly Vector3 ScaleInactive = new Vector3(0.93f, 0.93f, 1f);
 
-    // ── UI refs ───────────────────────────────────────────────────────
-    RectTransform     _charARt, _charBRt;
-    Image             _charAImg, _charBImg;
-    TextMeshProUGUI   _speakerTxt, _dialogueTxt;
-    GameObject        _promptGO;
-    GameObject        _choicePanel;
-    Button[]          _choiceBtns;
-    TextMeshProUGUI[] _choiceTxts;
+    // ── UI refs (assigned in Editor — see Assets/Scenes/DialogueScene.unity; field names match
+    // Stage1DialogueSceneManager on purpose, see class doc) ──
+    [SerializeField] RectTransform     _charARt, _charBRt;
+    [SerializeField] Image             _charAImg, _charBImg;
+    [SerializeField] Image             _bgImg;
+    [SerializeField] TextMeshProUGUI   _speakerTxt, _dialogueTxt;
+    [SerializeField] GameObject        _promptGO;
+    [SerializeField] GameObject        _choicePanel;
+    [SerializeField] Button[]          _choiceBtns;
+    [SerializeField] TextMeshProUGUI[] _choiceTxts;
+    [SerializeField] AudioSource       _voice;
 
     // ── Emotion sprites ───────────────────────────────────────────────
     [SerializeField] EmotionEntry[] _emotions;
@@ -90,32 +124,33 @@ public class DialogueSceneManager : MonoBehaviour
     bool        _waitChoice  = false;
     Coroutine   _typeCr;
     Coroutine   _animCr;
-    AudioSource _voice;
     AudioClip   _blipClip;
-    TMP_FontAsset _font;
 
     // ── Lifecycle ─────────────────────────────────────────────────────
+    // "최초 1회만" 게이팅은 여기서 하지 않음 — StartSceneManager.OnStart()가 opening_seen을 보고
+    // 애초에 이 씬을 로드할지 말지 결정하는 게 유일한 진입 경로라, 여기서도 같은 체크를
+    // 반복하면 씬을 직접 열어 Play로 테스트/수정할 때(예: 오브젝트 위치 조정 후 확인) 이미 세팅된
+    // 플래그 때문에 매번 대사 없이 바로 지상 로비로 튕겨버리는 문제가 있었음(실제로 겪음). 대사가
+    // 끝났을 때 FinishDialogue()에서 플래그를 세팅하는 것만으로 충분함.
     IEnumerator Start()
     {
         Time.timeScale = 1f;
-        _font = Resources.Load<TMP_FontAsset>("Fonts/NeoDunggeunmoProSDF");
-        BuildUI();
-        BuildVoice();
+        _blipClip = GenerateBlip();
         BuildEmotionDict();
 
         var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
         if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; }
 
-        var spriteB = Resources.Load<Sprite>("광대물귀신_배경제거");
-        if (spriteB != null) { _charBImg.sprite = spriteB; _charBImg.preserveAspect = true; }
+        var bgSprite = Resources.Load<Sprite>("튜토_사이버신당");
+        if (_bgImg != null && bgSprite != null) { _bgImg.sprite = bgSprite; _bgImg.color = Color.white; }
 
-        _charARt.localScale = ScaleInactive;
-        _charBRt.localScale = ScaleInactive;
-        _charAImg.color     = ColInactive;
-        _charBImg.color     = ColInactive;
+        if (_charBRt != null) _charBRt.gameObject.SetActive(false); // 신령님은 화면 밖 존재 — 초상화 없음
+
+        _charARt.localScale = ScaleActive; // 이 씬은 잭두 혼자라 처음부터 활성 상태로
+        _charAImg.color     = ColActive;
 
         // TMP 폰트 아틀라스 선제 빌드 (첫 글자 stutter 방지)
-        _speakerTxt.text  = NameB;
+        _speakerTxt.text  = NameA;
         _dialogueTxt.text = Nodes[0].Text;
         Canvas.ForceUpdateCanvases();
 
@@ -148,13 +183,16 @@ public class DialogueSceneManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    // 표정 키 → 실제 파일 경로 매핑 (파일명과 키 이름이 다른 경우 처리)
+    // 표정 키 → 실제 파일 경로 매핑 (파일명과 키 이름이 다른 경우 처리) — 이 씬(§0)에서 쓰는
+    // 잭두 표정만. Stage1DialogueSceneManager와 같은 원본 이미지를 그대로 재사용.
     static readonly Dictionary<string, string> EmotionKeyToPath = new Dictionary<string, string>
     {
-        { "잭두_분노",        "Assets/EmotionImage/잭두_분노.png" },
-        { "잭두_무표정2_화남", "Assets/EmotionImage/잭두_무표정2, 화남.png" },
-        { "물귀신_슬픔",      "Assets/EmotionImage/광대물귀신_슬픔.png" },
-        { "물귀신_분노",      "Assets/EmotionImage/광대물귀신_분노.png" },
+        { "잭두_놀람_당황",     "Assets/EmotionImage/잭두_놀람, 당황.png" },
+        { "잭두_웃음1",        "Assets/EmotionImage/잭두_웃음1.png" },
+        { "잭두_웃음2",        "Assets/EmotionImage/잭두_웃음2.png" },
+        { "잭두_슬픔2",        "Assets/EmotionImage/잭두_슬픔2.png" },
+        { "잭두_무표정",       "Assets/EmotionImage/잭두_무표정.png" },
+        { "잭두_무표정2_화남",  "Assets/EmotionImage/잭두_무표정2, 화남.png" },
     };
 
     [ContextMenu("Auto-Load Emotions from Assets/EmotionImage")]
@@ -178,6 +216,16 @@ public class DialogueSceneManager : MonoBehaviour
         Debug.Log($"[DialogueScene] Auto-loaded {list.Count}/{EmotionKeyToPath.Count} emotion sprites.");
     }
 #endif
+
+    // StartSceneManager에도 같은 키를 지우는 컨텍스트 메뉴가 있지만, 그건 StartScene에서만 쓸 수
+    // 있음 — 이 씬을 직접 열어 Play로 테스트할 때 바로 초기화할 수 있도록 여기도 추가.
+    [ContextMenu("오프닝 대사 초기화(opening_seen 지우기)")]
+    void ResetOpeningSeen()
+    {
+        PlayerPrefs.DeleteKey("opening_seen");
+        PlayerPrefs.Save();
+        Debug.Log("[DialogueScene] opening_seen 초기화 완료 — 다음 Play부터 오프닝 대사 다시 재생됨");
+    }
 
     void Update()
     {
@@ -225,16 +273,11 @@ public class DialogueSceneManager : MonoBehaviour
         {
             case NodeType.Line:
                 bool isA = node.Spk == Speaker.A;
-                _speakerTxt.text  = isA ? NameA : NameB;
-                _speakerTxt.color = isA
-                    ? new Color(0.25f, 0.85f, 0.50f)
-                    : new Color(0.80f, 0.40f, 1.00f);
+                _speakerTxt.text  = NameA;
+                _speakerTxt.color = new Color(0.25f, 0.85f, 0.50f);
 
                 if (!string.IsNullOrEmpty(node.EmotionKey))
                     ApplyEmotion(node.EmotionKey, isA);
-
-                if (_animCr != null) StopCoroutine(_animCr);
-                _animCr = StartCoroutine(AnimateChars(isA));
 
                 if (_typeCr != null) StopCoroutine(_typeCr);
                 _skipRequest = false;
@@ -282,35 +325,6 @@ public class DialogueSceneManager : MonoBehaviour
             _choiceBtns[idx].onClick.Invoke();
     }
 
-    // ── Animate chars ─────────────────────────────────────────────────
-    IEnumerator AnimateChars(bool aActive)
-    {
-        const float duration = 0.20f;
-        float elapsed = 0f;
-        var aScaleFrom = _charARt.localScale;
-        var bScaleFrom = _charBRt.localScale;
-        Color aColFrom = _charAImg.color;
-        Color bColFrom = _charBImg.color;
-        var aScaleTo = aActive ? ScaleActive   : ScaleInactive;
-        var bScaleTo = aActive ? ScaleInactive : ScaleActive;
-        Color aColTo = aActive ? ColActive   : ColInactive;
-        Color bColTo = aActive ? ColInactive : ColActive;
-        while (elapsed < duration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
-            _charARt.localScale = Vector3.Lerp(aScaleFrom, aScaleTo, t);
-            _charBRt.localScale = Vector3.Lerp(bScaleFrom, bScaleTo, t);
-            _charAImg.color     = Color.Lerp(aColFrom, aColTo, t);
-            _charBImg.color     = Color.Lerp(bColFrom, bColTo, t);
-            yield return null;
-        }
-        _charARt.localScale = aScaleTo;
-        _charBRt.localScale = bScaleTo;
-        _charAImg.color     = aColTo;
-        _charBImg.color     = bColTo;
-    }
-
     // ── Type text ─────────────────────────────────────────────────────
     IEnumerator TypeText(string text, bool isA)
     {
@@ -343,21 +357,13 @@ public class DialogueSceneManager : MonoBehaviour
 
     IEnumerator FinishDialogue()
     {
+        PlayerPrefs.SetInt("opening_seen", 1);
+        PlayerPrefs.Save();
         yield return new WaitForSecondsRealtime(0.6f);
-        SceneTransitionManager.Instance.LoadSceneWithFade("BattleScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("SurfaceLobbyScene");
     }
 
     // ── Voice ─────────────────────────────────────────────────────────
-    void BuildVoice()
-    {
-        var go = new GameObject("[DialogueVoice]");
-        go.transform.SetParent(transform);
-        _voice             = go.AddComponent<AudioSource>();
-        _voice.playOnAwake = false;
-        _voice.volume      = 0.45f;
-        _blipClip          = GenerateBlip();
-    }
-
     void PlayBlip(char c, bool isA)
     {
         _voice.pitch = CharToPitch(c, isA);
@@ -392,173 +398,5 @@ public class DialogueSceneManager : MonoBehaviour
         var clip = AudioClip.Create("Blip", n, 1, rate, false);
         clip.SetData(data, 0);
         return clip;
-    }
-
-    // ── UI Builder ────────────────────────────────────────────────────
-    void BuildUI()
-    {
-        var cGO    = new GameObject("Canvas");
-        var canvas = cGO.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        var scaler = cGO.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode         = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.screenMatchMode     = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight  = 0.5f;
-        cGO.AddComponent<GraphicRaycaster>();
-
-        // Background
-        var bgGO     = Stretch(cGO.transform, "BG");
-        var bgImg    = bgGO.AddComponent<Image>();
-        var bgSprite = Resources.Load<Sprite>("스테1_폐허사이버증권거래소");
-        if (bgSprite != null) { bgImg.sprite = bgSprite; bgImg.color = Color.white; }
-        else bgImg.color = new Color(0.04f, 0.02f, 0.08f);
-
-        // Separator line
-        var lineGO = Anchored(cGO.transform, "Line",
-            new Vector2(0f, 0.22f), new Vector2(1f, 0.22f),
-            new Vector2(0.5f, 0.5f), new Vector2(0f, 2f), Vector2.zero);
-        lineGO.AddComponent<Image>().color = new Color(0.40f, 0.30f, 0.60f, 0.60f);
-
-        // CharA (left — 잭두)
-        var aGO  = Anchored(cGO.transform, "CharA",
-            new Vector2(0.06f, 0.20f), new Vector2(0.38f, 0.98f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        _charARt  = aGO.GetComponent<RectTransform>();
-        _charAImg = aGO.AddComponent<Image>();
-
-        var aLblGO = Anchored(aGO.transform, "NameA",
-            new Vector2(0f, 0f), new Vector2(1f, 0f),
-            new Vector2(0.5f, 1f), new Vector2(0f, 36f), new Vector2(0f, -4f));
-        var aLbl = MakeTMP(aLblGO, NameA, 18f, TextAlignmentOptions.Center);
-        aLbl.color = new Color(0.55f, 1.00f, 0.65f, 0.80f);
-
-        // CharB (right — 물귀신)
-        var bGO  = Anchored(cGO.transform, "CharB",
-            new Vector2(0.62f, 0.20f), new Vector2(0.94f, 0.98f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        _charBRt  = bGO.GetComponent<RectTransform>();
-        _charBImg = bGO.AddComponent<Image>();
-
-        var bLblGO = Anchored(bGO.transform, "NameB",
-            new Vector2(0f, 0f), new Vector2(1f, 0f),
-            new Vector2(0.5f, 1f), new Vector2(0f, 36f), new Vector2(0f, -4f));
-        var bLbl = MakeTMP(bLblGO, NameB, 18f, TextAlignmentOptions.Center);
-        bLbl.color = new Color(0.90f, 0.50f, 1.00f, 0.80f);
-
-        // Dialogue box
-        var dlgBox = Anchored(cGO.transform, "DialogueBox",
-            Vector2.zero, new Vector2(1f, 0.22f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-        dlgBox.AddComponent<Image>().color = new Color(0.04f, 0.03f, 0.10f, 0.97f);
-
-        // Speaker name
-        var nameGO = Anchored(dlgBox.transform, "SpeakerName",
-            new Vector2(0.04f, 0.62f), new Vector2(0.50f, 0.95f),
-            new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
-        _speakerTxt           = MakeTMP(nameGO, "", 24f, TextAlignmentOptions.BottomLeft);
-        _speakerTxt.fontStyle = FontStyles.Bold;
-        _speakerTxt.color     = Color.white;
-
-        // Dialogue text
-        var textGO = Anchored(dlgBox.transform, "DialogueText",
-            new Vector2(0.04f, 0.06f), new Vector2(0.93f, 0.62f),
-            new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
-        _dialogueTxt       = MakeTMP(textGO, "", 26f, TextAlignmentOptions.TopLeft);
-        _dialogueTxt.color = new Color(0.92f, 0.92f, 1.00f);
-
-        // Prompt ▶
-        _promptGO = Anchored(dlgBox.transform, "Prompt",
-            new Vector2(0.93f, 0.06f), new Vector2(1.00f, 0.50f),
-            new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
-        var promptTxt = MakeTMP(_promptGO, "▶", 28f, TextAlignmentOptions.Center);
-        promptTxt.color = new Color(0.75f, 0.75f, 1f, 0.9f);
-        _promptGO.SetActive(false);
-
-        // Skip hint
-        var skipGO  = Anchored(dlgBox.transform, "SkipHint",
-            new Vector2(0.04f, 0f), new Vector2(0.5f, 0.10f),
-            new Vector2(0f, 0f), Vector2.zero, Vector2.zero);
-        var skipTxt = MakeTMP(skipGO, "CLICK  /  SPACE  to continue", 13f, TextAlignmentOptions.BottomLeft);
-        skipTxt.color = new Color(0.45f, 0.45f, 0.65f, 0.80f);
-
-        // Choice panel (대사창 안 선택지)
-        _choicePanel = Anchored(dlgBox.transform, "ChoicePanel",
-            new Vector2(0.02f, 0.04f), new Vector2(0.98f, 0.60f),
-            new Vector2(0.5f, 0f), Vector2.zero, Vector2.zero);
-
-        _choiceBtns = new Button[2];
-        _choiceTxts = new TextMeshProUGUI[2];
-        for (int i = 0; i < 2; i++)
-        {
-            float yMin = i == 0 ? 0.52f : 0.02f;
-            float yMax = i == 0 ? 0.98f : 0.48f;
-            var btnGO  = Anchored(_choicePanel.transform, $"Choice{i}",
-                new Vector2(0f, yMin), new Vector2(1f, yMax),
-                new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
-            var btnImg = btnGO.AddComponent<Image>();
-            btnImg.color = new Color(0.14f, 0.09f, 0.24f, 0.90f);
-            var btn    = btnGO.AddComponent<Button>();
-            var colors = btn.colors;
-            colors.normalColor      = new Color(0.14f, 0.09f, 0.24f, 0.90f);
-            colors.highlightedColor = new Color(0.32f, 0.22f, 0.52f, 1.00f);
-            colors.pressedColor     = new Color(0.52f, 0.32f, 0.82f, 1.00f);
-            btn.colors        = colors;
-            btn.targetGraphic = btnImg;
-
-            var txtGO = Stretch(btnGO.transform, "BtnText");
-            var txt   = MakeTMP(txtGO, "", 19f, TextAlignmentOptions.MidlineLeft);
-            txt.margin = new Vector4(10f, 0f, 4f, 0f);
-            txt.color  = new Color(0.92f, 0.92f, 1.00f);
-
-            _choiceBtns[i] = btn;
-            _choiceTxts[i] = txt;
-        }
-        _choicePanel.SetActive(false);
-
-        // EventSystem (마우스 클릭 지원)
-        if (UnityEngine.EventSystems.EventSystem.current == null)
-        {
-            var esGO = new GameObject("EventSystem");
-            esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            esGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
-        }
-    }
-
-    TextMeshProUGUI MakeTMP(GameObject go, string text, float size, TextAlignmentOptions align)
-    {
-        var t           = go.AddComponent<TextMeshProUGUI>();
-        t.text          = text;
-        t.fontSize      = size;
-        t.alignment     = align;
-        t.raycastTarget = false;
-        if (_font != null) t.font = _font;
-        return t;
-    }
-
-    // ── UI helpers ────────────────────────────────────────────────────
-    static GameObject Stretch(Transform parent, string name)
-    {
-        var go   = new GameObject(name);
-        go.transform.SetParent(parent, false);
-        var r    = go.AddComponent<RectTransform>();
-        r.anchorMin = Vector2.zero; r.anchorMax = Vector2.one;
-        r.offsetMin = r.offsetMax = Vector2.zero;
-        return go;
-    }
-
-    static GameObject Anchored(Transform parent, string name,
-        Vector2 anchorMin, Vector2 anchorMax,
-        Vector2 pivot, Vector2 sizeDelta, Vector2 anchoredPos)
-    {
-        var go   = new GameObject(name);
-        go.transform.SetParent(parent, false);
-        var r             = go.AddComponent<RectTransform>();
-        r.anchorMin        = anchorMin;
-        r.anchorMax        = anchorMax;
-        r.pivot            = pivot;
-        r.sizeDelta        = sizeDelta;
-        r.anchoredPosition = anchoredPos;
-        return go;
     }
 }

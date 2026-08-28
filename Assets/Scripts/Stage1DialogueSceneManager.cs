@@ -6,9 +6,17 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Dialogue scene leading into Stage1Scene (물타기) — §0 오프닝(사이버 신당) + §1 물귀신 등장.
+/// §1. 스테이지1 인트로 — 물귀신 등장. 지상 로비에서 스테이지1을 선택해 지하로 내려간 뒤 재생되는
+/// 대사(현재는 씬 전환의 페이드아웃/인만 있고, 별도의 "내려가는 연출"은 아직 없음 — 나중에 붙는
+/// 대로 이 씬 앞이나 SurfaceLobbyScene 쪽에 추가될 예정). 대사가 끝나면 UndergroundLobbyScene
+/// (1-1~1-5 스테이지 선택 로비, 아직 플레이스홀더)으로 전환됨 — Stage1Scene(1-1 실제 플레이)으로
+/// 바로 가는 게 아니라 그 사이에 지하 로비가 있음. 예전엔 §0 오프닝(사이버 신당)도 이 씬 앞부분에
+/// 같이 있었는데, 오프닝은 게임 전체에서 딱 한 번만 나오는 것으로 분리되어 이제 DialogueScene
+/// (원본 DialogueSceneManager를 이 용도로 개조함)에서 담당 — 이 씬은 §1만 남음.
+///
 /// Forked from DialogueSceneManager (kept untouched) rather than edited in place, since the
 /// original still leads into BattleScene and may be reverted to independently of this one.
+/// (그 DialogueScene 원본은 이후 오프닝 대사 전용으로 개조됐음 — 위 참고.)
 /// </summary>
 public class Stage1DialogueSceneManager : MonoBehaviour
 {
@@ -39,46 +47,64 @@ public class Stage1DialogueSceneManager : MonoBehaviour
 
     static readonly Node[] Nodes = new Node[]
     {
-        // ── §0. 오프닝 — 사이버 신당 ──────────────────────────────────
-        // 0: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_놀람_당황", BgKey="튜토_사이버신당",
-            Text="시스템 재부팅... 으윽. 어? 화면 밖에... 누구 계십니까?", Next=1 },
+        // ── §1. 스테이지 1 — 물귀신 등장/인트로 ─────────────────────────
+        // (무대: 물이 목까지 찬 곳, 개미들이 우글거림 — 배경/캐릭터로 이미 표현되어 별도 대사 노드
+        // 없음)
+        // 0: 물귀신
+        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔", BgKey="스테1_폐허사이버증권거래소",
+            Text="9만 층이요... 사람 있어요...\n구조대... 아직인가요...", Next=1 },
         // 1: 선택지 (신령님)
         new Node { Type=NodeType.Choice, Next=2,
-            Choices=new[]{ "게임 방금 켰는데. 넌 뭐야?", "뭐지, 내 컴퓨터 해킹당한 건가?" } },
+            Choices=new[]{ "9만 층?", "무슨 소리야 저게." } },
         // 2: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
-            Text="아, 해킹 아닙니다! 저는 잭두, 하드웨어 무당입니다. 원인 모를 신병 고쳐보겠다고 전 재산 털어 내림굿을 받았더니— 글쎄, 화면 밖 신령님이 제 시스템에 강림하셨지 뭡니까.", Next=3 },
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
+            Text="주식입니다. 9만 원에 사서 못 팔았다는 뜻이죠.\n물렸다고 합니다. 그러다 진짜 물에 빠지셨고요.", Next=3 },
         // 3: 선택지 (신령님)
         new Node { Type=NodeType.Choice, Next=4,
-            Choices=new[]{ "내가 신이라고? 난 그냥 게임 끌 건데.", "귀찮네. 종료 버튼 누르고 딴 거 할래." } },
+            Choices=new[]{ "밑에 우글거리는 건 뭐야.", "저 벌레들은." } },
         // 4: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="잠시만요 신령님!!! 종료만은 안 됩니다! 지금 나가시면 전 내일 아침 폐차장에서 캔으로 압축됩니다...", Next=5 },
-        // 5: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="기계인 저 혼자선 진짜 성불이 안 됩니다. 원혼을 달랠 '알맹이', 그러니까 신령님의 '리듬'이 개입해야만 위령이 됩니다.", Next=6 },
-        // 6: 선택지 (신령님)
-        new Node { Type=NodeType.Choice, Next=7,
-            Choices=new[]{ "결국 리듬게임 대리 뛰라는 소리네.", "내가 치고 돈은 네가 벌어? 날강도네 완전." } },
-        // 7: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음2",
-            Text="수익은... 제가 목숨만 건지면 어떻게든 보답하겠습니다! 방식은 백문이 불여일'타'(打), 부딪혀보며 익히는 게 빠릅니다. 마침 밖에 원혼들이 줄을 섰군요. 첫 손님부터 만나시죠. 가시죠, 신령님!", Next=8 },
-
-        // ── §1. 스테이지 1 — 물귀신 등장/인트로 ─────────────────────────
-        // 8: 물귀신
-        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔", BgKey="스테1_폐허사이버증권거래소",
-            Text="저기요... 9만 층에 사람 있어요...! 구조대 언제 오나요...? 네..? 돔황챠? 이미 한강 물이 턱밑인데 어딜 도망쳐어어!!", Next=9 },
-        // 9: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="첫 번째 타겟입니다. 야수의 심장으로 풀매수했다가 상장폐지 빔을 정통으로 맞고 원혼이 되어버린 놈이죠. 오르내리는 세상 이치를 빨간불·파란불로만 자르려다 저 꼴이 난 겁니다.", Next=10 },
-        // 10: 선택지 (신령님)
-        new Node { Type=NodeType.Choice, Next=11,
-            Choices=new[]{ "남 일 같지가 않네... 나도 뼈 맞고 게임 끄고 싶다.", "저렇게 우는데 굳이 때려야 해?" } },
+            Text="개미입니다. 저 양반 따라 들어갔다가 같이 잠긴 것들이죠.\n이제 저 양반 없이는 못 나갑니다.", Next=5 },
+        // 5: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=6,
+            Choices=new[]{ "분장한 건 뭔데.", "광대 같은데 저거." } },
+        // 6: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_놀람_당황",
+            Text="...광대 분장이군요.\n<b>영감입니다.</b> 도깨비요.", Next=7 },
+        // 7: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=8,
+            Choices=new[]{ "도깨비가 왜 붙어.", "귀신 아니고?" } },
+        // 8: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="도깨비는 재물신입니다. 부자로 만들어주기도 하고, 저 꼴로 만들기도 하죠.\n저 양반이 좇던 대박이 저겁니다. <b>도깨비불이었던 거예요.</b>", Next=9 },
+        // 9: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=10,
+            Choices=new[]{ "너랑 비슷하네.", "돈 때문에 저렇게 된 거잖아." } },
+        // 10: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
+            Text="...남 일 같지 않습니다.\n저도 다음 달까지 못 넣으면 저 옆자리입니다.", Next=11 },
         // 11: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_분노",
-            Text="신령님의 동정심은 제 마이너스 통장 이자를 1원도 안 깎아줍니다! 자비 없는 엇박자로 저 미련한 영혼을 물리적으로 구제해 주십시오!", Next=12 },
-        // 12: end
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="그래서 더 잘 보내드려야 합니다.", Next=12 },
+        // 12: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=13,
+            Choices=new[]{ "어떻게 보내는데.", "때려서 쫓아내?" } },
+        // 13: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="<b>영감이면 영감놀이입니다.</b> 놀아드리고 보내는 굿이죠.\n쫓으면 화내고 돌아옵니다. 실컷 놀아드려야 갑니다.", Next=14 },
+        // 14: 선택지 (신령님)
+        new Node { Type=NodeType.Choice, Next=15,
+            Choices=new[]{ "이기는 게 아니라?", "그게 무슨 굿이야." } },
+        // 15: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="이기면 안 됩니다. 지는 것도 아니고요.\n끝까지 같이 놀아드리는 게 전부입니다.", Next=16 },
+        // 16: 물귀신
+        new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
+            Text="안 가! 안 간다고!\n<b>존버는 승리한다!!</b> 나는 아직 안 팔았어!!", Next=17 },
+        // 17: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
+            Text="...기운은 좋으시군요.\n저 정도면 잘 노시겠습니다. 시작하시죠.", Next=18 },
+        // 18: end
         new Node { Type=NodeType.End },
     };
 
@@ -132,8 +158,8 @@ public class Stage1DialogueSceneManager : MonoBehaviour
         _charAImg.color     = ColInactive;
         _charBImg.color     = ColInactive;
 
-        // TMP 폰트 아틀라스 선제 빌드 (첫 글자 stutter 방지)
-        _speakerTxt.text  = NameA;
+        // TMP 폰트 아틀라스 선제 빌드 (첫 글자 stutter 방지) — Nodes[0]은 물귀신(B)의 대사
+        _speakerTxt.text  = NameB;
         _dialogueTxt.text = Nodes[0].Text;
         Canvas.ForceUpdateCanvases();
 
@@ -172,16 +198,15 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    // 표정 키 → 실제 파일 경로 매핑 (파일명과 키 이름이 다른 경우 처리)
+    // 표정 키 → 실제 파일 경로 매핑 (파일명과 키 이름이 다른 경우 처리) — §1에서 실제 쓰는 것만
+    // (§0 오프닝 전용 표정들은 DialogueScene 쪽으로 옮겨감 — 그쪽 EmotionKeyToPath 참고)
     static readonly Dictionary<string, string> EmotionKeyToPath = new Dictionary<string, string>
     {
-        { "잭두_놀람_당황",     "Assets/EmotionImage/잭두_놀람, 당황.png" },
-        { "잭두_웃음1",        "Assets/EmotionImage/잭두_웃음1.png" },
-        { "잭두_웃음2",        "Assets/EmotionImage/잭두_웃음2.png" },
-        { "잭두_슬픔2",        "Assets/EmotionImage/잭두_슬픔2.png" },
-        { "잭두_무표정",       "Assets/EmotionImage/잭두_무표정.png" },
-        { "잭두_분노",         "Assets/EmotionImage/잭두_분노.png" },
         { "잭두_무표정2_화남",  "Assets/EmotionImage/잭두_무표정2, 화남.png" },
+        { "잭두_무표정",       "Assets/EmotionImage/잭두_무표정.png" },
+        { "잭두_놀람_당황",     "Assets/EmotionImage/잭두_놀람, 당황.png" },
+        { "잭두_슬픔2",        "Assets/EmotionImage/잭두_슬픔2.png" },
+        { "잭두_웃음1",        "Assets/EmotionImage/잭두_웃음1.png" },
         { "물귀신_슬픔",       "Assets/EmotionImage/광대물귀신_슬픔.png" },
         { "물귀신_분노",       "Assets/EmotionImage/광대물귀신_분노.png" },
     };
@@ -205,6 +230,16 @@ public class Stage1DialogueSceneManager : MonoBehaviour
         _emotions = list.ToArray();
         UnityEditor.EditorUtility.SetDirty(this);
         Debug.Log($"[Stage1DialogueScene] Auto-loaded {list.Count}/{EmotionKeyToPath.Count} emotion sprites.");
+    }
+
+    // 이 씬을 직접 열어 Play로 테스트할 때 바로 초기화할 수 있도록 — SurfaceLobbyManager도 같은 키를
+    // 보고 대사를 다시 스킵할지 판단하니, 로비를 거쳐 재진입할 때도 이 초기화가 적용됨.
+    [ContextMenu("스테이지1 지하 인트로 초기화(stage1_underground_intro_seen 지우기)")]
+    void ResetIntroSeen()
+    {
+        PlayerPrefs.DeleteKey("stage1_underground_intro_seen");
+        PlayerPrefs.Save();
+        Debug.Log("[Stage1DialogueScene] stage1_underground_intro_seen 초기화 완료 — 다음부터 §1 대사 다시 재생됨");
     }
 #endif
 
@@ -374,8 +409,15 @@ public class Stage1DialogueSceneManager : MonoBehaviour
 
     IEnumerator FinishDialogue()
     {
+        // 스테이지1 지하 첫 진입 대사 — 오프닝(DialogueScene)과 같은 패턴으로 게임 통틀어 한 번만.
+        // 게이팅 자체는 여기서 안 함(그러면 이 씬을 에디터에서 직접 열어 테스트할 때마다 튕겨버림 —
+        // 오프닝 때 실제로 겪은 문제), SurfaceLobbyManager.TrySelect()가 이 플래그를 보고 애초에
+        // 이 씬을 다시 로드할지 말지 결정함. 여기서는 완주했다는 사실만 기록.
+        PlayerPrefs.SetInt("stage1_underground_intro_seen", 1);
+        PlayerPrefs.Save();
+
         yield return new WaitForSecondsRealtime(0.6f);
-        SceneTransitionManager.Instance.LoadSceneWithFade("Stage1Scene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("UndergroundLobbyScene");
     }
 
     // ── Voice ─────────────────────────────────────────────────────────
