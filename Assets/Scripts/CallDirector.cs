@@ -122,6 +122,22 @@ public class CallDirector : MonoBehaviour
     /// CallPatternData reference, and without waiting for the first spawn/OnPhaseChanged event.
     public bool StartsInResponsePhase => _calls != null && _calls.Count > 0 && _calls[0].role == CallRole.Response;
 
+    /// Read-only view of the live, already-sorted-by-cueBeat spawn list — the actual schedule this
+    /// director is running, INCLUDING whatever PracticeLoopExtender has synthesized/appended so far
+    /// (unlike CallPatternData.calls, which for a looping practice chart only ever holds the one
+    /// authored cycle). Added for Stage1SurviveVisuals: its bubble-anticipation cue needs each
+    /// character's own real cueBeat/releaseBeat, several beats ahead of when that entry actually
+    /// fires, to schedule "1 beat before" independently per entry instead of assuming a fixed gap
+    /// between characters (see that class's doc comment) — this is the only way to see appended
+    /// practice-loop reps far enough in advance for that to work.
+    public IReadOnlyList<CallEntry> Calls => _calls;
+
+    /// The CallClock this director reads SongTime from — exposed so visual glue scripts that get
+    /// rebound to a different director at runtime (Stage1PracticeGate segment swaps, tutorial gates)
+    /// can always reach the CURRENTLY bound director's clock via BindDirector(newDirector), instead
+    /// of holding a separate, potentially-stale CallClock reference of their own.
+    public CallClock Clock => clock;
+
     int  _nextSpawnIdx;
     bool _songEndFired;
     bool _prevPressed; // Space + mouse left click combined, previous-frame state

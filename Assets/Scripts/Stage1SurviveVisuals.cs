@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,8 +41,8 @@ using UnityEngine.UI;
 ///   - CallDirector.OnCallCueGroup (fires once per Call-role entry spawn): idx 0 = Clown surfaces,
 ///     idx 1 = NormalAnt surfaces, idx 2 = the beat4Cue — shower flips back "on" and Clown/NormalAnt
 ///     dive back down together. Also idx 0 is when the shower sprite flips to "off" (it stays off for
-///     the rest of the cycle), and each case ALSO starts the *next* character's head-bubble one beat
-///     early — see the bubble paragraph below.
+///     the rest of the cycle). Head-bubbles are NOT driven off this event — see the bubble paragraph
+///     below for why and how they're scheduled independently.
 ///   - CallDirector.OnResponsePress / OnResponseRelease: Y position is a direct, unconditional,
 ///     always-immediate mirror of the held button — press always sets the dive Y, release always sets
 ///     the surface Y, full stop, nothing ever delays or blocks it (explicit request: "위치 움직이는건
@@ -69,35 +70,38 @@ using UnityEngine.UI;
 ///     reported as the toggle "disappearing again." Left unsubscribed here; a near-miss press or an
 ///     early release still get their own Miss via OnGroupJudged regardless.
 ///
-/// Bubble anticipation cue ("올라오기 직전마다 머리 위에 기포가 뽀로록"), v2 — replaces the earlier
-/// procedural placeholder (soft round dots generated at runtime) now that real art exists
-/// (Assets/1-3/1-3 기포.png). Spec from the planner, verbatim behavior:
-///   - Clown/NormalAnt: their bubble appears exactly 1 beat before *their own* surface cue, and
+/// Bubble anticipation cue ("올라오기 직전마다 머리 위에 기포가 뽀로록"), v3 — replaces the v2 cascade
+/// implementation (each character's bubble triggered off the *previous* character's own cue firing),
+/// which silently assumed every character always surfaces exactly 1 beat after the one before it in
+/// the cycle. That assumption isn't the actual spec and isn't guaranteed by the chart data — the real
+/// rule, per character, independent of any other character's timing:
+///   - Clown/NormalAnt: their bubble appears exactly 1 beat before *their own* cueBeat, and
 ///     disappears the instant they actually surface.
-///   - PlayerAnt (Response): its bubble appears 1 beat before the beat they need to surface by — but
-///     ONLY if they're still submerged at that moment (they may have already surfaced early on a
-///     mistimed release, in which case there's nothing left to warn them about). It disappears the
-///     instant they surface too, for the same reason a bubble floating above someone already out of
-///     the water would look wrong ("기포가 물밖에 있으면 좀 이상하잖아").
-/// Implementation: each of Clown/NormalAnt/Player surfaces exactly 1 beat after the character *before*
-/// them in the cycle (Clown@beat1, NormalAnt@beat2, Player releases@beat3), and the beat4Cue itself
-/// lands exactly 1 beat before the *next* cycle's Clown@beat1. So instead of computing "beat - 1"
-/// against the chart directly, each OnCallCueGroup case in HandleCallCueGroup does double duty: it
-/// drives its own character's surfacing AND starts the *next* character's bubble, one beat early "for
-/// free," with no new chart entries needed. Clown/NormalAnt's bubble is hidden in DelayedReveal's
-/// completion callback (the exact moment they become visually surfaced); PlayerAnt's bubble is hidden
-/// unconditionally in HandlePlayerResponsePress/Release (covers every way it can surface: on-time
-/// Hit, early-release Miss, everything). Cycle 0's Clown bubble has no earlier beat4Cue to cascade off
-/// of (there is no "previous cycle"), so it's handled separately: ShowFirstClownBubble() reads the
-/// chart directly off `clock` (the only reason this script holds a CallClock reference at all) to find
-/// the very first Call-role entry's cueBeat, then waits until exactly 1 beat before it — same "1 beat
-/// before" rule as everywhere else, just computed once instead of cascaded from an event.
+///   - PlayerAnt (Response): its bubble appears 1 beat before the beat they need to surface by (their
+///     own Hold entry's releaseBeat) — but ONLY if they're still submerged at that moment (they may
+///     have already surfaced early on a mistimed release, in which case there's nothing left to warn
+///     them about). It disappears the instant they surface too, for the same reason a bubble floating
+///     above someone already out of the water would look wrong ("기포가 물밖에 있으면 좀 이상하잖아").
+/// Implementation: ScanForBubbleScheduling walks CallDirector.Calls (the director's actual live
+/// schedule — NOT CallPatternData.calls directly, which for a looping practice chart only ever holds
+/// the one authored cycle; PracticeLoopExtender appends synthesized reps straight into the director,
+/// several beats ahead of when they're due, which is exactly the lead time this needs) and, for every
+/// entry it hasn't seen yet, independently queues a "show at (this entry's own relevant beat) - 1"
+/// pending bubble — Clown/NormalAnt off their own cueBeat, Player off their own Hold's releaseBeat. No
+/// character's timing is ever inferred from another's. Queued bubbles are resolved by ResolvePendingBubbles
+/// every Update(), comparing each one's target time directly against CallClock.SongTime (dspTime-based)
+/// — deliberately NOT a WaitForSeconds coroutine (Time.deltaTime-based): the two clocks can drift apart
+/// under frame-pacing stalls (confirmed while testing headless via MCP — SongTime and Time.time visibly
+/// diverged), which would show a bubble at the wrong real moment even though the *beat* math was right.
+/// Polling SongTime directly keeps this exact regardless of frame pacing, same principle CallDirector's
+/// own judgement loop already follows. Clown/NormalAnt's bubble is still hidden in DelayedReveal's
+/// completion callback (the exact moment they become visually surfaced); PlayerAnt's bubble is still
+/// hidden unconditionally in HandlePlayerResponsePress/Release (covers every way it can surface:
+/// on-time Hit, early-release Miss, everything) — only the SHOW trigger changed, not the HIDE side.
 /// </summary>
 public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
 {
     [SerializeField] CallDirector callDirector;
-    [Tooltip("cycle 0의 첫 광대 기포 타이밍 계산에만 씀 — ShowFirstClownBubble() 참고.")]
-    [SerializeField] CallClock clock;
 
     [Header("광대")]
     [SerializeField] Image clownImage;
@@ -153,9 +157,33 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
     [SerializeField] Image antBubbleImage;
     [SerializeField] Image playerBubbleImage;
 
+    [Header("SFX")]
+    [SerializeField] AudioSource sfxSource;
+    [Tooltip("기포가 뜰 때(광대/개미/플레이어 공통, Assets/Sound/1-3_보글.wav)")]
+    [SerializeField] AudioClip bubbleSfx;
+    [Tooltip("캐릭터가 물 밖으로 나올 때(광대/개미/플레이어 공통, Assets/Sound/1-3탬버린.wav)")]
+    [SerializeField] AudioClip surfaceSfx;
+
     // groupId -> how many of this group's Call-role entries have fired OnCallCueGroup so far.
     // idx 0 = Clown, idx 1 = NormalAnt — see class doc.
-    readonly System.Collections.Generic.Dictionary<int, int> _groupCallCounts = new System.Collections.Generic.Dictionary<int, int>();
+    readonly Dictionary<int, int> _groupCallCounts = new Dictionary<int, int>();
+
+    // Bubble scheduling — see class doc's "Bubble anticipation cue" section. _bubbleCallIdxPerGroup is
+    // NOT the same idx counter as _groupCallCounts above, which only tracks entries that have actually
+    // FIRED — this one tracks entries merely SEEN in the live schedule, ahead of time, so bubbles can
+    // be queued a full beat-plus before they're due. _pendingBubbles holds every queued-but-not-yet-
+    // shown bubble; ResolvePendingBubbles (called every Update()) is what actually shows them once
+    // CallClock.SongTime reaches each one's target time.
+    readonly Dictionary<int, int> _bubbleCallIdxPerGroup = new Dictionary<int, int>();
+    struct PendingBubble
+    {
+        public Image bubbleImage;
+        public CallClock clock;
+        public float targetTime;
+        public bool requireStillSubmerged;
+    }
+    readonly List<PendingBubble> _pendingBubbles = new List<PendingBubble>();
+    int _bubbleScanIdx;
 
     Coroutine _clownCr;
     Coroutine _antCr;
@@ -204,11 +232,28 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
     }
 
     /// Switches which CallDirector drives these visuals — see Stage1WaveRideVisuals.BindDirector.
+    /// Also resets bubble-scheduling state: a rebind means a brand new director with its own,
+    /// freshly-restarted Calls list (Stage1PracticeGate segment swap, tutorial gate), so anything
+    /// still waiting to fire from the OLD director's schedule is stale and must be cancelled — never
+    /// let a bubble from a torn-down segment pop up over whatever's playing now.
     public void BindDirector(CallDirector newDirector)
     {
         Unbind(callDirector);
         callDirector = newDirector;
         Bind(callDirector);
+
+        _pendingBubbles.Clear();
+        _bubbleCallIdxPerGroup.Clear();
+        _bubbleScanIdx = 0;
+        SetBubble(clownBubbleImage, false);
+        SetBubble(antBubbleImage, false);
+        SetBubble(playerBubbleImage, false);
+    }
+
+    void Update()
+    {
+        ScanForBubbleScheduling();
+        ResolvePendingBubbles();
     }
 
     void Start()
@@ -226,36 +271,79 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
         SetBubble(clownBubbleImage, false);
         SetBubble(antBubbleImage, false);
         SetBubble(playerBubbleImage, false);
-
-        if (clock != null && clownBubbleImage != null) StartCoroutine(ShowFirstClownBubble());
     }
 
-    // Cycle 0's Clown bubble has no earlier beat4Cue to cascade off of (see class doc) — this computes
-    // its "1 beat before" timing directly instead, once, by reading the chart's own first Call-role
-    // entry off `clock.Pattern`. `calls` is guaranteed sorted by cueBeat (CallPatternData's own
-    // invariant), but the *very first* entry overall is usually the player's own Hold (its cueBeat ==
-    // this cycle's start, earlier than Clown's), so this specifically scans for the first Call-role one
-    // rather than just taking calls[0].
-    IEnumerator ShowFirstClownBubble()
+    // Walks callDirector.Calls (the director's actual live schedule, including whatever
+    // PracticeLoopExtender has appended so far) forward from wherever it last left off, and
+    // independently schedules a bubble for every entry that needs one — see class doc's "Bubble
+    // anticipation cue" section for why this reads the live schedule instead of CallPatternData.calls
+    // directly, and why each entry's timing is computed from its own beat rather than cascaded off
+    // another character's cue. _bubbleScanIdx only ever walks forward and Calls only ever grows
+    // (AppendCalls/ReplaceCalls — see CallDirector), so re-running this every Update() and resuming
+    // from _bubbleScanIdx is safe and cheap (a no-op scan once caught up).
+    void ScanForBubbleScheduling()
     {
-        yield return null; // let every other script's Start() (including CallClock's) run first —
-                            // clock.SongTime reads as a stale 0 before CallClock has started running.
+        if (callDirector == null) return;
+        var calls = callDirector.Calls;
+        if (calls == null) return;
 
-        var pattern = clock.Pattern;
-        if (pattern == null) yield break;
-
-        CallEntry firstClownCue = null;
-        foreach (var entry in pattern.calls)
+        for (; _bubbleScanIdx < calls.Count; _bubbleScanIdx++)
         {
-            if (entry.role == CallRole.Call) { firstClownCue = entry; break; }
+            var entry = calls[_bubbleScanIdx];
+
+            if (entry.role == CallRole.Call)
+            {
+                // idx 0 = Clown, idx 1 = NormalAnt, idx 2 = beat4Cue (submerge cue — no bubble; see
+                // class doc's "Chart shape per cycle"). This idx is purely a per-group ordinal
+                // position among Call-role entries, independent of any timing/spacing assumption.
+                _bubbleCallIdxPerGroup.TryGetValue(entry.groupId, out int idx);
+                _bubbleCallIdxPerGroup[entry.groupId] = idx + 1;
+
+                if (idx == 0) ScheduleBubble(clownBubbleImage, entry.cueBeat - 1f, requireStillSubmerged: false);
+                else if (idx == 1) ScheduleBubble(antBubbleImage, entry.cueBeat - 1f, requireStillSubmerged: false);
+            }
+            else if (entry.role == CallRole.Response && entry.type == CallType.Hold)
+            {
+                // The player's own Hold — "the beat they need to surface by" is its releaseBeat.
+                ScheduleBubble(playerBubbleImage, entry.releaseBeat - 1f, requireStillSubmerged: true);
+            }
         }
-        if (firstClownCue == null) yield break;
+    }
 
-        float targetTime = pattern.BeatToTime(firstClownCue.cueBeat - 1f);
-        float wait = targetTime - clock.SongTime;
-        if (wait > 0f) yield return new WaitForSeconds(wait);
+    void ScheduleBubble(Image bubbleImage, float targetBeat, bool requireStillSubmerged)
+    {
+        if (bubbleImage == null || callDirector == null) return;
+        var clock = callDirector.Clock;
+        if (clock == null || clock.Pattern == null) return;
 
-        SetBubble(clownBubbleImage, true);
+        _pendingBubbles.Add(new PendingBubble
+        {
+            bubbleImage = bubbleImage,
+            clock = clock,
+            targetTime = clock.Pattern.BeatToTime(targetBeat),
+            requireStillSubmerged = requireStillSubmerged,
+        });
+    }
+
+    // Polls every queued bubble against its own clock's SongTime — see class doc for why this is a
+    // poll instead of a WaitForSeconds coroutine. Iterates backward so RemoveAt mid-loop is safe.
+    void ResolvePendingBubbles()
+    {
+        for (int i = _pendingBubbles.Count - 1; i >= 0; i--)
+        {
+            var p = _pendingBubbles[i];
+            if (p.clock == null || p.clock.SongTime < p.targetTime) continue;
+
+            // Player only: if they already surfaced early on a mistimed release, there's nothing left
+            // to warn them about (see class doc). Clown/NormalAnt have no such exception — they're
+            // chart-timed demo characters, never player-input-dependent.
+            if (!p.requireStillSubmerged || _playerSubmerged)
+            {
+                SetBubble(p.bubbleImage, true);
+                PlaySfx(bubbleSfx);
+            }
+            _pendingBubbles.RemoveAt(i);
+        }
     }
 
     void HandleCallCueGroup(int groupId)
@@ -265,24 +353,17 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
 
         switch (idx)
         {
-            case 0: // Clown — beat 1. Also the moment the shower shuts off for this cycle, and
-                    // NormalAnt's bubble starts (NormalAnt surfaces 1 beat later, at beat 2).
+            case 0: // Clown — beat 1. Also the moment the shower shuts off for this cycle.
                 if (showerImage != null) showerImage.sprite = showerOffSprite;
                 SurfaceClown();
-                SetBubble(antBubbleImage, true);
                 break;
-            case 1: // NormalAnt — beat 2. Also starts PlayerAnt's bubble, but only if they're still
-                    // submerged — they may have already surfaced early on a mistimed release, in which
-                    // case there's nothing left to warn them about.
+            case 1: // NormalAnt — beat 2.
                 SurfaceAnt();
-                if (_playerSubmerged) SetBubble(playerBubbleImage, true);
                 break;
             case 2: // beat4Cue — shower back on, Clown/NormalAnt dive together. Chart-timed, does NOT
-                    // depend on the player's own press (see class doc). Also starts the *next* cycle's
-                    // Clown bubble (Clown surfaces 1 beat after this fires, at next cycle's beat 1).
+                    // depend on the player's own press (see class doc).
                 if (_submergeCr != null) StopCoroutine(_submergeCr);
                 _submergeCr = StartCoroutine(SubmergeCastNPCsDelayed());
-                SetBubble(clownBubbleImage, true);
                 break;
             // default: more than 3 Call-role fires in one group shouldn't happen for this chart shape.
         }
@@ -328,6 +409,7 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
         yield return new WaitForSeconds(surfaceRevealDelay);
         img.sprite = surfaceSprite;
         SetY(img.rectTransform, targetY);
+        PlaySfx(surfaceSfx);
         onComplete?.Invoke();
     }
 
@@ -377,6 +459,7 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
         SetY(playerAntImage.rectTransform, _playerBaseY + surfaceYOffset);
         if (_playerFailCr == null) playerAntImage.sprite = playerSurfaceSprite;
         SetBubble(playerBubbleImage, false);
+        PlaySfx(surfaceSfx);
     }
 
     // Briefly shows the fail sprite in place — deliberately never touches Y (HandlePlayerResponsePress/
@@ -402,6 +485,11 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
     static void SetBubble(Image bubbleImage, bool visible)
     {
         if (bubbleImage != null) bubbleImage.gameObject.SetActive(visible);
+    }
+
+    void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
     }
 
     IEnumerator ScalePulseRoutine(RectTransform rect, Vector3 baseScale, float peakY, float duration, Action onComplete)
