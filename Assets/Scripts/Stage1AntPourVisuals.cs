@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -78,8 +79,40 @@ public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
 
     Coroutine _handCr, _playerCr, _clownCr;
 
-    void OnEnable()  => Bind(callDirector);
-    void OnDisable() => Unbind(callDirector);
+    // SpawnBalloon()이 만드는 임시 Image들 — fire-and-forget이라 OnDisable 때 자동으로 안 사라짐(코루틴
+    // 자체는 SetActive(false)로 죽지만 그게 만든 GameObject는 그대로 남음). 리스트로 추적해뒀다가
+    // OnDisable에서 아직 안 끝난 것들을 강제로 Destroy — 안 그러면 Stage1_5Scene 리믹스처럼 이 화면이
+    // 껐다 켜지길 반복할 때, 지난 방문에서 떠오르다 만 풍선이 그대로 숨어있다가 다음 방문 때 그 자리에
+    // 다시 나타남(실제로 겪은 버그: "풍선이 뒷배경에 떠오르는 상태에 멈춰있음").
+    readonly List<GameObject> _liveBalloons = new List<GameObject>();
+
+    // Stage1_5Scene(리믹스)에서 같은 스타일이 한 곡 안에서 여러 번 반복될 때마다 이 GameObject가
+    // SetActive(true/false)로 재진입됨 — Start()는 최초 1회뿐이라 두 번째 이후 방문은 지난 방문이
+    // 끝난 시점의 스프라이트/코루틴 핸들이 그대로 남아있었음(실제로 겪은 버그). 재진입마다
+    // ResetVisualState를 돌려서 항상 깨끗한 idle 상태로 시작하게 함.
+    void OnEnable()
+    {
+        Bind(callDirector);
+        ResetVisualState();
+    }
+
+    void OnDisable()
+    {
+        Unbind(callDirector);
+
+        for (int i = _liveBalloons.Count - 1; i >= 0; i--)
+            if (_liveBalloons[i] != null) Destroy(_liveBalloons[i]);
+        _liveBalloons.Clear();
+    }
+
+    void ResetVisualState()
+    {
+        _handCr = null;
+        _playerCr = null;
+        _clownCr = null;
+        _handPulsesPending = 0;
+        ResetIdlePose();
+    }
 
     void Bind(CallDirector d)
     {
@@ -105,13 +138,22 @@ public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
         Bind(callDirector);
     }
 
-    void Start()
+    void Awake()
+    {
+        // 최초 1회만 캐시 — ResetVisualState는 재진입마다 돌아서 이 값을 다시 읽으면 지난 방문의
+        // AnimatePlayerBop() 스케일이 이미 섞인 값을 "기준"으로 잘못 학습하게 됨.
+        if (playerAntImage != null) _playerBaseScale = playerAntImage.rectTransform.localScale;
+    }
+
+    void Start() => ResetIdlePose();
+
+    void ResetIdlePose()
     {
         if (handImage != null)      handImage.sprite      = handIdleSprite;
         if (playerAntImage != null)
         {
             playerAntImage.sprite = playerAntIdleSprite;
-            _playerBaseScale = playerAntImage.rectTransform.localScale;
+            playerAntImage.rectTransform.localScale = _playerBaseScale;
         }
         if (clownImage != null)     clownImage.sprite     = clownIdleSprite;
     }
@@ -246,6 +288,7 @@ public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
         if (sprite == null) yield break;
 
         var go = new GameObject("Balloon(Temp)", typeof(RectTransform), typeof(Image));
+        _liveBalloons.Add(go);
         var rt = (RectTransform)go.transform;
         rt.SetParent(balloonSpawnParent, false);
 
@@ -275,6 +318,10 @@ public class Stage1AntPourVisuals : MonoBehaviour, IPracticeRebindable
 
             yield return null;
         }
-        if (rt != null) Destroy(rt.gameObject);
+        if (rt != null)
+        {
+            _liveBalloons.Remove(rt.gameObject);
+            Destroy(rt.gameObject);
+        }
     }
 }

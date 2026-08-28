@@ -4,13 +4,19 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Stage1 end-of-song result popup — same visual language as BattleResultScreen (same sprite
-/// assets, same Dim/Popup/RankText/RankIcon composition), but simplified: Stage1Scene isn't wired
-/// into the Lobby stage-unlock economy yet, so there's no Page2/mugu-equip step and no tutorial
-/// branch — just the rank icon and a single button back to Lobby.
+/// assets, same Dim/Popup/RankText/RankIcon composition), but simplified: no Page2/mugu-equip step,
+/// no tutorial branch — just the rank icon and a single button back to the 지하 로비
+/// (UndergroundLobbyScene). 이 씬 하나짜리 컴포넌트를 Stage1_1Scene~Stage1_5Scene 각각에 그대로
+/// 복제해서 씀 — 그래서 stageIndex(0-based, 1-1=0)로 "내가 몇 번째 스테이지인지"만 인스펙터에서
+/// 지정해주면 됨. 랭크 A 이상으로 클리어하면 UndergroundLobbyProgress를 통해 다음 스테이지를 해금.
 /// </summary>
 public class Stage1ResultScreen : MonoBehaviour
 {
     [SerializeField] CallDirector director;
+
+    [Tooltip("이 스테이지의 지하 로비 슬롯 인덱스(0-based, 1-1=0, 1-2=1 ...) — 랭크 A 이상 클리어 시 " +
+             "이 값+1을 해금 처리하는 데 씀.")]
+    [SerializeField] int stageIndex = 0;
 
     [Header("Same sprite assets as BattleResultScreen")]
     [SerializeField] Sprite _sprPopup;
@@ -41,6 +47,11 @@ public class Stage1ResultScreen : MonoBehaviour
         string rank  = gm != null ? gm.GetRank() : "C";
         bool   clear = gm != null && gm.IsClear;
 
+        // 다음 스테이지 해금 기준은 "클리어"(B 이상, 기존 무구 경제 기준)보다 엄격한 A 이상 — 사용자
+        // 확정 요구사항.
+        if (rank == "S" || rank == "A")
+            UndergroundLobbyProgress.UnlockUpTo(stageIndex + 1);
+
         StartCoroutine(ShowResult(rank, clear));
     }
 
@@ -70,15 +81,15 @@ public class Stage1ResultScreen : MonoBehaviour
         MakeImg(root, "RankIcon", rankSpr);
 
         MakeImg(root, clear ? "UnlockText" : "RetryText", clear ? _sprUnlockText : _sprRetryText);
-        MakeArrowBtn(root, GoLobby);
+        MakeArrowBtn(root, GoUndergroundLobby);
 
         yield return null;
     }
 
-    void GoLobby()
+    void GoUndergroundLobby()
     {
         Time.timeScale = 1f;
-        SceneTransitionManager.Instance.LoadSceneWithFade("LobbyScene");
+        SceneTransitionManager.Instance.LoadSceneWithFade("UndergroundLobbyScene");
     }
 
     // 장식용 이미지 (클릭 불가)

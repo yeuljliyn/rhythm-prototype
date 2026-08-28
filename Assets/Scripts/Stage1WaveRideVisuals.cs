@@ -112,10 +112,19 @@ public class Stage1WaveRideVisuals : MonoBehaviour, IPracticeRebindable
     float _baseY;
     float _bobPhase;
 
+    // Stage1_5Scene(리믹스)의 Stage1RemixPhaseSwitcher는 같은 스타일(예: "1-1")이 한 곡 안에서 여러 번
+    // 반복 등장할 때마다 이 GameObject를 SetActive(true/false)로 껐다 켰다 함 — Start()는 최초 1회만
+    // 실행되므로, 예전엔 두 번째 이후 방문에서 지난 방문이 끝난 시점의 스프라이트/위치/코루틴 핸들이
+    // 그대로 남아있었음(실제로 겪은 버그: "1-1 끝나고 1-2로 넘어가면 1-1 상태 그대로"). 특히 코루틴
+    // 핸들(_antPulses 등)은 SetActive(false)가 코루틴 자체는 자동으로 죽이지만 그 핸들 변수는 그대로
+    // non-null로 남겨서, busy-guard(`if (_antPulses[i] != null) return;`)가 "아직 재생 중"이라고 착각해
+    // 재진입 후 그 파츠가 영원히 다시 안 움직이는 문제도 있었음. 그래서 Start()의 초기화 로직을
+    // OnEnable()에서도(=재진입마다) 매번 실행하도록 통일함.
     void OnEnable()
     {
         Bind(callDirector);
         if (GameManager.Instance != null) GameManager.Instance.OnJudgement += HandleJudgement;
+        ResetVisualState();
     }
 
     void OnDisable()
@@ -124,21 +133,44 @@ public class Stage1WaveRideVisuals : MonoBehaviour, IPracticeRebindable
         if (GameManager.Instance != null) GameManager.Instance.OnJudgement -= HandleJudgement;
     }
 
-    void Start()
+    void Start() => ResetVisualState();
+
+    void ResetVisualState()
     {
+        for (int i = 0; i < _antPulses.Length; i++) _antPulses[i] = null;
+        _returnToStartCr = null;
+        _missPoseCr      = null;
+        _antFailCr       = null;
+        _seaWaveCr       = null;
+        _callCueCount    = 0;
+
         for (int i = 0; i < antImages.Length; i++)
             if (antImages[i] != null) antImages[i].sprite = IdleSpriteFor(i);
 
         if (clownImage != null) clownImage.sprite = clownNormalSprite;
+        if (seaRect != null)
+        {
+            var pos = seaRect.anchoredPosition;
+            pos.y = seaWaveMaxY;
+            seaRect.anchoredPosition = pos;
+        }
 
         _targetAntIndex = callDirector != null && callDirector.StartsInResponsePhase ? 4 : 0;
 
         if (clownRect != null)
         {
-            _baseY = clownRect.anchoredPosition.y;
-            _posX  = AntX(_targetAntIndex);
+            // _baseY는 최초 1회(Awake)에 캐시해둔 authored 값을 씀 — 여기서 현재 anchoredPosition.y를
+            // 다시 읽으면, 재진입 시점엔 지난 방문의 bob/tilt 오프셋이 이미 섞인 값이라 매번 조금씩
+            // 어긋난 위치를 "기준"으로 잘못 학습하게 됨.
+            _posX = AntX(_targetAntIndex);
+            _velX = 0f;
             ApplyTransform(_posX, _baseY, 0f);
         }
+    }
+
+    void Awake()
+    {
+        if (clownRect != null) _baseY = clownRect.anchoredPosition.y;
     }
 
     void Update()

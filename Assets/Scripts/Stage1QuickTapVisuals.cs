@@ -205,7 +205,16 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
                 : null;
     }
 
-    void OnEnable()  => Bind(callDirector);
+    // Stage1_5Scene(리믹스)에서 같은 스타일이 한 곡 안에서 여러 번 반복될 때마다 이 GameObject가
+    // SetActive(true/false)로 재진입됨 — Start()는 최초 1회뿐이라 두 번째 이후 방문은 지난 방문이
+    // 끝난 시점의 컵/스프라이트/코루틴 핸들이 그대로 남아있었음(실제로 겪은 버그). ResetVisualState를
+    // 재진입마다(OnEnable) 매번 돌려서 항상 깨끗한 상태로 시작하게 함 — BindDirector가 이미 하던
+    // ResetGroupState()에 안 개미/플레이어/광대 스프라이트 리셋과 코루틴 핸들 null화까지 더한 버전.
+    void OnEnable()
+    {
+        Bind(callDirector);
+        ResetVisualState();
+    }
     void OnDisable() => Unbind(callDirector);
 
     void Bind(CallDirector d)
@@ -289,28 +298,40 @@ public class Stage1QuickTapVisuals : MonoBehaviour, IPracticeRebindable
         }
     }
 
-    void Start()
+    void Start() => ResetVisualState();
+
+    void ResetVisualState()
     {
+        ResetGroupState(); // 컵 풀 + 그룹 딕셔너리 초기화(재진입 시 지난 방문 상태가 안 남게)
+
+        if (_questionMarkCr != null) { StopCoroutine(_questionMarkCr); _questionMarkCr = null; }
+        if (_playerCr != null) { StopCoroutine(_playerCr); _playerCr = null; }
+        if (_clownCr != null) { StopCoroutine(_clownCr); _clownCr = null; }
+        if (_playerScaleCr != null) { StopCoroutine(_playerScaleCr); _playerScaleCr = null; }
+        if (_antCrs != null)
+            for (int i = 0; i < _antCrs.Length; i++)
+            {
+                if (_antCrs[i] != null) StopCoroutine(_antCrs[i]);
+                _antCrs[i] = null;
+            }
+
         if (questionMark != null) questionMark.SetActive(false);
-        if (cupStackBaseImage != null) cupStackBaseImage.gameObject.SetActive(false);
-        if (cupStackTopImages != null)
-            foreach (var icon in cupStackTopImages)
-                if (icon != null) icon.gameObject.SetActive(false);
 
         if (normalAntImages != null)
             for (int i = 0; i < normalAntImages.Length; i++)
-                if (normalAntImages[i] != null) normalAntImages[i].sprite = antIdleSprites[i];
-
-        if (playerAntImage != null) playerAntImage.sprite = playerAntIdleSprite;
-        if (clownImage != null) clownImage.sprite = clownNormalSprite;
-
-        if (cupPool != null)
-            foreach (var cup in cupPool)
             {
-                if (cup == null) continue;
-                cup.sprite = cupIdleSprite;
-                cup.gameObject.SetActive(false);
+                if (normalAntImages[i] == null) continue;
+                normalAntImages[i].sprite = antIdleSprites[i];
+                if (_antBaseScale != null && i < _antBaseScale.Length)
+                    normalAntImages[i].rectTransform.localScale = _antBaseScale[i];
             }
+
+        if (playerAntImage != null)
+        {
+            playerAntImage.sprite = playerAntIdleSprite;
+            playerAntImage.rectTransform.localScale = _playerBaseScale;
+        }
+        if (clownImage != null) clownImage.sprite = clownNormalSprite;
     }
 
     void HandleCallCueGroup(int groupId)

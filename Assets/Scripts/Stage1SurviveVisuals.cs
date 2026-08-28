@@ -210,7 +210,15 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
         }
     }
 
-    void OnEnable()  => Bind(callDirector);
+    // Stage1_5Scene(리믹스)에서 같은 스타일이 한 곡 안에서 여러 번 반복될 때마다 이 GameObject가
+    // SetActive(true/false)로 재진입됨 — Start()는 최초 1회뿐이라 두 번째 이후 방문은 지난 방문이
+    // 끝난 시점의 스프라이트/위치/기포 예약 상태가 그대로 남아있었음(실제로 겪은 버그). 재진입마다
+    // ResetVisualState를 돌려서 항상 "모두 잠수, 샤워 켜짐" 초기 상태로 시작하게 함.
+    void OnEnable()
+    {
+        Bind(callDirector);
+        ResetVisualState();
+    }
     void OnDisable() => Unbind(callDirector);
 
     void Bind(CallDirector d)
@@ -256,13 +264,35 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
         ResolvePendingBubbles();
     }
 
-    void Start()
+    void Start() => ResetVisualState();
+
+    // 그룹ID로 키가 잡힌 상태(_groupCallCounts, 기포 스캔용 _bubbleScanIdx 등)는 일부러 안 건드림 —
+    // 이 채보의 groupId는 곡 전체(리믹스 전체)에서 유일하게 부여되므로(에디터가 배치 시점에 명시적으로
+    // 찍음, 스타일마다 리셋되지 않음) 재진입한다고 다시 훑을 필요가 없고, 특히 _bubbleScanIdx를
+    // 0으로 되돌리면 이미 지난 노트들의 기포를 전부 "아직 안 보여준 것"으로 착각해 재진입 즉시 한꺼번에
+    // 쏟아내는 훨씬 나쁜 버그가 생김(ResolvePendingBubbles가 SongTime>=targetTime인 걸 전부 즉시
+    // 발화시키므로). 여기서 리셋하는 건 순전히 "화면에 지금 보이는 모습"(스프라이트/위치/코루틴
+    // 핸들)뿐 — Stage1_5Scene 리믹스처럼 같은 스타일이 여러 번 반복 등장할 때 지난 방문 종료 시점의
+    // 포즈가 다음 방문 시작 프레임에 그대로 남아있던 버그(실제로 겪음) 수정.
+    void ResetVisualState()
     {
+        if (_clownCr != null) { StopCoroutine(_clownCr); _clownCr = null; }
+        if (_antCr != null) { StopCoroutine(_antCr); _antCr = null; }
+        if (_submergeCr != null) { StopCoroutine(_submergeCr); _submergeCr = null; }
+        if (_playerFailCr != null) { StopCoroutine(_playerFailCr); _playerFailCr = null; }
+        if (_playerScaleCr != null) { StopCoroutine(_playerScaleCr); _playerScaleCr = null; }
+        _playerSubmerged = true;
+
         // Everyone starts submerged, shower on, player already "holding" — see class doc. The scene-
         // authored position IS the dive pose (see surfaceYOffset's tooltip), so no offset needed here.
         if (clownImage != null) { clownImage.sprite = clownDiveSprite; SetY(clownImage.rectTransform, _clownBaseY); }
         if (normalAntImage != null) { normalAntImage.sprite = antDiveSprite; SetY(normalAntImage.rectTransform, _antBaseY); }
-        if (playerAntImage != null) { playerAntImage.sprite = playerDiveSprite; SetY(playerAntImage.rectTransform, _playerBaseY); }
+        if (playerAntImage != null)
+        {
+            playerAntImage.sprite = playerDiveSprite;
+            SetY(playerAntImage.rectTransform, _playerBaseY);
+            playerAntImage.rectTransform.localScale = _playerBaseScale;
+        }
         if (showerImage != null) showerImage.sprite = showerOnSprite;
 
         if (clownBubbleImage != null)  clownBubbleImage.sprite  = bubbleSprite;

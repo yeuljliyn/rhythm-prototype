@@ -1256,6 +1256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stage1ResultScreen
   director: {fileID: 1605954057}
+  stageIndex: 0
   _sprPopup: {fileID: 21300000, guid: 0c62336c915913e4b837fa887e591163, type: 3}
   _sprRankText: {fileID: 21300000, guid: 44a2d11b349402045ba43f3acde09e25, type: 3}
   _sprRankS: {fileID: 21300000, guid: 23bba1a79e7acd54495abb9f024c53d4, type: 3}
