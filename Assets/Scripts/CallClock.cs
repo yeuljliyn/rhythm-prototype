@@ -2,7 +2,13 @@ using UnityEngine;
 
 /// <summary>
 /// Minimal dspTime-based song clock for the call-and-response engine.
-/// SongTime == 0 when music starts; negative during intro delay.
+/// SongTime == 0 the instant the audio clip actually starts playing — which happens immediately on
+/// activation, no artificial wait. introDelay does NOT delay playback here; it only lives in
+/// CallPatternData.BeatToTime/TimeToBeat's math (the clip's own audio already contains that many
+/// seconds of real intro content — it was never blank silence — so scheduling playback introDelay
+/// seconds late would just insert a redundant silent gap in front of content that's already there;
+/// confirmed via the chart editor, which plays that same clip and is audible the whole way through
+/// starting from sample 0). SongTime therefore never goes negative — it starts at 0 and counts up.
 /// Deliberately duplicates RhythmManager's formula instead of depending on it,
 /// since RhythmManager is hard-typed to PatternData (the 4-direction chart asset).
 /// </summary>
@@ -59,8 +65,10 @@ public class CallClock : MonoBehaviour
     // fire audio later while the segment sits inactive.
     void OnEnable()
     {
-        float introDelay = pattern != null ? pattern.introDelay : 2f;
-        _scheduledMusicStartDsp = AudioSettings.dspTime + introDelay;
+        // No introDelay offset here — playback starts immediately, right now. See the class doc
+        // comment for why: the clip's own audio already contains that many seconds of real intro
+        // content, so delaying playback would just bury it under a redundant silent gap.
+        _scheduledMusicStartDsp = AudioSettings.dspTime;
 
         if (pattern != null && pattern.music != null)
         {

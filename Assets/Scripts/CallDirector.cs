@@ -316,6 +316,7 @@ public class CallDirector : MonoBehaviour
             {
                 OnCallCue?.Invoke();
                 OnCallCueGroup?.Invoke(entry.groupId);
+                Debug.Log($"[CallDirector:{name}] Call cue — group {entry.groupId} (beat {entry.cueBeat})"); // 콘솔에서 진행 그룹 확인용
             }
 
             _nextSpawnIdx++;
@@ -563,6 +564,7 @@ public class CallDirector : MonoBehaviour
         else                        indicator?.ShowMiss();
 
         OnGroupJudged?.Invoke(lc.data.groupId, j);
+        Debug.Log($"[CallDirector:{name}] Group {lc.data.groupId} judged: {j}"); // 콘솔에서 진행 그룹 확인용
     }
 
     void CheckSongEnd(float t)

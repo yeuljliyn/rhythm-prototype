@@ -796,4 +796,5 @@ MonoBehaviour:
     groupId: 30
     cueBeat: 170.25
     releaseBeat: 0
+  loopLengthBeats: 0
   phases: []

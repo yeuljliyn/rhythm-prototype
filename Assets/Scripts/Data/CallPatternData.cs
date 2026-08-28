@@ -57,8 +57,26 @@ public class CallPatternData : ScriptableObject
     public List<ChartPhase> phases = new List<ChartPhase>();
 
     public float BeatInterval               => 60f / Mathf.Max(1f, bpm);
-    public float BeatToTime(float beat)     => beat * BeatInterval;
-    public float TimeToBeat(float songTime) => songTime / BeatInterval;
+
+    // introDelay is folded directly into this conversion (not just used as CallClock's real-world
+    // playback-start delay) — see class doc note below for why. BeatToTime(beat) is what every
+    // consumer (CallDirector's judgement, Stage1SurviveVisuals, Stage1RemixPhaseSwitcher,
+    // PracticeLoopExtender, the chart editor's own timeline/REC math) treats as "true audio content
+    // time for this beat"; TimeToBeat is its exact inverse (BeatToTime(TimeToBeat(x)) == x).
+    //
+    // Why introDelay lives here instead of purely in CallClock's scheduling: the chart editor tool
+    // (Stage1ChartEditorWindow) captures a note's cueBeat from its own internal chart-clock
+    // (_currentSongTime), which — once its own PlayAudio-timing bug was fixed (audio now genuinely
+    // starts only after a real introDelay-second silent lead-in, matching CallClock's runtime
+    // scheduling exactly) — equals true content time C exactly. Storing cueBeat as a bare
+    // C/BeatInterval would require migrating every already-authored note (BPM differs per chart,
+    // so the fix isn't even a single constant) to match; baking the SAME introDelay this chart
+    // already carries into the conversion instead means EVERY existing chart's already-recorded
+    // notes are correct as-is, no data migration needed, no editing decimals-y beat numbers by
+    // hand — confirmed via QA (planner + dev) that this fixes the "notes fire introDelay seconds
+    // early relative to the music" bug across every stage without touching a single stored beat.
+    public float BeatToTime(float beat)     => beat * BeatInterval + introDelay;
+    public float TimeToBeat(float songTime) => (songTime - introDelay) / BeatInterval;
 
     /// First phase whose [startBeat, endBeat) contains the given beat, or null if phases is empty
     /// or the beat falls in a gap between phases. Overlapping phases (shouldn't normally happen,

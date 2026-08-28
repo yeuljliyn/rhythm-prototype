@@ -28,6 +28,9 @@ public class Stage1CallMapEditorWindow : EditorWindow
     bool   _isPlaying;
     double _sessionStart;
     float  _currentSongTime;
+    // Whether PlayAudio() has fired for the current session yet — see StartSession/Tick. Kept
+    // separate from _currentSongTime>=0 checks scattered elsewhere so this only ever fires once.
+    bool   _audioStarted;
 
     // REC-mode press tracking (Space key or mouse-left, whichever starts first)
     bool   _isPressed;
@@ -112,6 +115,23 @@ public class Stage1CallMapEditorWindow : EditorWindow
 
         _currentSongTime = (float)(EditorApplication.timeSinceStartup - _sessionStart)
                            - _pattern.introDelay;
+
+        // Actually start the audio clip only once _currentSongTime reaches 0 — i.e. after a real
+        // introDelay-second silent lead-in, exactly mirroring CallClock's runtime scheduling
+        // (_scheduledMusicStartDsp = dspTime + introDelay; PlayScheduled(...)), where SongTime==0
+        // is defined as the instant the (delayed) audio actually starts. Previously PlayAudio() was
+        // called immediately in StartSession() with no delay at all, so the clip's real audio
+        // content already started sounding introDelay seconds before the tool's own "beat 0" —
+        // notes recorded by ear (or placed against what's visually at beat 0) were then stored
+        // introDelay seconds off from the audio they were actually aligned to, and every chart
+        // authored this way plays back at runtime with every cue firing introDelay seconds early
+        // relative to the music (confirmed reported, QA: "노트가 인트로 구간만큼 빨리 나오는 것
+        // 같다" — across every stage, since they all go through this one shared tool).
+        if (!_audioStarted && _currentSongTime >= 0f)
+        {
+            PlayAudio(_pattern.music);
+            _audioStarted = true;
+        }
 
         float musicLen = _pattern.music != null ? _pattern.music.length : 0f;
         if (musicLen > 0f && _currentSongTime > musicLen)
@@ -1043,7 +1063,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
         _sessionStart    = EditorApplication.timeSinceStartup;
         _currentSongTime = -_pattern.introDelay;
         _isPressed       = false;
-        PlayAudio(_pattern.music);
+        _audioStarted    = false; // Tick() fires PlayAudio() once _currentSongTime reaches 0 — see Tick
     }
 
     void StopSession()

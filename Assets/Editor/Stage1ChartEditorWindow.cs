@@ -200,11 +200,22 @@ public class Stage1ChartEditorWindow : EditorWindow
 
         _currentSongTime = _sessionStartSongTime + (float)(EditorApplication.timeSinceStartup - _sessionStart);
 
+        // PlayAudio() fires immediately in StartSession() (no artificial wait) and
+        // _sessionStartSongTime starts at 0 for that same instant, so _currentSongTime is always true
+        // audio content time — 0 at the real content start, counting up in lockstep with what's
+        // actually playing. That's the same quantity CallPatternData.BeatToTime's output represents,
+        // so every pixel-from-time conversion below multiplies by _zoom directly, no manual
+        // "+ introDelay" (introDelay is baked into BeatToTime/TimeToBeat themselves — see
+        // CallPatternData.cs — so notes captured here via TimeToBeat(_currentSongTime) round-trip
+        // correctly without needing any real silent lead-in here to match anything at runtime;
+        // CallClock's own real introDelay-second wait before its AudioSource starts is a separate,
+        // unrelated real-time scheduling detail — see CallClock.OnEnable — that this tool doesn't
+        // need to reproduce).
         float musicLen = _pattern.music != null ? _pattern.music.length : 0f;
-        if (musicLen > 0f && _currentSongTime + _pattern.introDelay > musicLen)
+        if (musicLen > 0f && _currentSongTime > musicLen)
             StopSession();
 
-        float absX   = (_currentSongTime + _pattern.introDelay) * _zoom;
+        float absX   = _currentSongTime * _zoom;
         float viewW  = position.width - LABEL_W - 20f;
         float target = absX - viewW * 0.25f;
         if (Mathf.Abs(target - _scrollPos.x) > 8f)
@@ -518,7 +529,12 @@ public class Stage1ChartEditorWindow : EditorWindow
         if (full.height < 20f) return;
 
         float totalAudio = Mathf.Max(10f, _pattern.music != null ? _pattern.music.length : 60f);
-        float contentW   = (_pattern.introDelay + totalAudio) * _zoom + 120f;
+        // totalAudio is raw content time (the clip's own file duration, content-time 0 = file
+        // sample 0) — same kind of quantity as _currentSongTime, so no manual "+ introDelay" here
+        // either now that introDelay is baked into BeatToTime/TimeToBeat rather than applied
+        // per-call-site (the "intro" shaded region drawn at the left, see below, is the FIRST
+        // introDelay seconds of this same span, not extra width tacked on before it).
+        float contentW   = totalAudio * _zoom + 120f;
         // Phase lane rides at the very bottom, below every note lane — purely additive to the
         // layout (nothing above it moves), so none of the existing note-lane Y math needed to
         // change to make room for it.
@@ -578,7 +594,7 @@ public class Stage1ChartEditorWindow : EditorWindow
             GUI.Label(new Rect(4f, 2f, 50f, RULER_H - 4f), "intro",
                 new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = Color.gray } });
 
-        float liveX = (_pattern.introDelay + _pattern.BeatToTime(_pattern.liveInputStartBeat)) * _zoom;
+        float liveX = _pattern.BeatToTime(_pattern.liveInputStartBeat) * _zoom; // introDelay is already baked into BeatToTime
         if (liveX > introW && liveX < totalW)
         {
             EditorGUI.DrawRect(new Rect(liveX, 0f, 2f, contentH), new Color(0.6f, 1f, 0.6f, 0.6f));
@@ -703,7 +719,7 @@ public class Stage1ChartEditorWindow : EditorWindow
         }
     }
 
-    float BeatX(float beat) => (_pattern.introDelay + _pattern.BeatToTime(beat)) * _zoom;
+    float BeatX(float beat) => _pattern.BeatToTime(beat) * _zoom; // introDelay is already baked into BeatToTime
 
     static (float y, float h) FixedSubRowRect(int sectionIndex, int subRow)
     {
@@ -899,7 +915,7 @@ public class Stage1ChartEditorWindow : EditorWindow
     void DrawRecordingPreview()
     {
         float x0 = BeatX(_pressStartBeat);
-        float x1 = (_currentSongTime + _pattern.introDelay) * _zoom;
+        float x1 = _currentSongTime * _zoom; // introDelay already baked into BeatX's own formula; _currentSongTime is raw content time
         EditorGUI.DrawRect(new Rect(Mathf.Min(x0, x1), RULER_H, Mathf.Max(2f, Mathf.Abs(x1 - x0)), LANE_H * TOTAL_ROWS),
             new Color(1f, 1f, 0.3f, 0.18f));
     }
@@ -915,7 +931,7 @@ public class Stage1ChartEditorWindow : EditorWindow
     void DrawPlayhead(float contentH)
     {
         if (!_isRecording && !_isPlaying) return;
-        float x = (_currentSongTime + _pattern.introDelay) * _zoom;
+        float x = _currentSongTime * _zoom; // introDelay already baked into BeatX's own formula; _currentSongTime is raw content time
         EditorGUI.DrawRect(new Rect(x - 1f, 0f, 2f, contentH), new Color(1f, 0.92f, 0.15f, 0.90f));
         EditorGUI.DrawRect(new Rect(x - 4f, 0f, 8f, 4f), new Color(1f, 0.92f, 0.15f));
     }
@@ -963,8 +979,8 @@ public class Stage1ChartEditorWindow : EditorWindow
                 // playhead already occupies this role).
                 if (!_isPlaying && !_isRecording && e.button == 0)
                 {
-                    float songTime = mp.x / _zoom - _pattern.introDelay;
-                    _scrubBeat = Mathf.Max(0f, SnapBeat(_pattern.TimeToBeat(songTime)));
+                    // introDelay is already baked into TimeToBeat — no manual subtraction here.
+                    _scrubBeat = Mathf.Max(0f, SnapBeat(_pattern.TimeToBeat(mp.x / _zoom)));
                     e.Use();
                     Repaint();
                 }
@@ -983,8 +999,8 @@ public class Stage1ChartEditorWindow : EditorWindow
             int section = row >= 0 && row < TOTAL_ROWS ? SectionOfRow(row, SUBROWS) : -1;
             if (section < 0) return;
 
-            float clickSongTime = mp.x / _zoom - _pattern.introDelay;
-            float clickBeat = SnapBeat(_pattern.TimeToBeat(clickSongTime));
+            // introDelay is already baked into TimeToBeat — no manual subtraction here.
+            float clickBeat = SnapBeat(_pattern.TimeToBeat(mp.x / _zoom));
 
             if (e.button == 0)
             {
@@ -1140,8 +1156,8 @@ public class Stage1ChartEditorWindow : EditorWindow
             {
                 // Create-by-dragging, same shape as a Hold note: place it at the click beat with a
                 // default 4-beat length, then immediately start dragging its end handle to size it.
-                float songTime = mp.x / _zoom - _pattern.introDelay;
-                float clickBeat = SnapBeat(_pattern.TimeToBeat(songTime));
+                // introDelay is already baked into TimeToBeat — no manual subtraction here.
+                float clickBeat = SnapBeat(_pattern.TimeToBeat(mp.x / _zoom));
                 Undo.RecordObject(_pattern, "Add Phase");
                 var phase = new ChartPhase { styleId = _newPhaseStyleId, startBeat = clickBeat, endBeat = clickBeat + 4f };
                 if (_pattern.phases == null) _pattern.phases = new List<ChartPhase>();
@@ -1626,8 +1642,9 @@ public class Stage1ChartEditorWindow : EditorWindow
     }
 
     // ── Session control ─────────────────────────────────────────────────────
-    /// startBeat < 0 means "start from the very beginning of the audio file" (old behavior,
-    /// unchanged: chart-time starts at -introDelay, audio plays from sample 0). startBeat >= 0
+    /// startBeat < 0 means "start from the very beginning of the audio file" — chart-time starts at
+    /// 0 and audio plays from sample 0 immediately, no artificial pre-roll wait (introDelay only
+    /// affects BeatToTime/TimeToBeat's math, not when playback actually starts here). startBeat >= 0
     /// seeks both the chart-time bookkeeping and the actual audio playback to that beat.
     void StartSession(bool record, float startBeat)
     {
@@ -1638,16 +1655,25 @@ public class Stage1ChartEditorWindow : EditorWindow
 
         if (startBeat < 0f)
         {
-            _sessionStartSongTime = -_pattern.introDelay;
-            _currentSongTime      = -_pattern.introDelay;
+            // _currentSongTime starts at 0 the instant PlayAudio fires here — no artificial wait.
+            // introDelay lives purely in BeatToTime/TimeToBeat's math (CallPatternData.cs), not in
+            // this session clock's epoch, so REC capture (_pattern.TimeToBeat(_currentSongTime),
+            // unwrapped, elsewhere in this file) round-trips correctly through BeatToTime without
+            // needing real silence here to match anything at runtime.
+            _sessionStartSongTime = 0f;
+            _currentSongTime      = 0f;
             _isPressed = false;
             PlayAudio(_pattern.music, 0);
         }
         else
         {
+            // chartTime is already true audio content time (introDelay baked into BeatToTime), and
+            // the raw clip file has no silence of its own baked in — its sample 0 IS content time 0
+            // (CallClock's real silent lead-in comes from delaying when PlayScheduled fires, not
+            // from anything inside the clip) — so the seek sample is chartTime directly, no further
+            // +introDelay.
             float chartTime = _pattern.BeatToTime(startBeat);
-            float clipTime  = chartTime + _pattern.introDelay;
-            int   startSample = Mathf.Max(0, Mathf.RoundToInt(clipTime * _pattern.music.frequency));
+            int   startSample = Mathf.Max(0, Mathf.RoundToInt(chartTime * _pattern.music.frequency));
             _sessionStartSongTime = chartTime;
             _currentSongTime      = chartTime;
             _isPressed = false;
