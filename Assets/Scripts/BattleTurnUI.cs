@@ -55,7 +55,7 @@ public class BattleTurnUI : MonoBehaviour
             var sc = go.AddComponent<CanvasScaler>();
             sc.uiScaleMode         = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             sc.referenceResolution = new Vector2(1920, 1080);
-            sc.matchWidthOrHeight  = 0.5f;
+            sc.matchWidthOrHeight  = 1f; // 세로(높이) 기준 고정 — 와이드/울트라와이드에서 위아래 잘림 방지
             go.AddComponent<GraphicRaycaster>();
             parent = go.transform;
         }

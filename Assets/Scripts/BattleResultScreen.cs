@@ -120,7 +120,7 @@ public class BattleResultScreen : MonoBehaviour
         var sc = cvGO.AddComponent<CanvasScaler>();
         sc.uiScaleMode         = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         sc.referenceResolution = new Vector2(1672f, 941f);
-        sc.matchWidthOrHeight  = 0.5f;
+        sc.matchWidthOrHeight  = 1f; // 세로(높이) 기준 고정 — 와이드/울트라와이드에서 위아래 잘림 방지
 
         cvGO.AddComponent<GraphicRaycaster>();
         _cvRoot = cvGO.transform;
