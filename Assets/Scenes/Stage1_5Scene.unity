@@ -5698,17 +5698,17 @@ MonoBehaviour:
   - {fileID: 423605501}
   - {fileID: 1683969020}
   callAntIdleSprites:
-  - {fileID: -3065474543044070092, guid: e5393128830dddc459e42a7dca103a19, type: 3}
-  - {fileID: 8613360606801151919, guid: 132a6c1cfb5b9554f8cdb0b3e836ed4a, type: 3}
-  - {fileID: -2907085112882583670, guid: 629880c786b906648be6fd00d9a30ff8, type: 3}
+  - {fileID: -8819033146335614099, guid: c79eef6eebb914e43b2971c512a05ade, type: 3}
+  - {fileID: -4978079674347005947, guid: e59b860cd2267b0498c44b131e35bbfd, type: 3}
+  - {fileID: -1554126332850630959, guid: 8a66346ac92e7a342805802f8c0facf0, type: 3}
   - {fileID: -4117437934129188258, guid: a403e5a823f852d499236ab4ad1a024e, type: 3}
   callAntRaisedSprites:
-  - {fileID: -9135825131138311507, guid: e5393128830dddc459e42a7dca103a19, type: 3}
-  - {fileID: 2271251547137655914, guid: 132a6c1cfb5b9554f8cdb0b3e836ed4a, type: 3}
-  - {fileID: 1915638331532352433, guid: 629880c786b906648be6fd00d9a30ff8, type: 3}
+  - {fileID: 5480453804947101223, guid: c79eef6eebb914e43b2971c512a05ade, type: 3}
+  - {fileID: 7177506975070570263, guid: e59b860cd2267b0498c44b131e35bbfd, type: 3}
+  - {fileID: -8620922945810298856, guid: 8a66346ac92e7a342805802f8c0facf0, type: 3}
   - {fileID: 6875898520502008039, guid: a403e5a823f852d499236ab4ad1a024e, type: 3}
-  responseAntIdleSprite: {fileID: -3009115056872166845, guid: cd7c122a128c874429e1d326c3badb83, type: 3}
-  responseAntRaisedSprite: {fileID: 3724725486868500343, guid: cd7c122a128c874429e1d326c3badb83, type: 3}
+  responseAntIdleSprite: {fileID: -8531970205598387286, guid: 5cb885793469fd74bad05672ade57dc6, type: 3}
+  responseAntRaisedSprite: {fileID: 6727970725450827808, guid: 5cb885793469fd74bad05672ade57dc6, type: 3}
   clownRect: {fileID: 541968577}
   seaRect: {fileID: 1551618725}
   seaWaveMinY: 160
@@ -5720,11 +5720,11 @@ MonoBehaviour:
   clownFallSprite: {fileID: -4525839075153415978, guid: 8c647a2fdd72b8046b380ec224cf447d, type: 3}
   missPoseDuration: 0.4
   callAntFailSprites:
-  - {fileID: -7711269072700239511, guid: e5393128830dddc459e42a7dca103a19, type: 3}
-  - {fileID: -7330794105997844257, guid: 132a6c1cfb5b9554f8cdb0b3e836ed4a, type: 3}
-  - {fileID: -1261571813303572444, guid: 629880c786b906648be6fd00d9a30ff8, type: 3}
+  - {fileID: -612509638029348305, guid: c79eef6eebb914e43b2971c512a05ade, type: 3}
+  - {fileID: -6131489158172881140, guid: e59b860cd2267b0498c44b131e35bbfd, type: 3}
+  - {fileID: -5834570472492227936, guid: 8a66346ac92e7a342805802f8c0facf0, type: 3}
   - {fileID: -3383599055789547862, guid: a403e5a823f852d499236ab4ad1a024e, type: 3}
-  ant5FailSprite: {fileID: 5498171288194459904, guid: 0e8edc0d0a52f48448043ac614aca4d2, type: 3}
+  ant5FailSprite: {fileID: -1723617249191369279, guid: 5cb885793469fd74bad05672ade57dc6, type: 3}
   antPulseDuration: 0.25
   antTurnSfxSource: {fileID: 1531648841}
   antTurnSfx:
