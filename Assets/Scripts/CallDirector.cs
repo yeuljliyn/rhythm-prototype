@@ -108,7 +108,7 @@ public class CallDirector : MonoBehaviour
         public CallEntry data;
         public float windowOpenTime;     // Tap: cue-hw.      Hold: release-hw.
         public float deadline;           // Tap: cue+hw.      Hold: release+hw.
-        public float claimableFromTime;  // Tap: windowOpenTime. Hold: cueTime (start-of-hold cue).
+        public float claimableFromTime;  // Tap: cue-hw.      Hold: cue-hw (start-of-hold cue, same ± hw tolerance).
         public bool  isDemo;
         public bool  isHoldArmed;
         public bool  resolved;
@@ -361,7 +361,14 @@ public class CallDirector : MonoBehaviour
             data = entry, isDemo = isDemo,
             windowOpenTime    = releaseTime - pattern.hitWindow,
             deadline          = releaseTime + pattern.hitWindow,
-            claimableFromTime = cueTime,   // armable any time from its own start cue
+            // Armable from hitWindow BEFORE the start cue — symmetric with a Tap's claim window
+            // (cueTime - hitWindow), and with how "on the beat" means "± hitWindow" everywhere
+            // else. Previously this was bare `cueTime`, so a press even 1 ms early didn't arm, and
+            // since the player is then holding the button (no fresh press edge) the hold could
+            // never arm at all and died on timeout — a Miss for a hold the player pressed and held
+            // right through. Only stage with Holds is 1-3, which is exactly where this was reported
+            // as unfair. (The auto-arm in HandleInput covers pressing MORE than hitWindow early.)
+            claimableFromTime = cueTime - pattern.hitWindow,
         };
     }
 
@@ -506,6 +513,41 @@ public class CallDirector : MonoBehaviour
                         // judged/locked (_judgedEntries excludes it from FindNearMissEntry too).
                         OnResponseWasted?.Invoke();
                     }
+                }
+            }
+        }
+
+        // Auto-arm a Hold whose claim window is open while the button is already held down, with
+        // nothing else armed. Covers the player pressing BEFORE this hold's window opened (natural
+        // right after releasing the previous cycle's hold, or just anticipating the beat) and then
+        // holding straight through — there's no fresh press edge inside the window for the pressEdge
+        // path above to claim it, so without this the hold silently never arms and times out as a
+        // Miss even though the player is physically holding through the whole thing (reported as
+        // unfair on 1-3 — the only stage with Holds). This only ever fixes the ARM: the release is
+        // still judged strictly against releaseBeat ± hitWindow, no verdict is softened. Respects
+        // the mash cooldown exactly like every other input path.
+        if (pressedNow && t >= _cooldownUntil)
+        {
+            bool anyHoldArmed = false;
+            foreach (var lc in _live)
+                if (!lc.resolved && lc.data.type == CallType.Hold && lc.isHoldArmed) { anyHoldArmed = true; break; }
+
+            if (!anyHoldArmed)
+            {
+                LiveCall toArm = null;
+                float bestDeadline = float.MaxValue;
+                foreach (var lc in _live)
+                {
+                    if (lc.resolved || lc.isDemo || lc.data.type != CallType.Hold) continue;
+                    if (lc.isHoldArmed) continue;
+                    if (_judgedEntries.Contains(lc.data)) continue; // a hold already blown this turn never re-arms
+                    if (t < lc.claimableFromTime || t > lc.deadline) continue;
+                    if (lc.deadline < bestDeadline) { bestDeadline = lc.deadline; toArm = lc; } // earliest-deadline wins, same as pressEdge
+                }
+                if (toArm != null)
+                {
+                    toArm.isHoldArmed = true;
+                    OnHoldArmed?.Invoke(toArm.data.groupId);
                 }
             }
         }
