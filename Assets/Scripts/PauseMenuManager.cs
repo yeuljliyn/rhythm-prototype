@@ -65,8 +65,13 @@ public class PauseMenuManager : MonoBehaviour
 
         if (kb.escapeKey.wasPressedThisFrame)
         {
-            if (IsPaused) OnContinue();
-            else          DoPause();
+            // IsPaused는 카운트다운이 끝날 때까지 계속 true라서, 카운트다운 도중 ESC를 또 누르면
+            // "아직 paused니까" OnContinue()가 다시 불려 코루틴이 처음부터 재시작 — 카운트다운이
+            // 3초로 리셋되는 버그(Stage1PauseMenuManager와 동일 계열, 같이 수정). 카운트다운 중인지
+            // (_resumeCr != null)를 먼저 봐서, 그때 ESC는 재개 취소 + 일시정지 화면 복귀로 처리.
+            if (_resumeCr != null) CancelResumeCountdown();
+            else if (IsPaused)     OnContinue();
+            else                   DoPause();
         }
     }
 
@@ -89,6 +94,19 @@ public class PauseMenuManager : MonoBehaviour
         _panel.SetActive(false);
         if (_resumeCr != null) StopCoroutine(_resumeCr);
         _resumeCr = StartCoroutine(ResumeCountdown());
+    }
+
+    // 카운트다운 도중 다시 ESC — Time.timeScale/오디오는 DoPause() 이후로 계속 멈춰있는 상태 그대로라
+    // 다시 멈출 필요 없이 카운트다운 텍스트만 지우고 패널을 도로 보여주면 됨.
+    void CancelResumeCountdown()
+    {
+        StopCoroutine(_resumeCr);
+        _resumeCr = null;
+
+        _countdownTxt.text = "";
+        _countdownTxt.gameObject.SetActive(false);
+
+        _panel.SetActive(true);
     }
 
     IEnumerator ResumeCountdown()
@@ -161,8 +179,20 @@ public class PauseMenuManager : MonoBehaviour
         dimImg.color          = new Color(0f, 0f, 0f, 0.55f);
         dimImg.raycastTarget  = false;
 
+        // Dim은 화면 전체를 덮어야 하니 풀스트레치 그대로 두고, 패널/카운트다운은 SafeFrame(항상
+        // 정확히 1920x1080, 캔버스 중앙 고정) 안에 넣음 — Stage1PauseMenuManager와 동일한 이유(패널의
+        // 왼쪽-끝 앵커가 울트라와이드에서 캔버스 자체의 넓어진 왼쪽 끝을 기준 삼아 화면 밖으로 밀려나는
+        // 버그 방지).
+        var safeFrameGO = new GameObject("SafeFrame", typeof(RectTransform));
+        safeFrameGO.transform.SetParent(cGO.transform, false);
+        var safeFrameRt = (RectTransform)safeFrameGO.transform;
+        safeFrameRt.anchorMin = safeFrameRt.anchorMax = new Vector2(0.5f, 0.5f);
+        safeFrameRt.pivot = new Vector2(0.5f, 0.5f);
+        safeFrameRt.sizeDelta = new Vector2(1920f, 1080f);
+        safeFrameRt.anchoredPosition = Vector2.zero;
+
         // Countdown text — screen center
-        var cdGO  = Anchored(cGO.transform, "Countdown",
+        var cdGO  = Anchored(safeFrameRt, "Countdown",
                         new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                         new Vector2(0.5f, 0.5f), new Vector2(400f, 300f), Vector2.zero);
         _countdownTxt               = cdGO.AddComponent<TextMeshProUGUI>();
@@ -174,7 +204,7 @@ public class PauseMenuManager : MonoBehaviour
         cdGO.SetActive(false);
 
         // ── Pause panel — left side ──
-        _panel = Anchored(cGO.transform, "PausePanel",
+        _panel = Anchored(safeFrameRt, "PausePanel",
                      new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
                      new Vector2(0f, 0.5f), new Vector2(300f, 460f),
                      new Vector2(0f, 0f));
