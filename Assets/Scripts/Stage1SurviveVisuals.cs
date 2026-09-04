@@ -250,12 +250,27 @@ public class Stage1SurviveVisuals : MonoBehaviour, IPracticeRebindable
         callDirector = newDirector;
         Bind(callDirector);
 
+        // A rebind is always a genuine restart — a different CallDirector with its own Calls list whose
+        // groupIds count again from the authored base. Stage1PracticeGate swaps Practice_A -> Practice_B,
+        // and PracticeLoopExtender numbers every rep as (authored groupId + rep * 1000) in BOTH, so
+        // segment B reuses the exact same groupIds segment A already burned through. Every groupId-keyed
+        // accumulator below is therefore stale and MUST be cleared. _groupCallCounts especially: leave it
+        // and HandleCallCueGroup sees a leftover count of 3 for group 0, routes segment B's first cycles
+        // into the switch's default case, so clown/ant/shower never move — and their anticipation bubbles
+        // (shown by the scan, hidden only when a character actually surfaces) hang on screen forever.
+        // Reported: "동시에 올라오기 파트에서 광대·개미가 안 움직이고 기포가 계속 떠 있음", intermittently
+        // self-correcting once segment B reaches a rep groupId segment A never got to.
+        // OnEnable's ResetVisualState deliberately leaves these alone for the Stage1_5 remix's SetActive
+        // re-entry, where groupIds are unique across the whole song — that path is not a restart, this is.
+        _groupCallCounts.Clear();
         _pendingBubbles.Clear();
         _bubbleCallIdxPerGroup.Clear();
         _bubbleScanIdx = 0;
-        SetBubble(clownBubbleImage, false);
-        SetBubble(antBubbleImage, false);
-        SetBubble(playerBubbleImage, false);
+
+        // Also wipe the on-screen pose: segment A may have left clown/ant surfaced (sprite + raised Y),
+        // the shower off, a reveal coroutine mid-flight. ResetVisualState stops every coroutine and snaps
+        // everyone back to the "all submerged, shower on" start state, bubbles included.
+        ResetVisualState();
     }
 
     void Update()
