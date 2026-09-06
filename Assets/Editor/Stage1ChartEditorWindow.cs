@@ -319,12 +319,13 @@ public class Stage1ChartEditorWindow : EditorWindow
             if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(_pattern);
 
             int total = _pattern.calls?.Count ?? 0;
-            int taps  = 0, holds = 0, calls = 0, responses = 0;
+            int taps  = 0, holds = 0, calls = 0, responses = 0, noteClips = 0;
             if (_pattern.calls != null)
                 foreach (var c in _pattern.calls)
                 {
                     if (c.type == CallType.Tap) taps++; else holds++;
                     if (c.role == CallRole.Call) calls++; else responses++;
+                    if (c.clip != null) noteClips++;
                 }
 
             float dur = _pattern.music != null ? _pattern.music.length : 0f;
@@ -334,7 +335,7 @@ public class Stage1ChartEditorWindow : EditorWindow
             EditorGUILayout.LabelField(
                 $"전체 노트: {total}개  (Tap {taps} / Hold {holds})   Call {calls} / Response {responses}   재생 시간: {durStr}   " +
                 $"사용 중인 레인: {SUBROWS}   선택됨: {_selection.Count}개   Phase: {_pattern.phases?.Count ?? 0}개   " +
-                $"SFX: {_pattern.sfxCues?.Count ?? 0}개",
+                $"SFX: {_pattern.sfxCues?.Count ?? 0}개   노트 효과음: {noteClips}개",
                 EditorStyles.miniLabel);
         }
     }
@@ -506,8 +507,8 @@ public class Stage1ChartEditorWindow : EditorWindow
                 _newPhaseStyleId = EditorGUILayout.TextField(_newPhaseStyleId, GUILayout.Width(70));
                 GUILayout.Space(16);
                 EditorGUILayout.LabelField(
-                    new GUIContent("새 SFX 클립", "맨 아래 SFX 레인에 새 큐를 찍을 때 자동 배정되는 클립. " +
-                        "큐마다 개별 변경 가능(큐 클릭 → 바로 위 칸). 비워두면 클립 없이 찍힘."),
+                    new GUIContent("새 SFX 클립", "룰러 바로 아래 SFX 레인에 새 큐를 찍을 때 자동 배정되는 클립. " +
+                        "큐마다 개별 변경 가능(큐 클릭 → 바로 아래 칸). 비워두면 클립 없이 찍힘."),
                     EditorStyles.miniLabel, GUILayout.Width(72));
                 EditorGUI.BeginChangeCheck();
                 var ndc = (AudioClip)EditorGUILayout.ObjectField(_pattern.sfxCueDefaultClip, typeof(AudioClip), false, GUILayout.Width(130));
@@ -540,12 +541,14 @@ public class Stage1ChartEditorWindow : EditorWindow
                     "빈 공간 클릭 = 노트 추가.   눈금자 클릭 = 탐색 박자 설정.   Shift+드래그(빈 공간) = 박스 선택.   " +
                     "Shift+클릭(노트) = 선택 추가/제거.   더블클릭 = 그룹 전체 선택.   " +
                     "Tap/Hold 몸통 드래그 = 선택된 것 전체를 함께 이동(리사이즈 핸들은 그 노트만).   " +
+                    "노트 클릭 = 선택 + 바로 위(맨 윗줄이면 아래)에 그 노트의 효과음 클립 칸/▶ 미리듣기 표시 " +
+                    "(CallEntry.clip — 판정·개미/손/보스 반응과 무관하게 그 박자에 소리만 남, 클립 있으면 노트 아래에 하늘색 줄).   " +
                     "Ctrl+C = 복사, Ctrl+V = 탐색 박자 위치에 붙여넣기(새 그룹 #).   Ctrl+A = 전체 선택.   Del = 선택 삭제.   Esc = 선택 해제.   " +
                     $"Z = 그룹 #{_currentGroupId}의 Call을 Response로 복사, 이후 #{_currentGroupId + 1}로 이동.   " +
-                    "PHASE 레인(1-5같이 여러 스테이지가 섞인 곡용): 빈 공간 클릭 = " +
+                    "PHASE 레인(맨 아래, 1-5같이 여러 스테이지가 섞인 곡용): 빈 공간 클릭 = " +
                     "'새 Phase 스타일' 태그로 phase 추가, 가장자리 드래그 = 크기 조절, 몸통 드래그 = 이동, 우클릭 = 삭제.   " +
-                    "SFX 레인(맨 아래, 판정과 무관한 순수 효과음): 빈 공간 클릭 = '새 SFX 클립'으로 큐 추가, " +
-                    "큐 클릭 = 선택(바로 위 칸에서 클립 지정/▶ 미리듣기), 드래그 = 이동, 우클릭 = 삭제, Del = 선택 삭제.",
+                    "SFX 레인(룰러 바로 아래, 노트와 무관한 순수 효과음): 빈 공간 클릭 = '새 SFX 클립'으로 큐 추가, " +
+                    "큐 클릭 = 선택(바로 아래 칸에서 클립 지정/▶ 미리듣기), 드래그 = 이동, 우클릭 = 삭제, Del = 선택 삭제.",
                     EditorStyles.wordWrappedMiniLabel);
             }
         }
@@ -599,6 +602,7 @@ public class Stage1ChartEditorWindow : EditorWindow
         DrawCalls();
         DrawPhases(contentW, noteLanesH);
         DrawSfxCues(contentW, noteLanesH);
+        DrawSelectedNoteClipEditor();
         if (_isMarqueeSelecting) DrawMarquee();
         if (_isRecording && _isPressed) DrawRecordingPreview();
         DrawScrubMarker(contentH);
@@ -787,6 +791,8 @@ public class Stage1ChartEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(x, y, NOTE_W, h), col);
         EditorGUI.DrawRect(new Rect(x + 2f, y + 2f, NOTE_W - 4f, h * 0.4f),
             new Color(1f, 1f, 1f, entry.role == CallRole.Call ? 0.2f : 0.35f));
+        if (entry.clip != null) // carries a decorative SFX clip
+            EditorGUI.DrawRect(new Rect(x, y + h - 3f, NOTE_W, 3f), SfxCueColor);
 
         if (dragging)
         {
@@ -836,6 +842,8 @@ public class Stage1ChartEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(x0, y, Mathf.Max(2f, x1 - x0), h), col);
         EditorGUI.DrawRect(new Rect(x0 - 2f, y, 4f, h), new Color(1f, 1f, 1f, 0.8f));
         EditorGUI.DrawRect(new Rect(x1 - 2f, y, 4f, h), new Color(1f, 1f, 1f, 0.8f));
+        if (entry.clip != null) // carries a decorative SFX clip
+            EditorGUI.DrawRect(new Rect(x0, y + h - 3f, Mathf.Max(2f, x1 - x0), 3f), SfxCueColor);
 
         if (selected && _isDragging)
         {
@@ -1021,6 +1029,39 @@ public class Stage1ChartEditorWindow : EditorWindow
             if (!_isSfxDragging)
                 EditorGUIUtility.AddCursorRect(new Rect(x - 6f, noteY, NOTE_W + 12f, noteH), MouseCursor.MoveArrow);
         }
+    }
+
+    // Inline SFX-clip picker anchored to the primary-selected Tap/Hold note — same idea as the
+    // SFX lane's inline editor, but for CallEntry.clip (a decorative sound played at the note's
+    // cueBeat by CallNoteSfxPlayer — no judgement, no input, no ant/hand/boss glue). Lets that
+    // clip be assigned without leaving the Chart Editor for the Inspector / Call Map Editor.
+    void DrawSelectedNoteClipEditor()
+    {
+        if (_isRecording || _isPlaying || _isDragging) return;
+        if (_primaryEntry == null || !_selection.Contains(_primaryEntry)) return;
+        if (!_entryScreenRects.TryGetValue(_primaryEntry, out Rect nr)) return;
+
+        var editRect = new Rect(Mathf.Max(2f, nr.x - 60f), nr.y - 24f, 150f, 18f);
+        bool flipped = editRect.y < NOTE_TOP + 2f;
+        if (flipped) editRect.y = nr.yMax + 6f; // would sit under the SFX strip → drop below the note
+
+        EditorGUI.DrawRect(new Rect(editRect.x - 2f, editRect.y - 2f, editRect.width + 4f + 24f, editRect.height + 4f),
+            new Color(0f, 0f, 0f, 0.8f));
+        EditorGUI.BeginChangeCheck();
+        var newClip = (AudioClip)EditorGUI.ObjectField(editRect, _primaryEntry.clip, typeof(AudioClip), false);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(_pattern, "Change Note SFX Clip");
+            _primaryEntry.clip = newClip;
+            EditorUtility.SetDirty(_pattern);
+        }
+        if (GUI.Button(new Rect(editRect.xMax + 2f, editRect.y, 20f, 18f), "▶") && _primaryEntry.clip != null)
+            PlayAudio(_primaryEntry.clip, 0);
+
+        float capY = flipped ? editRect.yMax + 2f : editRect.y - 14f;
+        GUI.Label(new Rect(editRect.x, capY, 280f, 14f),
+            $"{(_primaryEntry.type == CallType.Tap ? "Tap" : "Hold")} {_primaryEntry.role} 효과음 (판정과 무관, 소리만)",
+            new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = Color.white } });
     }
 
     void DrawRecordingPreview()
