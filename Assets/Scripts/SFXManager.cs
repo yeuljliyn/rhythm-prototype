@@ -35,10 +35,12 @@ public class SFXManager : MonoBehaviour
         _src.playOnAwake = false;
         _src.spatialBlend = 0f;
 
-        // 전용 wav가 있으면 그걸, 없으면 기존 합성음으로 폴백.
-        _click    = Resources.Load<AudioClip>("SFX/클릭") ?? BuildTone(440f, 0.07f, 14f);
-        _navigate = Resources.Load<AudioClip>("SFX/이동") ?? BuildTone(660f, 0.06f, 18f);
-        _confirm  = Resources.Load<AudioClip>("SFX/선택") ?? BuildChord(new[] { 550f, 880f }, new[] { 0f, 0.05f }, 0.12f, 16f);
+        // 전용 wav가 있으면 그걸, 없으면 기존 합성음으로 폴백. wav 원본이 매우 조용하게(피크
+        // -18dBFS 수준) 뽑혀 있어서 그대로 쓰면 거의 안 들림 — 로드 후 코드에서 피크 정규화해
+        // 합성음과 비슷한 레벨로 맞춤.
+        _click    = Normalize(Resources.Load<AudioClip>("SFX/클릭")) ?? BuildTone(440f, 0.07f, 14f);
+        _navigate = Normalize(Resources.Load<AudioClip>("SFX/이동")) ?? BuildTone(660f, 0.06f, 18f);
+        _confirm  = Normalize(Resources.Load<AudioClip>("SFX/선택")) ?? BuildChord(new[] { 550f, 880f }, new[] { 0f, 0.05f }, 0.12f, 16f);
         _back     = BuildTone(330f, 0.09f, 10f);
     }
 
@@ -56,6 +58,25 @@ public class SFXManager : MonoBehaviour
     }
 
     // ── 사운드 생성 ───────────────────────────────────────────────────────
+
+    // 로드한 클립을 피크 targetPeak로 정규화한 새 클립으로 복제(원본 에셋은 안 건드림).
+    // null이면 null 반환 → 위의 ?? 폴백으로 넘어감.
+    static AudioClip Normalize(AudioClip src, float targetPeak = 0.9f)
+    {
+        if (src == null) return null;
+        var data = new float[src.samples * src.channels];
+        src.GetData(data, 0);
+        float peak = 0f;
+        foreach (var s in data) { float a = Mathf.Abs(s); if (a > peak) peak = a; }
+        if (peak > 1e-4f)
+        {
+            float g = targetPeak / peak;
+            for (int i = 0; i < data.Length; i++) data[i] *= g;
+        }
+        var clip = AudioClip.Create(src.name, src.samples, src.channels, src.frequency, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
 
     static AudioClip BuildTone(float freq, float duration, float decay)
     {
