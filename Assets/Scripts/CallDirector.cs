@@ -260,6 +260,13 @@ public class CallDirector : MonoBehaviour
         if (clock == null || pattern == null) return;
         if (clock.IsPaused) return; // frozen SongTime means no new spawns/timeouts, but input must be dropped too
 
+        // Song's over and the result screen is up. Everything is already spawned and resolved so
+        // there's nothing left to do here — and crucially HandleInput must stop, otherwise a
+        // Space/click that dismisses the result screen also fires OnResponsePress/OnResponseRelease
+        // and the player character visibly reacts behind the popup (reported on every stage).
+        // CheckSongEnd sets this the same frame OnSongEnded fires.
+        if (_songEndFired) return;
+
         float t = clock.SongTime;
 
         SpawnDueCalls(t);

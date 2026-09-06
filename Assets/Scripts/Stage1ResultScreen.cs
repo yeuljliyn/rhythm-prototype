@@ -31,19 +31,36 @@ public class Stage1ResultScreen : MonoBehaviour
     [SerializeField] Sprite _sprArrow;
 
     bool _triggered;
+    bool _advanced;
+    float _shownRealtime;
+
+    // 결과창이 뜬 직후 짧은 유예 — 곡이 끝나는 순간 마침 누르고 있던 Space/클릭이 결과창을 보기도
+    // 전에 그대로 "다음으로" 스킵돼버리지 않도록.
+    const float AdvanceArmDelay = 0.4f;
 
     void Start()      { if (director != null) director.OnSongEnded += HandleSongEnded; }
     void OnDestroy()  { if (director != null) director.OnSongEnded -= HandleSongEnded; }
 
-    // 테스트용 강제 랭크 치트 — BattleResultScreen(구)의 F1(S강제)/F2(C강제)와 동일한 패턴. 새 결과창
-    // (Stage1ResultScreen)엔 이게 빠져있어서 안 되던 것 — 여기 추가.
     void Update()
     {
-        if (_triggered) return;
         var kb = Keyboard.current;
-        if (kb == null) return;
-        if (kb.f1Key.wasPressedThisFrame) { Trigger("S"); return; }
-        if (kb.f2Key.wasPressedThisFrame) { Trigger("C"); return; }
+
+        if (!_triggered)
+        {
+            // 테스트용 강제 랭크 치트 — BattleResultScreen(구)의 F1(S강제)/F2(C강제)와 동일한 패턴.
+            if (kb == null) return;
+            if (kb.f1Key.wasPressedThisFrame) { Trigger("S"); return; }
+            if (kb.f2Key.wasPressedThisFrame) { Trigger("C"); return; }
+            return;
+        }
+
+        // 결과창 표시 중 — Space/좌클릭으로도 다음으로 넘어감(화살표 버튼은 그대로 둠).
+        if (_advanced) return;
+        if (Time.realtimeSinceStartup - _shownRealtime < AdvanceArmDelay) return;
+
+        bool space = kb != null && kb.spaceKey.wasPressedThisFrame;
+        bool click = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+        if (space || click) GoUndergroundLobby();
     }
 
     void HandleSongEnded() => Trigger(null);
@@ -52,6 +69,7 @@ public class Stage1ResultScreen : MonoBehaviour
     {
         if (_triggered) return;
         _triggered = true;
+        _shownRealtime = Time.realtimeSinceStartup;
         Time.timeScale = 0f;
 
         foreach (var src in FindObjectsOfType<AudioSource>())
@@ -116,6 +134,8 @@ public class Stage1ResultScreen : MonoBehaviour
 
     void GoUndergroundLobby()
     {
+        if (_advanced) return;   // 화살표 버튼 클릭 / Space / 좌클릭 어느 쪽으로 들어와도 전환은 한 번만
+        _advanced = true;
         Time.timeScale = 1f;
         SceneTransitionManager.Instance.LoadSceneWithFade("UndergroundLobbyScene");
     }
