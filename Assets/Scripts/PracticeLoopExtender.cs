@@ -127,6 +127,7 @@ public class PracticeLoopExtender : MonoBehaviour
                 cueBeat     = src.cueBeat + beatOffset,
                 releaseBeat = src.releaseBeat + beatOffset,
                 forceDemo   = forceDemo,
+                clip        = src.clip, // 노트별 효과음(CallNoteSfxPlayer)도 반복마다 유지
             });
         }
         return result;

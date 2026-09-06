@@ -43,6 +43,12 @@ public class CallPatternData : ScriptableObject
              "툴이 자동으로 재정렬함.")]
     public List<CallEntry> calls = new List<CallEntry>();
 
+    [Tooltip("Call Map Editor에서 새로 찍는 노트(클릭/REC)에 자동 배정되는 효과음. 순수 작업 " +
+             "편의용 설정 — 이 값을 바꿔도 그 이후에 찍는 노트에만 적용되고 이미 찍어둔 노트는 " +
+             "영향받지 않음(CallEntry마다 확정된 clip을 각자 따로 들고 있음). Z-에코로 생성되는 " +
+             "Response 노트에는 안 붙음.")]
+    public AudioClip newNoteDefaultClip;
+
     [Tooltip("0보다 크면 이 차트는 '연습 루프 한 사이클'이다 — PracticeLoopExtender가 calls 전체를 " +
              "이 박자 길이만큼씩 뒤로 밀어서 계속 이어붙여 무한 반복시킨다. 실제 음악 파일의 길이(초) " +
              "== loopLengthBeats * BeatInterval이어야 AudioSource.loop가 노트 반복과 어긋나지 않는다. " +
@@ -142,6 +148,13 @@ public class CallEntry
 
     /// Hold only. The judged release beat (window = releaseBeat ± hitWindow). Must be > cueBeat.
     public float releaseBeat;
+
+    /// Optional decorative sound played once at this note's cueBeat during play — no judgement,
+    /// no input, no object reaction (unlike OnCallCue/OnResponsePress which drive the ant/hand/
+    /// boss glue). Assigned per-note in the Call Map Editor (selected-note panel), or stamped
+    /// from CallPatternData.newNoteDefaultClip when the note is first placed. CallNoteSfxPlayer
+    /// is the only runtime consumer; CallDirector ignores this entirely.
+    public AudioClip clip;
 
     /// Runtime-only (never authored, never serialized — deliberately [NonSerialized] so it never
     /// clutters the Call Map Editor's Inspector for real chart entries). Set true only by

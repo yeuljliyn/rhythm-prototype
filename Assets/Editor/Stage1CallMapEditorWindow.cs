@@ -315,6 +315,24 @@ public class Stage1CallMapEditorWindow : EditorWindow
                 _currentGroupId = Mathf.Max(0, EditorGUILayout.IntField(_currentGroupId, GUILayout.Width(30)));
                 GUILayout.Space(8);
 
+                if (_pattern != null)
+                {
+                    EditorGUILayout.LabelField(
+                        new GUIContent("New SFX", "새로 찍는 노트(클릭/REC)에 자동 배정되는 효과음. " +
+                            "이미 찍은 노트엔 영향 없음. Z-에코 Response에는 안 붙음."),
+                        EditorStyles.miniLabel, GUILayout.Width(52));
+                    EditorGUI.BeginChangeCheck();
+                    var ndc = (AudioClip)EditorGUILayout.ObjectField(
+                        _pattern.newNoteDefaultClip, typeof(AudioClip), false, GUILayout.Width(110));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        Undo.RecordObject(_pattern, "Set New-Note Clip");
+                        _pattern.newNoteDefaultClip = ndc;
+                        EditorUtility.SetDirty(_pattern);
+                    }
+                    GUILayout.Space(8);
+                }
+
                 string timeStr = (_isRecording || _isPlaying) && _pattern != null
                     ? $"{Mathf.Max(0f, _currentSongTime) / 60f:0}:{Mathf.Max(0f, _currentSongTime) % 60f:00.0}  " +
                       $"Beat {Mathf.Max(0f, _pattern.TimeToBeat(_currentSongTime)):F1}"
@@ -343,6 +361,29 @@ public class Stage1CallMapEditorWindow : EditorWindow
                     $"Z = echo Group #{_currentGroupId}'s Calls into a Response, then advance to #{_currentGroupId + 1}.   " +
                     "Del = delete selected" + selInfo,
                     EditorStyles.miniLabel);
+
+                if (_selEntry != null)
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField(
+                            new GUIContent("Selected note SFX", "이 노트의 cueBeat에 재생될 효과음 " +
+                                "(판정과 무관, 소리만). ▶ Play는 REC/PREVIEW 정지 상태에서만 들림."),
+                            GUILayout.Width(110));
+                        EditorGUI.BeginChangeCheck();
+                        var newClip = (AudioClip)EditorGUILayout.ObjectField(
+                            _selEntry.clip, typeof(AudioClip), false, GUILayout.Width(160));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(_pattern, "Change Note Clip");
+                            _selEntry.clip = newClip;
+                            EditorUtility.SetDirty(_pattern);
+                        }
+                        if (GUILayout.Button("▶ Play", GUILayout.Width(52)) && _selEntry.clip != null)
+                            PlayAudio(_selEntry.clip);
+                        GUILayout.FlexibleSpace();
+                    }
+                }
             }
         }
     }
@@ -552,6 +593,9 @@ public class Stage1CallMapEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(x + 2f, y + 2f, NOTE_W - 4f, h * 0.4f),
             new Color(1f, 1f, 1f, entry.role == CallRole.Call ? 0.2f : 0.35f));
 
+        if (entry.clip != null) // 노트별 효과음이 붙어있음 표시(cyan 틱)
+            EditorGUI.DrawRect(new Rect(x + 1f, y - 5f, NOTE_W - 2f, 3f), new Color(0.4f, 0.85f, 1f, 0.95f));
+
         if (dragging)
             GUI.Label(new Rect(x - 12f, y - 16f, 50f, 14f), $"B {beat:F2}",
                 new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(1f, 0.9f, 0.1f) }, fontStyle = FontStyle.Bold });
@@ -591,6 +635,9 @@ public class Stage1CallMapEditorWindow : EditorWindow
         // Handles
         EditorGUI.DrawRect(new Rect(x0 - 2f, y, 4f, h), new Color(1f, 1f, 1f, 0.8f));
         EditorGUI.DrawRect(new Rect(x1 - 2f, y, 4f, h), new Color(1f, 1f, 1f, 0.8f));
+
+        if (entry.clip != null) // 노트별 효과음 표시(cyan 틱)
+            EditorGUI.DrawRect(new Rect(x0, y - 5f, Mathf.Max(3f, x1 - x0), 3f), new Color(0.4f, 0.85f, 1f, 0.95f));
 
         if (selected && _isDragging)
             GUI.Label(new Rect(x0, y - 16f, 100f, 14f), $"B {cueBeat:F2} → {releaseBeat:F2}",
@@ -720,7 +767,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
                     else if (section == 0)
                     {
                         Undo.RecordObject(_pattern, "Add Tap");
-                        var entry = new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = clickBeat };
+                        var entry = new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = clickBeat, clip = _pattern.newNoteDefaultClip };
                         AddCall(entry);
                         _selEntry = entry;
                     }
@@ -729,7 +776,7 @@ public class Stage1CallMapEditorWindow : EditorWindow
                         // Start creating a Hold: begin at click, immediately drag the end handle
                         float step = 1f / SnapDivs[_snapIndex];
                         Undo.RecordObject(_pattern, "Add Hold");
-                        var entry = new CallEntry { type = CallType.Hold, role = CallRole.Call, groupId = _currentGroupId, cueBeat = clickBeat, releaseBeat = clickBeat + step };
+                        var entry = new CallEntry { type = CallType.Hold, role = CallRole.Call, groupId = _currentGroupId, cueBeat = clickBeat, releaseBeat = clickBeat + step, clip = _pattern.newNoteDefaultClip };
                         AddCall(entry);
                         BeginDrag(entry, DragHandle.HoldEnd, mp.x);
                     }
@@ -982,8 +1029,8 @@ public class Stage1CallMapEditorWindow : EditorWindow
 
             Undo.RecordObject(_pattern, "Record Call");
             CallEntry entry = durationSec < _holdThresholdSec
-                ? new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = pressBeat }
-                : new CallEntry { type = CallType.Hold, role = CallRole.Call, groupId = _currentGroupId, cueBeat = pressBeat, releaseBeat = Mathf.Max(releaseBeat, pressBeat + MIN_HOLD_BEATS) };
+                ? new CallEntry { type = CallType.Tap, role = CallRole.Call, groupId = _currentGroupId, cueBeat = pressBeat, clip = _pattern.newNoteDefaultClip }
+                : new CallEntry { type = CallType.Hold, role = CallRole.Call, groupId = _currentGroupId, cueBeat = pressBeat, releaseBeat = Mathf.Max(releaseBeat, pressBeat + MIN_HOLD_BEATS), clip = _pattern.newNoteDefaultClip };
             AddCall(entry);
             e.Use();
         }
