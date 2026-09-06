@@ -96,12 +96,8 @@ public class DialogueSceneManager : MonoBehaviour
     };
 
     // ── Character appearance ──────────────────────────────────────────
-    static readonly Color ColActive   = Color.white;
-    static readonly Color ColInactive = new Color(0.30f, 0.30f, 0.30f, 0.65f);
-    // 이 씬은 잭두 초상화가 처음부터 화면 왼쪽에 크게 서 있는 구도(대사씬시작 아트) — 활성 강조
-    // 스케일업이 필요 없음(오히려 프레임 밖으로 넘침). 등배율 유지.
-    static readonly Vector3 ScaleActive   = Vector3.one;
-    static readonly Vector3 ScaleInactive = new Vector3(0.93f, 0.93f, 1f);
+    // 이 씬은 잭두 혼자라 활성/비활성 강조(스케일업·디밍)가 없음 — 색만 흰색으로 보장.
+    static readonly Color ColActive = Color.white;
 
     // ── UI refs (assigned in Editor — see Assets/Scenes/DialogueScene.unity; field names match
     // Stage1DialogueSceneManager on purpose, see class doc) ──
@@ -153,8 +149,11 @@ public class DialogueSceneManager : MonoBehaviour
 
         if (_charBRt != null) _charBRt.gameObject.SetActive(false); // 신령님은 화면 밖 존재 — 초상화 없음
 
-        _charARt.localScale = ScaleActive; // 이 씬은 잭두 혼자라 처음부터 활성 상태로
-        _charAImg.color     = ColActive;
+        // CharA(잭두)의 크기·위치·좌우반전은 전부 에디터에서 직접 잡음 — 여기서 localScale을
+        // 건드리지 않는다. (예전엔 활성/비활성 강조용으로 ScaleActive를 씌웠는데, 이 씬은 잭두
+        // 혼자라 강조가 필요 없고, 그 대입이 에디터에서 조절한 스케일·flip(localScale.x=-1)을
+        // 매번 덮어써서 Play하면 초상화가 커지고 반전이 풀리는 버그가 있었음.)
+        _charAImg.color = ColActive;
 
         // TMP 폰트 아틀라스 선제 빌드 (첫 글자 stutter 방지)
         _speakerTxt.text  = NameA;
