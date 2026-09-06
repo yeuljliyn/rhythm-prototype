@@ -3165,7 +3165,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 809937859}
-  - component: {fileID: 809937860}
   m_Layer: 0
   m_Name: Screen_1_1
   m_TagString: Untagged
@@ -3197,21 +3196,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &809937860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 809937858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5603f37d0151faa49b1d7c14ff580bbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScreenVignetteFlash
-  _peakAlpha: 0.4
-  _fadeIn: 0.05
-  _fadeOut: 0.18
 --- !u!1 &816034880
 GameObject:
   m_ObjectHideFlags: 0
@@ -3886,6 +3870,7 @@ GameObject:
   - component: {fileID: 1002775566}
   - component: {fileID: 1002775565}
   - component: {fileID: 1002775564}
+  - component: {fileID: 1002775568}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -3976,6 +3961,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1002775568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002775563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5603f37d0151faa49b1d7c14ff580bbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScreenVignetteFlash
+  _peakAlpha: 0.4
+  _fadeIn: 0.05
+  _fadeOut: 0.18
 --- !u!1 &1016806041
 GameObject:
   m_ObjectHideFlags: 0
@@ -6496,7 +6496,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1697676517}
-  - component: {fileID: 1697676518}
   m_Layer: 0
   m_Name: Screen_1_2
   m_TagString: Untagged
@@ -6538,21 +6537,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1697676518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1697676516}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5603f37d0151faa49b1d7c14ff580bbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScreenVignetteFlash
-  _peakAlpha: 0.4
-  _fadeIn: 0.05
-  _fadeOut: 0.18
 --- !u!1 &1714168425
 GameObject:
   m_ObjectHideFlags: 0
