@@ -342,9 +342,13 @@ public class Stage1ChartEditorWindow : EditorWindow
     // ── Toolbar ────────────────────────────────────────────────────────────
     void DrawToolbar()
     {
-        using (new EditorGUILayout.VerticalScope(EditorStyles.toolbar))
+        // NOTE: the toolbar style goes on each ROW's HorizontalScope, not on an outer
+        // VerticalScope — EditorStyles.toolbar pins a fixed height and doesn't stretch, so a
+        // multi-row VerticalScope with that style under-reserves its layout height and the
+        // lower rows spill down over the timeline's top-left label cell ("SFX"/"PHASE").
+        using (new EditorGUILayout.VerticalScope())
         {
-            using (new EditorGUILayout.HorizontalScope())
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 bool canPlay = _pattern?.music != null;
                 GUI.enabled = canPlay;
@@ -452,7 +456,7 @@ public class Stage1ChartEditorWindow : EditorWindow
                 EditorGUILayout.LabelField(timeStr, EditorStyles.miniLabel, GUILayout.Width(140));
             }
 
-            using (new EditorGUILayout.HorizontalScope())
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 GUI.enabled = _selection.Count > 0 && _pattern != null;
                 EditorGUILayout.LabelField(
@@ -494,7 +498,7 @@ public class Stage1ChartEditorWindow : EditorWindow
             // row above. Only "new phase" default lives here now; editing an EXISTING phase's style
             // is done via an inline field drawn directly above that phase in the PHASE lane itself
             // (DrawPhases) — same reasoning, doesn't compete for toolbar space at all.
-            using (new EditorGUILayout.HorizontalScope())
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 EditorGUILayout.LabelField(
                     new GUIContent("새 Phase 스타일", "아래 PHASE 레인의 빈 공간을 클릭해 새 phase를 만들 때 찍히는 스타일 태그."),
