@@ -98,7 +98,9 @@ public class DialogueSceneManager : MonoBehaviour
     // ── Character appearance ──────────────────────────────────────────
     static readonly Color ColActive   = Color.white;
     static readonly Color ColInactive = new Color(0.30f, 0.30f, 0.30f, 0.65f);
-    static readonly Vector3 ScaleActive   = new Vector3(1.10f, 1.10f, 1f);
+    // 이 씬은 잭두 초상화가 처음부터 화면 왼쪽에 크게 서 있는 구도(대사씬시작 아트) — 활성 강조
+    // 스케일업이 필요 없음(오히려 프레임 밖으로 넘침). 등배율 유지.
+    static readonly Vector3 ScaleActive   = Vector3.one;
     static readonly Vector3 ScaleInactive = new Vector3(0.93f, 0.93f, 1f);
 
     // ── UI refs (assigned in Editor — see Assets/Scenes/DialogueScene.unity; field names match
@@ -116,6 +118,11 @@ public class DialogueSceneManager : MonoBehaviour
     // ── Emotion sprites ───────────────────────────────────────────────
     [SerializeField] EmotionEntry[] _emotions;
     Dictionary<string, Sprite>      _emotionDict = new Dictionary<string, Sprite>();
+
+    // 배경 스프라이트(옥탑방). 예전엔 Resources.Load("튜토_사이버신당")로 잡았지만 그 파일이
+    // Resources 하위폴더에 있어 bare-key 로드가 null을 반환하던 버그가 있었음 — 이제 에디터에서
+    // 직접 배정(Assets/대사씬시작/대사씬0_옥탑방배경). 비어 있으면 씬에 이미 꽂힌 BG 스프라이트 유지.
+    [SerializeField] Sprite _bgSprite;
 
     // ── State ─────────────────────────────────────────────────────────
     int         _nodeIdx     = 0;
@@ -138,11 +145,11 @@ public class DialogueSceneManager : MonoBehaviour
         _blipClip = GenerateBlip();
         BuildEmotionDict();
 
-        var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
-        if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; }
+        // 잭두 베이스 스프라이트는 에디터에서 CharA에 직접 꽂아둠(대사씬0_잭두_일반). 첫 노드가
+        // 곧바로 EmotionKey로 표정을 덮어쓰므로 런타임 로드가 따로 필요 없음.
+        if (_charAImg != null) _charAImg.preserveAspect = true;
 
-        var bgSprite = Resources.Load<Sprite>("튜토_사이버신당");
-        if (_bgImg != null && bgSprite != null) { _bgImg.sprite = bgSprite; _bgImg.color = Color.white; }
+        if (_bgImg != null && _bgSprite != null) { _bgImg.sprite = _bgSprite; _bgImg.color = Color.white; }
 
         if (_charBRt != null) _charBRt.gameObject.SetActive(false); // 신령님은 화면 밖 존재 — 초상화 없음
 
@@ -183,19 +190,22 @@ public class DialogueSceneManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    // 표정 키 → 실제 파일 경로 매핑 (파일명과 키 이름이 다른 경우 처리) — 이 씬(§0)에서 쓰는
-    // 잭두 표정만. Stage1DialogueSceneManager와 같은 원본 이미지를 그대로 재사용.
+    // 표정 키(Nodes[]의 EmotionKey) → 실제 파일 경로. 새 대사씬 아트(Assets/대사씬시작/) 기준.
+    // §0에서 실제로 쓰는 건 6종이지만 9종 전부 매핑해둠(기획자가 노드에서 골라 쓸 수 있게).
     static readonly Dictionary<string, string> EmotionKeyToPath = new Dictionary<string, string>
     {
-        { "잭두_놀람_당황",     "Assets/EmotionImage/잭두_놀람, 당황.png" },
-        { "잭두_웃음1",        "Assets/EmotionImage/잭두_웃음1.png" },
-        { "잭두_웃음2",        "Assets/EmotionImage/잭두_웃음2.png" },
-        { "잭두_슬픔2",        "Assets/EmotionImage/잭두_슬픔2.png" },
-        { "잭두_무표정",       "Assets/EmotionImage/잭두_무표정.png" },
-        { "잭두_무표정2_화남",  "Assets/EmotionImage/잭두_무표정2, 화남.png" },
+        { "잭두_일반",         "Assets/대사씬시작/대사씬0_잭두_일반.png" },
+        { "잭두_무표정",       "Assets/대사씬시작/대사씬0_잭두_무표정.png" },
+        { "잭두_무표정2_화남",  "Assets/대사씬시작/대사씬0_잭두_무표정2화남.png" },
+        { "잭두_놀람_당황",     "Assets/대사씬시작/대사씬0_잭두_놀람당황.png" },
+        { "잭두_분노",         "Assets/대사씬시작/대사씬0_잭두_분노.png" },
+        { "잭두_슬픔1",        "Assets/대사씬시작/대사씬0_잭두_슬픔1.png" },
+        { "잭두_슬픔2",        "Assets/대사씬시작/대사씬0_잭두_슬픔2.png" },
+        { "잭두_웃음1",        "Assets/대사씬시작/대사씬0_잭두_웃음1.png" },
+        { "잭두_웃음2",        "Assets/대사씬시작/대사씬0_잭두_웃음2.png" },
     };
 
-    [ContextMenu("Auto-Load Emotions from Assets/EmotionImage")]
+    [ContextMenu("Auto-Load Emotions from Assets/대사씬시작")]
     void EditorAutoLoadEmotions()
     {
         var list = new List<EmotionEntry>();
