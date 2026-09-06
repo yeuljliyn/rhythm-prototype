@@ -789,8 +789,13 @@ public class Stage1ChartEditorWindow : EditorWindow
             new Color(1f, 1f, 1f, entry.role == CallRole.Call ? 0.2f : 0.35f));
 
         if (dragging)
-            GUI.Label(new Rect(x - 12f, y - 16f, 50f, 14f), $"B {beat:F2}",
+        {
+            // Top note row's "above" position (y-16) lands inside the SFX strip, which is drawn
+            // afterwards and would cover it — flip the readout below the note in that case.
+            float lblY = (y - 16f < NOTE_TOP) ? y + h + 2f : y - 16f;
+            GUI.Label(new Rect(x - 12f, lblY, 50f, 14f), $"B {beat:F2}",
                 new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(1f, 0.9f, 0.1f) }, fontStyle = FontStyle.Bold });
+        }
 
         _entryScreenRects[entry] = new Rect(x, y, NOTE_W, h);
 
@@ -833,8 +838,11 @@ public class Stage1ChartEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(x1 - 2f, y, 4f, h), new Color(1f, 1f, 1f, 0.8f));
 
         if (selected && _isDragging)
-            GUI.Label(new Rect(x0, y - 16f, 100f, 14f), $"B {cueBeat:F2} → {releaseBeat:F2}",
+        {
+            float lblY = (y - 16f < NOTE_TOP) ? y + h + 2f : y - 16f;
+            GUI.Label(new Rect(x0, lblY, 100f, 14f), $"B {cueBeat:F2} → {releaseBeat:F2}",
                 new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(1f, 0.9f, 0.1f) }, fontStyle = FontStyle.Bold });
+        }
 
         _entryScreenRects[entry] = new Rect(x0, y, Mathf.Max(2f, x1 - x0), h);
 
