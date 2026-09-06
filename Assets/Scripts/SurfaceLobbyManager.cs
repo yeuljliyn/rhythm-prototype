@@ -67,6 +67,8 @@ public class SurfaceLobbyManager : MonoBehaviour
         // 계속 0이 되어 아래 Lerp가 절대 움직이지 않음 — CallClock/RhythmManager와 동일한 방어 로직.
         Time.timeScale = 1f;
 
+        LobbyBGMPlayer.Ensure(); // 지상/지하 로비 공용 BGM — 이미 재생 중이면 no-op
+
         if (stage1ClownImage != null) stage1ClownImage.sprite = clownSelectedSprite; // 시작은 스테이지1 선택 상태
     }
 

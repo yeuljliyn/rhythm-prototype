@@ -48,6 +48,8 @@ public class UndergroundLobbyManager : MonoBehaviour
         // Lerp가 절대 움직이지 않음 — CallClock/RhythmManager/SurfaceLobbyManager와 동일한 방어 로직.
         Time.timeScale = 1f;
 
+        LobbyBGMPlayer.Ensure(); // 지상/지하 로비 공용 BGM — 지상 로비에서 내려온 거면 이미 재생 중이라 no-op
+
         // 인스펙터에 찍힌 값 대신 실제 저장된 해금 진행도를 씀 — Stage1ResultScreen이 랭크 A 이상
         // 클리어 시 UndergroundLobbyProgress.UnlockUpTo(...)로 갱신한 값.
         maxEnterableIndex = UndergroundLobbyProgress.GetUnlockedIndex();
