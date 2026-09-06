@@ -163,6 +163,10 @@ public class Stage1ChartEditorWindow : EditorWindow
     const float NOTE_W     = 10f;
     const float MIN_HOLD_BEATS = 0.1f;
 
+    // The SFX cue strip sits directly under the ruler, above the Tap/Hold note lanes; the PHASE
+    // strip stays pinned to the very bottom. So the note lanes start below ruler + SFX strip.
+    const float NOTE_TOP = RULER_H + SFX_LANE_H;
+
     // Dynamic band count — how many concurrent lanes the busiest moment of the chart currently
     // needs. Recomputed every DrawTimeline() call by RecomputeGroupBands (see class doc point 1).
     // TOTAL_ROWS = LANE_COUNT * SUBROWS, interleaved Tap/Hold/Tap/Hold/... same physical ordering
@@ -565,19 +569,18 @@ public class Stage1ChartEditorWindow : EditorWindow
         // per-call-site (the "intro" shaded region drawn at the left, see below, is the FIRST
         // introDelay seconds of this same span, not extra width tacked on before it).
         float contentW   = totalAudio * _zoom + 120f;
-        // Phase lane rides at the very bottom, below every note lane — purely additive to the
-        // layout (nothing above it moves), so none of the existing note-lane Y math needed to
-        // change to make room for it.
+        // Strip order top-to-bottom: ruler, SFX strip, Tap/Hold note lanes, PHASE strip. The note
+        // lanes start at NOTE_TOP (= RULER_H + SFX_LANE_H); the PHASE strip stays pinned last.
         float noteLanesH = LANE_H * TOTAL_ROWS;
-        float contentH   = RULER_H + noteLanesH + PHASE_LANE_H + SFX_LANE_H;
+        float contentH   = RULER_H + SFX_LANE_H + noteLanesH + PHASE_LANE_H;
 
-        Rect labelsRect = new Rect(full.x, full.y + RULER_H, LABEL_W, noteLanesH);
+        Rect labelsRect = new Rect(full.x, full.y + NOTE_TOP, LABEL_W, noteLanesH);
         DrawLaneLabels(labelsRect);
         var stripLabelStyle = new GUIStyle(EditorStyles.boldLabel)
             { alignment = TextAnchor.MiddleCenter, normal = { textColor = new Color(0.7f, 0.7f, 0.7f) } };
-        Rect phaseLabelRect = new Rect(full.x, full.y + RULER_H + noteLanesH, LABEL_W, PHASE_LANE_H);
+        Rect phaseLabelRect = new Rect(full.x, full.y + NOTE_TOP + noteLanesH, LABEL_W, PHASE_LANE_H);
         GUI.Label(phaseLabelRect, "PHASE", stripLabelStyle);
-        Rect sfxLabelRect = new Rect(full.x, full.y + RULER_H + noteLanesH + PHASE_LANE_H, LABEL_W, SFX_LANE_H);
+        Rect sfxLabelRect = new Rect(full.x, full.y + RULER_H, LABEL_W, SFX_LANE_H);
         GUI.Label(sfxLabelRect, "SFX", stripLabelStyle);
 
         Rect scrollRect  = new Rect(full.x + LABEL_W, full.y, full.width - LABEL_W, full.height);
@@ -647,7 +650,7 @@ public class Stage1ChartEditorWindow : EditorWindow
             if (x > totalW) break;
 
             bool isMeasure = (i % 4 == 0);
-            EditorGUI.DrawRect(new Rect(x, RULER_H, 1f, LANE_H * TOTAL_ROWS),
+            EditorGUI.DrawRect(new Rect(x, NOTE_TOP, 1f, LANE_H * TOTAL_ROWS),
                 new Color(0.6f, 0.6f, 0.6f, isMeasure ? 0.55f : 0.20f));
 
             if (isMeasure)
@@ -669,7 +672,7 @@ public class Stage1ChartEditorWindow : EditorWindow
         for (int row = 0; row < TOTAL_ROWS; row++)
         {
             int   section = SectionOfRow(row, SUBROWS);
-            float y  = RULER_H + row * LANE_H;
+            float y  = NOTE_TOP + row * LANE_H;
             Color bg = section % 2 == 0 ? new Color(0.155f, 0.155f, 0.155f) : new Color(0.130f, 0.130f, 0.130f);
             EditorGUI.DrawRect(new Rect(0f, y, totalW, LANE_H), bg);
 
@@ -757,7 +760,7 @@ public class Stage1ChartEditorWindow : EditorWindow
 
     static (float y, float h) FixedSubRowRect(int sectionIndex, int subRow)
     {
-        float rowTop = RULER_H + RowOf(sectionIndex, subRow) * LANE_H;
+        float rowTop = NOTE_TOP + RowOf(sectionIndex, subRow) * LANE_H;
         return (rowTop + 6f, LANE_H - 12f);
     }
 
@@ -845,12 +848,14 @@ public class Stage1ChartEditorWindow : EditorWindow
         if (spans.Count == 0) return;
 
         var ordered = spans.OrderBy(s => s.start).ToList();
-        float bandH = (contentH - RULER_H) / Mathf.Max(1, SUBROWS);
+        // Bands must line up with the note rows only — divide the note-lane height (not everything
+        // below the ruler, which would fold in the SFX + PHASE strips) by the sub-row count.
+        float bandH = (LANE_H * TOTAL_ROWS) / Mathf.Max(1, SUBROWS);
 
         int colorIndex = 0;
         foreach (var s in ordered)
         {
-            float bandY = RULER_H + (_groupBandCache.TryGetValue(s.groupId, out int bnd) ? bnd : 0) * bandH;
+            float bandY = NOTE_TOP + (_groupBandCache.TryGetValue(s.groupId, out int bnd) ? bnd : 0) * bandH;
 
             float x0 = BeatX(s.start);
             float x1 = BeatX(s.end);
@@ -879,7 +884,7 @@ public class Stage1ChartEditorWindow : EditorWindow
 
     void DrawPhases(float totalW, float noteLanesH)
     {
-        float y = RULER_H + noteLanesH;
+        float y = NOTE_TOP + noteLanesH;
         EditorGUI.DrawRect(new Rect(0f, y, totalW, PHASE_LANE_H), new Color(0.09f, 0.09f, 0.11f));
 
         if (_pattern.phases == null) return;
@@ -949,7 +954,9 @@ public class Stage1ChartEditorWindow : EditorWindow
     // ── SFX cue lane ────────────────────────────────────────────────────────
     void DrawSfxCues(float totalW, float noteLanesH)
     {
-        float y = RULER_H + noteLanesH + PHASE_LANE_H;
+        // SFX strip sits directly under the ruler, above the note lanes (noteLanesH unused now that
+        // it's not stacked below them — kept in the signature to match DrawPhases).
+        float y = RULER_H;
         EditorGUI.DrawRect(new Rect(0f, y, totalW, SFX_LANE_H), new Color(0.08f, 0.11f, 0.13f));
 
         if (_pattern.sfxCues == null) return;
@@ -970,18 +977,19 @@ public class Stage1ChartEditorWindow : EditorWindow
             EditorGUI.DrawRect(new Rect(x + 2f, noteY + 2f, NOTE_W - 4f, noteH * 0.4f), new Color(1f, 1f, 1f, 0.35f));
 
             if (_isSfxDragging && selected)
-                GUI.Label(new Rect(x - 12f, noteY - 15f, 60f, 14f), $"B {beat:F2}",
+                GUI.Label(new Rect(x - 12f, y + SFX_LANE_H + 1f, 60f, 14f), $"B {beat:F2}",
                     new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(1f, 0.9f, 0.1f) }, fontStyle = FontStyle.Bold });
             else if (_zoom > 80f)
                 GUI.Label(new Rect(x + NOTE_W + 3f, noteY - 1f, 120f, noteH),
                     c.clip != null ? c.clip.name : "(none)",
                     new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(1f, 1f, 1f, 0.75f) } });
 
-            // Clip picker inline right above the selected cue (same reasoning as the phase styleId
-            // editor — never fights the toolbar for horizontal space).
+            // Clip picker inline just BELOW the selected cue (the SFX strip now sits directly under
+            // the ruler, so there's no room above it — drawing below keeps it off the ruler while
+            // still never fighting the toolbar for horizontal space).
             if (selected && !_isSfxDragging)
             {
-                var editRect = new Rect(x - 60f, y - 22f, 150f, 18f);
+                var editRect = new Rect(x - 60f, y + SFX_LANE_H + 18f, 150f, 18f);
                 EditorGUI.DrawRect(new Rect(editRect.x - 2f, editRect.y - 2f, editRect.width + 4f + 24f, editRect.height + 4f),
                     new Color(0f, 0f, 0f, 0.8f));
                 EditorGUI.BeginChangeCheck();
@@ -1007,7 +1015,7 @@ public class Stage1ChartEditorWindow : EditorWindow
     {
         float x0 = BeatX(_pressStartBeat);
         float x1 = _currentSongTime * _zoom; // introDelay already baked into BeatX's own formula; _currentSongTime is raw content time
-        EditorGUI.DrawRect(new Rect(Mathf.Min(x0, x1), RULER_H, Mathf.Max(2f, Mathf.Abs(x1 - x0)), LANE_H * TOTAL_ROWS),
+        EditorGUI.DrawRect(new Rect(Mathf.Min(x0, x1), NOTE_TOP, Mathf.Max(2f, Mathf.Abs(x1 - x0)), LANE_H * TOTAL_ROWS),
             new Color(1f, 1f, 0.3f, 0.18f));
     }
 
@@ -1055,8 +1063,8 @@ public class Stage1ChartEditorWindow : EditorWindow
     void HandleTimelineMouseInput(Rect contentRect, float noteLanesH)
     {
         Event e = Event.current;
-        float phaseLaneTop = RULER_H + noteLanesH;
-        float sfxLaneTop   = phaseLaneTop + PHASE_LANE_H;
+        // Strip order: ruler [0, RULER_H) → SFX [RULER_H, NOTE_TOP) → note lanes → PHASE (bottom).
+        float phaseLaneTop = NOTE_TOP + noteLanesH;
 
         if (e.type == EventType.MouseDown)
         {
@@ -1079,8 +1087,9 @@ public class Stage1ChartEditorWindow : EditorWindow
                 return;
             }
 
-            if (mp.y >= sfxLaneTop)
+            if (mp.y < NOTE_TOP)
             {
+                // SFX strip — directly under the ruler (ruler case already returned above).
                 HandleSfxLaneMouseDown(mp, e.button);
                 e.Use();
                 Repaint();
@@ -1095,7 +1104,7 @@ public class Stage1ChartEditorWindow : EditorWindow
                 return;
             }
 
-            int row     = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
+            int row     = Mathf.FloorToInt((mp.y - NOTE_TOP) / LANE_H);
             int section = row >= 0 && row < TOTAL_ROWS ? SectionOfRow(row, SUBROWS) : -1;
             if (section < 0) return;
 
@@ -1807,7 +1816,7 @@ public class Stage1ChartEditorWindow : EditorWindow
     CallEntry FindTapNearPixel(Vector2 mp, float tolerance)
     {
         if (_pattern.calls == null) return null;
-        int row = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
+        int row = Mathf.FloorToInt((mp.y - NOTE_TOP) / LANE_H);
         if (row < 0 || row >= TOTAL_ROWS || SectionOfRow(row, SUBROWS) != 0) return null;
         int clickedSubRow = SubRowOfRow(row, SUBROWS);
 
@@ -1826,7 +1835,7 @@ public class Stage1ChartEditorWindow : EditorWindow
     (CallEntry entry, DragHandle handle) FindHoldNearPixel(Vector2 mp, float handleTolerance)
     {
         if (_pattern.calls == null) return (null, DragHandle.None);
-        int row = Mathf.FloorToInt((mp.y - RULER_H) / LANE_H);
+        int row = Mathf.FloorToInt((mp.y - NOTE_TOP) / LANE_H);
         if (row < 0 || row >= TOTAL_ROWS || SectionOfRow(row, SUBROWS) != 1) return (null, DragHandle.None);
         int clickedSubRow = SubRowOfRow(row, SUBROWS);
 
