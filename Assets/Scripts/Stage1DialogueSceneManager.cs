@@ -109,10 +109,12 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     };
 
     // ── Character appearance ──────────────────────────────────────────
+    // 말하는 쪽 강조는 '색 디밍'만 — 크기(localScale)는 안 건드림. CharA/CharB의 크기·위치·
+    // 좌우반전(localRotation)은 전부 에디터에서 직접 잡음(대사씬시작 아트 구도, DialogueScene과
+    // 동일). 예전엔 여기서 ScaleActive/ScaleInactive를 lerp로 씌웠는데 그게 에디터 스케일을
+    // 매번 덮어써서 Play하면 초상화가 커지던 버그가 있었음(DialogueScene에서 먼저 고침).
     static readonly Color ColActive   = Color.white;
-    static readonly Color ColInactive = new Color(0.30f, 0.30f, 0.30f, 0.65f);
-    static readonly Vector3 ScaleActive   = new Vector3(1.10f, 1.10f, 1f);
-    static readonly Vector3 ScaleInactive = new Vector3(0.93f, 0.93f, 1f);
+    static readonly Color ColInactive = new Color(0.55f, 0.55f, 0.60f, 0.75f);
 
     // ── UI refs (assigned in Editor — see Assets/Scenes/Stage1DialogueScene.unity) ──
     [SerializeField] RectTransform     _charARt, _charBRt;
@@ -128,6 +130,12 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     // ── Emotion sprites ───────────────────────────────────────────────
     [SerializeField] EmotionEntry[] _emotions;
     Dictionary<string, Sprite>      _emotionDict = new Dictionary<string, Sprite>();
+
+    // §1 배경. 예전 Resources.Load("스테1_폐허사이버증권거래소")는 그 파일이 Resources 하위폴더에
+    // 있어 bare-key 로드가 null을 반환 → 배경이 아예 안 떴음. 지금은 임시로 §0 옥탑방 배경을
+    // 에디터에서 직접 배정(§1 전용 배경 아트 나오면 교체). 노드 BgKey는 그대로 두되(Resources가
+    // 잡히면 그때부터 노드별 전환 동작), null이면 이 스프라이트를 안 덮어씀(ApplyBg의 null 가드).
+    [SerializeField] Sprite _bgSprite;
 
     // ── State ─────────────────────────────────────────────────────────
     int         _nodeIdx     = 0;
@@ -145,18 +153,16 @@ public class Stage1DialogueSceneManager : MonoBehaviour
         _blipClip = GenerateBlip();
         BuildEmotionDict();
 
-        var spriteA = Resources.Load<Sprite>("사이보그무당_배경제거");
-        if (spriteA != null) { _charAImg.sprite = spriteA; _charAImg.preserveAspect = true; }
+        // CharA(잭두)/CharB(광대물귀신) 베이스 스프라이트는 에디터에서 직접 꽂아둠 — 첫 노드가
+        // 곧바로 EmotionKey로 덮어씀. 크기·위치·좌우반전도 에디터 값 그대로(여기서 안 건드림).
+        if (_charAImg != null) _charAImg.preserveAspect = true;
+        if (_charBImg != null) _charBImg.preserveAspect = true;
 
-        var spriteB = Resources.Load<Sprite>("광대물귀신_배경제거");
-        if (spriteB != null) { _charBImg.sprite = spriteB; _charBImg.preserveAspect = true; }
+        if (_bgImg != null && _bgSprite != null) { _bgImg.sprite = _bgSprite; _bgImg.color = Color.white; }
+        if (!string.IsNullOrEmpty(Nodes[0].BgKey)) ApplyBg(Nodes[0].BgKey); // Resources가 잡히면 노드 배경으로 덮음
 
-        if (!string.IsNullOrEmpty(Nodes[0].BgKey)) ApplyBg(Nodes[0].BgKey);
-
-        _charARt.localScale = ScaleInactive;
-        _charBRt.localScale = ScaleInactive;
-        _charAImg.color     = ColInactive;
-        _charBImg.color     = ColInactive;
+        _charAImg.color = ColInactive;
+        _charBImg.color = ColInactive;
 
         // TMP 폰트 아틀라스 선제 빌드 (첫 글자 stutter 방지) — Nodes[0]은 물귀신(B)의 대사
         _speakerTxt.text  = NameB;
@@ -202,11 +208,13 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     // (§0 오프닝 전용 표정들은 DialogueScene 쪽으로 옮겨감 — 그쪽 EmotionKeyToPath 참고)
     static readonly Dictionary<string, string> EmotionKeyToPath = new Dictionary<string, string>
     {
-        { "잭두_무표정2_화남",  "Assets/EmotionImage/잭두_무표정2, 화남.png" },
-        { "잭두_무표정",       "Assets/EmotionImage/잭두_무표정.png" },
-        { "잭두_놀람_당황",     "Assets/EmotionImage/잭두_놀람, 당황.png" },
-        { "잭두_슬픔2",        "Assets/EmotionImage/잭두_슬픔2.png" },
-        { "잭두_웃음1",        "Assets/EmotionImage/잭두_웃음1.png" },
+        // 잭두는 §0(DialogueScene)와 같은 새 아트(Assets/대사씬시작/)로 통일.
+        { "잭두_무표정2_화남",  "Assets/대사씬시작/대사씬0_잭두_무표정2화남.png" },
+        { "잭두_무표정",       "Assets/대사씬시작/대사씬0_잭두_무표정.png" },
+        { "잭두_놀람_당황",     "Assets/대사씬시작/대사씬0_잭두_놀람당황.png" },
+        { "잭두_슬픔2",        "Assets/대사씬시작/대사씬0_잭두_슬픔2.png" },
+        { "잭두_웃음1",        "Assets/대사씬시작/대사씬0_잭두_웃음1.png" },
+        // 광대(물귀신)는 새 아트가 아직 없어 기존 EmotionImage로 임시 — 나중에 교체.
         { "물귀신_슬픔",       "Assets/EmotionImage/광대물귀신_슬픔.png" },
         { "물귀신_분노",       "Assets/EmotionImage/광대물귀신_분노.png" },
     };
@@ -349,32 +357,25 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     }
 
     // ── Animate chars ─────────────────────────────────────────────────
+    // 말하는 쪽만 밝게, 나머지는 디밍 — 색만 lerp. 크기·반전은 에디터 값 유지(위 주석 참고).
     IEnumerator AnimateChars(bool aActive)
     {
         const float duration = 0.20f;
         float elapsed = 0f;
-        var aScaleFrom = _charARt.localScale;
-        var bScaleFrom = _charBRt.localScale;
         Color aColFrom = _charAImg.color;
         Color bColFrom = _charBImg.color;
-        var aScaleTo = aActive ? ScaleActive   : ScaleInactive;
-        var bScaleTo = aActive ? ScaleInactive : ScaleActive;
         Color aColTo = aActive ? ColActive   : ColInactive;
         Color bColTo = aActive ? ColInactive : ColActive;
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
-            _charARt.localScale = Vector3.Lerp(aScaleFrom, aScaleTo, t);
-            _charBRt.localScale = Vector3.Lerp(bScaleFrom, bScaleTo, t);
-            _charAImg.color     = Color.Lerp(aColFrom, aColTo, t);
-            _charBImg.color     = Color.Lerp(bColFrom, bColTo, t);
+            _charAImg.color = Color.Lerp(aColFrom, aColTo, t);
+            _charBImg.color = Color.Lerp(bColFrom, bColTo, t);
             yield return null;
         }
-        _charARt.localScale = aScaleTo;
-        _charBRt.localScale = bScaleTo;
-        _charAImg.color     = aColTo;
-        _charBImg.color     = bColTo;
+        _charAImg.color = aColTo;
+        _charBImg.color = bColTo;
     }
 
     // ── Type text ─────────────────────────────────────────────────────
