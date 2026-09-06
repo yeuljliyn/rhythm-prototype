@@ -49,377 +49,377 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 12.25
+    cueBeat: 12.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 12.75
+    cueBeat: 13
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 13.25
+    cueBeat: 13.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 13.75
+    cueBeat: 14
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 1
-    cueBeat: 14.25
+    cueBeat: 14.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 2
-    cueBeat: 20
+    cueBeat: 20.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 2
-    cueBeat: 20.5
+    cueBeat: 20.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 2
-    cueBeat: 21
+    cueBeat: 21.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 2
-    cueBeat: 21.5
+    cueBeat: 21.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 2
-    cueBeat: 22
+    cueBeat: 22.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 28.25
+    cueBeat: 28.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 28.75
+    cueBeat: 29
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 29.25
+    cueBeat: 29.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 3
-    cueBeat: 29.75
+    cueBeat: 30
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 3
-    cueBeat: 30.25
+    cueBeat: 30.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 36.25
+    cueBeat: 36.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 36.75
+    cueBeat: 37
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 37.25
+    cueBeat: 37.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 4
-    cueBeat: 37.75
+    cueBeat: 38
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 4
-    cueBeat: 38.25
+    cueBeat: 38.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 40.25
+    cueBeat: 40.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 40.75
+    cueBeat: 41
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 41.25
+    cueBeat: 41.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 5
-    cueBeat: 41.75
+    cueBeat: 42
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 5
-    cueBeat: 42.25
+    cueBeat: 42.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 46.75
+    cueBeat: 47
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 47.25
+    cueBeat: 47.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 47.75
+    cueBeat: 48
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 6
-    cueBeat: 48.25
+    cueBeat: 48.5
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 6
-    cueBeat: 48.75
+    cueBeat: 49
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 52.25
+    cueBeat: 52.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 52.75
+    cueBeat: 53
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 53.25
+    cueBeat: 53.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 7
-    cueBeat: 53.75
+    cueBeat: 54
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 7
-    cueBeat: 54.25
+    cueBeat: 54.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 8
-    cueBeat: 56.25
+    cueBeat: 56.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 8
-    cueBeat: 56.75
+    cueBeat: 57
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 8
-    cueBeat: 57.25
+    cueBeat: 57.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 8
-    cueBeat: 57.75
+    cueBeat: 58
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 8
-    cueBeat: 58.25
+    cueBeat: 58.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 9
-    cueBeat: 64.25
+    cueBeat: 64.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 9
-    cueBeat: 64.75
+    cueBeat: 65
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 9
-    cueBeat: 65.25
+    cueBeat: 65.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 9
-    cueBeat: 65.75
+    cueBeat: 66
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 9
-    cueBeat: 66.25
+    cueBeat: 66.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 10
-    cueBeat: 68.25
+    cueBeat: 68.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 10
-    cueBeat: 68.75
+    cueBeat: 69
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 10
-    cueBeat: 69.25
+    cueBeat: 69.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 10
-    cueBeat: 69.75
+    cueBeat: 70
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 10
-    cueBeat: 70.25
+    cueBeat: 70.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 11
-    cueBeat: 74.25
+    cueBeat: 74.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 11
-    cueBeat: 74.75
+    cueBeat: 75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 11
-    cueBeat: 75.25
+    cueBeat: 75.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 11
-    cueBeat: 75.75
+    cueBeat: 76
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 11
-    cueBeat: 76.25
+    cueBeat: 76.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 12
-    cueBeat: 80.25
+    cueBeat: 80.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 12
-    cueBeat: 80.75
+    cueBeat: 81
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 12
-    cueBeat: 81.25
+    cueBeat: 81.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 12
-    cueBeat: 81.75
+    cueBeat: 82
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 12
-    cueBeat: 82.25
+    cueBeat: 82.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 13
-    cueBeat: 86.25
+    cueBeat: 86.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 13
-    cueBeat: 86.75
+    cueBeat: 87
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 13
-    cueBeat: 87.25
+    cueBeat: 87.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 13
-    cueBeat: 87.75
+    cueBeat: 88
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 13
-    cueBeat: 88.25
+    cueBeat: 88.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 14
-    cueBeat: 92.25
+    cueBeat: 92.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 14
-    cueBeat: 92.75
+    cueBeat: 93
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 14
-    cueBeat: 93.25
+    cueBeat: 93.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 14
-    cueBeat: 93.75
+    cueBeat: 94
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 14
-    cueBeat: 94.25
+    cueBeat: 94.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 15
-    cueBeat: 96.25
+    cueBeat: 96.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 15
-    cueBeat: 96.75
+    cueBeat: 97
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 15
-    cueBeat: 97.25
+    cueBeat: 97.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 15
-    cueBeat: 97.75
+    cueBeat: 98
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 15
-    cueBeat: 98.25
+    cueBeat: 98.5
     releaseBeat: 0
   - type: 0
     role: 1
@@ -449,352 +449,352 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 17
-    cueBeat: 104.25
+    cueBeat: 104.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 17
-    cueBeat: 104.75
+    cueBeat: 105
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 17
-    cueBeat: 105.25
+    cueBeat: 105.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 17
-    cueBeat: 105.75
+    cueBeat: 106
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 17
-    cueBeat: 106.25
-    releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 18
     cueBeat: 106.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 18
-    cueBeat: 107
+    cueBeat: 106.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 18
-    cueBeat: 107.5
+    cueBeat: 107.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 18
-    cueBeat: 108
+    cueBeat: 107.75
+    releaseBeat: 0
+  - type: 0
+    role: 1
+    groupId: 18
+    cueBeat: 108.25
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 18
-    cueBeat: 108.5
+    cueBeat: 108.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 31
-    cueBeat: 110.5
+    cueBeat: 110.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 31
-    cueBeat: 111
+    cueBeat: 111.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 31
-    cueBeat: 111.5
+    cueBeat: 111.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 31
-    cueBeat: 112
+    cueBeat: 112.25
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 31
-    cueBeat: 112.5
+    cueBeat: 112.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 20
-    cueBeat: 116
+    cueBeat: 116.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 20
-    cueBeat: 116.5
+    cueBeat: 116.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 20
-    cueBeat: 117
+    cueBeat: 117.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 20
-    cueBeat: 117.5
+    cueBeat: 117.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 20
-    cueBeat: 118
+    cueBeat: 118.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 21
-    cueBeat: 120.25
+    cueBeat: 120.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 21
-    cueBeat: 120.75
+    cueBeat: 121
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 21
-    cueBeat: 121.25
+    cueBeat: 121.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 21
-    cueBeat: 121.75
+    cueBeat: 122
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 21
-    cueBeat: 122.25
+    cueBeat: 122.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 22
-    cueBeat: 126.25
+    cueBeat: 126.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 22
-    cueBeat: 126.75
+    cueBeat: 127
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 22
-    cueBeat: 127.25
+    cueBeat: 127.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 22
-    cueBeat: 127.75
+    cueBeat: 128
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 22
-    cueBeat: 128.25
+    cueBeat: 128.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 23
-    cueBeat: 132.25
+    cueBeat: 132.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 23
-    cueBeat: 132.75
+    cueBeat: 133
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 23
-    cueBeat: 133.25
+    cueBeat: 133.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 23
-    cueBeat: 133.75
+    cueBeat: 134
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 23
-    cueBeat: 134.25
+    cueBeat: 134.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 24
-    cueBeat: 140.25
+    cueBeat: 140.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 24
-    cueBeat: 140.75
+    cueBeat: 141
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 24
-    cueBeat: 141.25
+    cueBeat: 141.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 24
-    cueBeat: 141.75
+    cueBeat: 142
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 24
-    cueBeat: 142.25
+    cueBeat: 142.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 25
-    cueBeat: 144
+    cueBeat: 144.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 25
-    cueBeat: 144.5
+    cueBeat: 144.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 25
-    cueBeat: 145
+    cueBeat: 145.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 25
-    cueBeat: 145.5
+    cueBeat: 145.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 25
-    cueBeat: 146
+    cueBeat: 146.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 26
-    cueBeat: 148
+    cueBeat: 148.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 26
-    cueBeat: 148.5
+    cueBeat: 148.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 26
-    cueBeat: 149
+    cueBeat: 149.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 26
-    cueBeat: 149.5
+    cueBeat: 149.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 26
-    cueBeat: 150
+    cueBeat: 150.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 27
-    cueBeat: 150.75
+    cueBeat: 151
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 27
-    cueBeat: 151.25
+    cueBeat: 151.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 27
-    cueBeat: 151.75
+    cueBeat: 152
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 27
-    cueBeat: 152.25
+    cueBeat: 152.5
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 27
-    cueBeat: 152.75
+    cueBeat: 153
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 28
-    cueBeat: 156.25
+    cueBeat: 156.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 28
-    cueBeat: 156.75
+    cueBeat: 157
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 28
-    cueBeat: 157.25
+    cueBeat: 157.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 28
-    cueBeat: 157.75
+    cueBeat: 158
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 28
-    cueBeat: 158.25
+    cueBeat: 158.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 29
-    cueBeat: 161
+    cueBeat: 161.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 29
-    cueBeat: 161.5
+    cueBeat: 161.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 29
-    cueBeat: 162
+    cueBeat: 162.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 29
-    cueBeat: 162.5
+    cueBeat: 162.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 29
-    cueBeat: 163
+    cueBeat: 163.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 30
-    cueBeat: 168.25
+    cueBeat: 168.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 30
-    cueBeat: 168.75
+    cueBeat: 169
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 30
-    cueBeat: 169.25
+    cueBeat: 169.5
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 30
-    cueBeat: 169.75
+    cueBeat: 170
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 30
-    cueBeat: 170.25
+    cueBeat: 170.5
     releaseBeat: 0
   loopLengthBeats: 0
   phases: []

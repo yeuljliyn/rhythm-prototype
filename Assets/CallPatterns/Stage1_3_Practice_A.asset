@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Stage1_3_Practice_A
   m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
   chartName: Stage1-3 Practice A (sequential)
-  music: {fileID: 0}
-  bpm: 122
+  music: {fileID: 8300000, guid: fc123c110d5c84b43ae1f1213d347659, type: 3}
+  bpm: 120
   introDelay: 1
-  hitWindow: 0.15
-  missWindow: 0.38
+  hitWindow: 0.3
+  missWindow: 0.2
   minInputIntervalSeconds: 0.5
   liveInputStartBeat: 0
   calls:

@@ -2381,11 +2381,11 @@ MonoBehaviour:
   antPulseDuration: 0.25
   antTurnSfxSource: {fileID: 1648010846}
   antTurnSfx:
-  - {fileID: 8300000, guid: 0ee2998552003374a8792368856acc9c, type: 3}
-  - {fileID: 8300000, guid: 027782c7bcd65464ba585cf9ec96d818, type: 3}
-  - {fileID: 8300000, guid: 9231d17334b3cbd4f9b7b575c09c30d6, type: 3}
-  - {fileID: 8300000, guid: 46e9a33c6448ebb428a9fd3a48e1b060, type: 3}
-  - {fileID: 8300000, guid: 00258e34a74f0f8489df945f25808ab0, type: 3}
+  - {fileID: 8300000, guid: a12d00b419b37fd4fac405896e0376db, type: 3}
+  - {fileID: 8300000, guid: 7e41bcdba66863248aafed48dc425cc2, type: 3}
+  - {fileID: 8300000, guid: b1df024bc498ef045b8141b8e7a69bd9, type: 3}
+  - {fileID: 8300000, guid: 211a08802237fc3478958f2779f89373, type: 3}
+  - {fileID: 8300000, guid: 9fdd9432f1be33e44ad76877b21af6ef, type: 3}
   clock: {fileID: 1605954058}
   antScaleMinY: 1.5
   antScaleMaxY: 1.55

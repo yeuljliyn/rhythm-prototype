@@ -13,38 +13,38 @@ MonoBehaviour:
   m_Name: Stage1_1_Practice
   m_EditorClassIdentifier: Assembly-CSharp::CallPatternData
   chartName: Stage1-1 Practice (placeholder)
-  music: {fileID: 0}
-  bpm: 122
+  music: {fileID: 8300000, guid: fc123c110d5c84b43ae1f1213d347659, type: 3}
+  bpm: 120
   introDelay: 1
-  hitWindow: 0.12
-  missWindow: 0.38
+  hitWindow: 0.3
+  missWindow: 0.2
   minInputIntervalSeconds: 0.5
   liveInputStartBeat: 0
   calls:
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 0.5
+    cueBeat: 2.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 1
+    cueBeat: 2.75
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 1.5
+    cueBeat: 3.25
     releaseBeat: 0
   - type: 0
     role: 1
     groupId: 0
-    cueBeat: 2
+    cueBeat: 3.75
     releaseBeat: 0
   - type: 0
     role: 0
     groupId: 0
-    cueBeat: 2.5
+    cueBeat: 4.25
     releaseBeat: 0
   loopLengthBeats: 4
   phases: []

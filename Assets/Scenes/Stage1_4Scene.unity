@@ -421,8 +421,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stage1AntPourVisuals
   callDirector: {fileID: 1507358175}
   sfxSource: {fileID: 272465004}
-  handPourSfx: {fileID: 8300000, guid: 788078a3d601db44f978e08ed6a143f2, type: 3}
-  playerPourSfx: {fileID: 8300000, guid: 9b82815134740af4985d7c737553a401, type: 3}
+  handPourSfx: {fileID: 8300000, guid: adbc69c1705b4ae46ae09595976304b6, type: 3}
+  playerPourSfx: {fileID: 8300000, guid: 14ff51fadedd60d45befafa154f43b5e, type: 3}
   handImage: {fileID: 1586661929}
   handIdleSprite: {fileID: 7219212827918029610, guid: 6767a210b9d53764a87dae196f9bcf9d, type: 3}
   handPourSprite: {fileID: -4793205535858711587, guid: 6767a210b9d53764a87dae196f9bcf9d, type: 3}
