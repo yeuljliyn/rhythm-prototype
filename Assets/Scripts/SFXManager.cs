@@ -11,10 +11,10 @@ public class SFXManager : MonoBehaviour
 
     AudioSource _src;
 
-    AudioClip _click;      // 일반 버튼 클릭 (440 Hz, 짧고 선명)
-    AudioClip _navigate;   // 로비 좌우 이동 (660 Hz, 더 가벼운 틱)
-    AudioClip _back;       // 뒤로/닫기 (330 Hz, 약간 낮음)
-    AudioClip _confirm;    // 선택 확정 (550 Hz → 880 Hz, 두 음)
+    AudioClip _click;      // 일반 버튼 클릭 — Assets/Resources/SFX/클릭.wav (없으면 440 Hz 합성음)
+    AudioClip _navigate;   // 로비 좌우 이동 — Assets/Resources/SFX/이동.wav (없으면 660 Hz 합성음)
+    AudioClip _back;       // 뒤로/닫기 (330 Hz 합성음 — 전용 파일 없음)
+    AudioClip _confirm;    // 선택 확정 — Assets/Resources/SFX/선택.wav (없으면 550→880 Hz 합성음)
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Bootstrap()
@@ -35,10 +35,11 @@ public class SFXManager : MonoBehaviour
         _src.playOnAwake = false;
         _src.spatialBlend = 0f;
 
-        _click    = BuildTone(440f, 0.07f, 14f);
-        _navigate = BuildTone(660f, 0.06f, 18f);
+        // 전용 wav가 있으면 그걸, 없으면 기존 합성음으로 폴백.
+        _click    = Resources.Load<AudioClip>("SFX/클릭") ?? BuildTone(440f, 0.07f, 14f);
+        _navigate = Resources.Load<AudioClip>("SFX/이동") ?? BuildTone(660f, 0.06f, 18f);
+        _confirm  = Resources.Load<AudioClip>("SFX/선택") ?? BuildChord(new[] { 550f, 880f }, new[] { 0f, 0.05f }, 0.12f, 16f);
         _back     = BuildTone(330f, 0.09f, 10f);
-        _confirm  = BuildChord(new[] { 550f, 880f }, new[] { 0f, 0.05f }, 0.12f, 16f);
     }
 
     // ── Public API ────────────────────────────────────────────────────────
