@@ -18,7 +18,7 @@ MonoBehaviour:
   introDelay: 2
   hitWindow: 0.3
   missWindow: 0.2
-  minInputIntervalSeconds: 0.5
+  minInputIntervalSeconds: 0.1
   liveInputStartBeat: 0
   calls:
   - type: 0
