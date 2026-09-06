@@ -55,9 +55,15 @@ public class ScreenVignetteFlash : MonoBehaviour
         go.transform.SetAsLastSibling();
 
         var rt = go.AddComponent<RectTransform>();
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        // 화면 전체 스트레치가 아니라 기준 프레임(1920x1080, 중앙 고정)에 맞춤 — 21:9 같은
+        // 울트라와이드에서 AspectRatioLetterbox가 x=±960 바깥을 검은 필러박스 바(sortingOrder 999)로
+        // 덮어버려서, 풀스트레치 비네트는 좌우 가장자리가 그 바 밑에 깔려 안 보이고 위아래만 보였음
+        // (신고받음). 기준 프레임 크기로 맞추면 좌우 글로우가 바 안쪽 경계에 딱 붙어서 다 보임.
+        // CanvasScaler(matchWidthOrHeight=1)가 이 좌표를 필러박스 프레임과 정확히 일치시켜 줌.
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = new Vector2(1920f, 1080f);
+        rt.anchoredPosition = Vector2.zero;
 
         const int S = 256;
         _tex    = BuildVignetteTex(S);
