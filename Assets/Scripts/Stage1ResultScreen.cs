@@ -75,6 +75,14 @@ public class Stage1ResultScreen : MonoBehaviour
         foreach (var src in FindObjectsOfType<AudioSource>())
             if (src.isPlaying) src.Pause();
 
+        // 결과창이 뜨면 모든 CallDirector를 한 번에 정지 — 안 그러면 CallDirector.Update()가 계속
+        // 돌면서 결과창을 넘기려고 누른 Space/클릭이 OnResponsePress/OnResponseRelease까지 발화해서
+        // 팝업 뒤 캐릭터가 움직이고 효과음도 남(신고받음). CallDirector 자체의 _songEndFired 가드는
+        // 곡을 끝까지 재생한 경우에만 걸리고 F1/F2 치트·연습 중 조기 종료 등에선 안 켜짐. 컴포넌트를
+        // 끄는 것도 Stage1PracticeGate가 세그먼트를 도로 SetActive하면 되살아나서 불안정 —
+        // 정적 플래그가 확실. CallDirector.Awake()에서 씬 로드마다 false로 리셋됨.
+        CallDirector.SuppressAll = true;
+
         var    gm   = GameManager.Instance;
         string rank = forcedRank ?? (gm != null ? gm.GetRank() : "C");
         // UnlockText/RetryText 표시 기준은 gm.IsClear(기존 무구 경제의 B 이상 "클리어")가 아니라

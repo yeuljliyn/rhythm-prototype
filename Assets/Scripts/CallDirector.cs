@@ -164,8 +164,18 @@ public class CallDirector : MonoBehaviour
     // LiveCall.data built from them.
     readonly HashSet<CallEntry> _judgedEntries = new HashSet<CallEntry>();
 
+    /// Global kill switch for EVERY CallDirector in the scene at once — spawns, timeouts, input,
+    /// the lot. Set by Stage1ResultScreen when the end-of-song popup comes up so a Space/click that
+    /// dismisses it can't also drive the player character (or fire judgement SFX) behind the popup.
+    /// A static flag rather than disabling components because Stage1PracticeGate can SetActive a
+    /// practice-segment director back on after the fact — this survives that. Reset in Awake() so it
+    /// always starts false on a fresh scene load (every director Awakes before Stage1ResultScreen).
+    public static bool SuppressAll;
+
     void Awake()
     {
+        SuppressAll = false;
+
         if (pattern == null && clock != null) pattern = clock.Pattern;
         _calls = pattern != null ? new List<CallEntry>(pattern.calls) : new List<CallEntry>();
         _calls.Sort((a, b) => a.cueBeat.CompareTo(b.cueBeat));
@@ -257,6 +267,7 @@ public class CallDirector : MonoBehaviour
 
     void Update()
     {
+        if (SuppressAll) return;     // result popup is up — see SuppressAll's doc comment
         if (clock == null || pattern == null) return;
         if (clock.IsPaused) return; // frozen SongTime means no new spawns/timeouts, but input must be dropped too
 
