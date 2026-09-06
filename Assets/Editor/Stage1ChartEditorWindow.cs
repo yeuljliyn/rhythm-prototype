@@ -197,6 +197,15 @@ public class Stage1ChartEditorWindow : EditorWindow
     // ── Audio reflection ───────────────────────────────────────────────────
     static MethodInfo _playMethod;
     static MethodInfo _stopMethod;
+    static MethodInfo _posMethod;      // AudioUtil.GetPreviewClipPosition() -> float seconds (real playback position)
+    static MethodInfo _isPlayingMethod;// AudioUtil.IsPreviewClipPlaying() -> bool
+
+    // ── Metronome (그리드 박마다 딱 소리 — bpm/introDelay를 귀로 맞추는 용) ───────────────────
+    [SerializeField] bool _metronome;
+    int         _lastMetroBeat = int.MinValue;
+    GameObject  _metroGO;         // 숨김 GameObject + AudioSource, 에디터 세션 동안만 존재
+    AudioSource _metroSrc;
+    AudioClip   _metroTick, _metroAccent;
 
     // ── Menu ───────────────────────────────────────────────────────────────
     [MenuItem("RhythmGame/Chart Editor")]
@@ -209,29 +218,35 @@ public class Stage1ChartEditorWindow : EditorWindow
 
     // ── Lifecycle ──────────────────────────────────────────────────────────
     void OnEnable()  => EditorApplication.update += Tick;
-    void OnDisable() { EditorApplication.update -= Tick; StopAudio(); }
+    void OnDisable()
+    {
+        EditorApplication.update -= Tick;
+        StopAudio();
+        if (_metroGO != null) DestroyImmediate(_metroGO);
+        _metroGO = null; _metroSrc = null;
+    }
 
     void Tick()
     {
         if (!_isRecording && !_isPlaying) return;
         if (_pattern == null) { StopSession(); return; }
 
-        _currentSongTime = _sessionStartSongTime + (float)(EditorApplication.timeSinceStartup - _sessionStart);
+        // 재생바 위치 = 실제 오디오 재생 위치(AudioUtil.GetPreviewClipPosition). 예전엔 벽시계
+        // (timeSinceStartup) 추정치를 썼는데, PlayPreviewClip 호출 후 실제로 소리가 나기까지의
+        // 지연 때문에 재생바가 소리보다 늘 앞서가서 "박자 안 맞는 느낌"의 원인이었음. 실제 위치는
+        // 파일 sample 0 기준(=_currentSongTime과 같은 프레임) — 그대로 대입. 재생이 아직 안
+        // 잡혔거나 리플렉션 실패면 예전 벽시계 방식으로 폴백.
+        float wallEst = _sessionStartSongTime + (float)(EditorApplication.timeSinceStartup - _sessionStart);
+        float realPos = GetPreviewAudioPosition();
+        _currentSongTime = (realPos >= _sessionStartSongTime - 0.05f && IsPreviewAudioPlaying())
+            ? realPos
+            : wallEst;
 
-        // PlayAudio() fires immediately in StartSession() (no artificial wait) and
-        // _sessionStartSongTime starts at 0 for that same instant, so _currentSongTime is always true
-        // audio content time — 0 at the real content start, counting up in lockstep with what's
-        // actually playing. That's the same quantity CallPatternData.BeatToTime's output represents,
-        // so every pixel-from-time conversion below multiplies by _zoom directly, no manual
-        // "+ introDelay" (introDelay is baked into BeatToTime/TimeToBeat themselves — see
-        // CallPatternData.cs — so notes captured here via TimeToBeat(_currentSongTime) round-trip
-        // correctly without needing any real silent lead-in here to match anything at runtime;
-        // CallClock's own real introDelay-second wait before its AudioSource starts is a separate,
-        // unrelated real-time scheduling detail — see CallClock.OnEnable — that this tool doesn't
-        // need to reproduce).
         float musicLen = _pattern.music != null ? _pattern.music.length : 0f;
         if (musicLen > 0f && _currentSongTime > musicLen)
             StopSession();
+
+        FireMetronome();
 
         float absX   = _currentSongTime * _zoom;
         float viewW  = position.width - LABEL_W - 20f;
@@ -286,9 +301,17 @@ public class Stage1ChartEditorWindow : EditorWindow
                 _pattern.bpm = EditorGUILayout.FloatField(_pattern.bpm, GUILayout.Width(56));
                 GUILayout.Space(8);
                 EditorGUILayout.LabelField(
-                    new GUIContent("인트로 딜레이", "음악 파일 시작부터 첫 박자(beat 0)까지 걸리는 시간(초)."),
+                    new GUIContent("인트로 딜레이",
+                        "음악 파일 시작부터 첫 박자(beat 0)까지 걸리는 시간(초). 이 값이 파일 실제 " +
+                        "앞부분과 안 맞으면 그리드가 곡 전체에서 일정하게 어긋남. 메트로놈(툴바) 켜고 " +
+                        "−/+ 버튼으로 딱 소리가 음악 비트에 겹치게 맞추면 됨. 런타임 노트-음악 타이밍엔 " +
+                        "영향 없음(카운트인 길이만 바뀜)."),
                     GUILayout.Width(72));
                 _pattern.introDelay = EditorGUILayout.FloatField(_pattern.introDelay, GUILayout.Width(46));
+                if (GUILayout.Button(new GUIContent("−", "−10ms"), EditorStyles.miniButtonLeft, GUILayout.Width(20)))
+                    { Undo.RecordObject(_pattern, "Nudge Intro Delay"); _pattern.introDelay -= 0.01f; EditorUtility.SetDirty(_pattern); }
+                if (GUILayout.Button(new GUIContent("+", "+10ms"), EditorStyles.miniButtonRight, GUILayout.Width(20)))
+                    { Undo.RecordObject(_pattern, "Nudge Intro Delay"); _pattern.introDelay += 0.01f; EditorUtility.SetDirty(_pattern); }
             }
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -426,6 +449,11 @@ public class Stage1ChartEditorWindow : EditorWindow
                 GUI.enabled = true;
                 GUILayout.FlexibleSpace();
 
+                _metronome = GUILayout.Toggle(_metronome,
+                    new GUIContent("메트로놈", "재생/녹음 중 그리드 박마다 '딱' 소리. 이 소리와 음악 비트가 " +
+                        "안 겹치면 헤더의 '인트로 딜레이' −/+로 맞추면 그리드가 곡에 정렬됨."),
+                    EditorStyles.toolbarButton, GUILayout.Width(64));
+                GUILayout.Space(8);
                 EditorGUILayout.LabelField(
                     new GUIContent("Hold≥", "이 길이(초) 이상 누르고 있으면 REC 중 자동으로 Hold 노트로 기록됨 (짧으면 Tap)."),
                     EditorStyles.miniLabel, GUILayout.Width(36));
@@ -1918,6 +1946,7 @@ public class Stage1ChartEditorWindow : EditorWindow
         _isRecording = record;
         _isPlaying   = !record;
         _sessionStart = EditorApplication.timeSinceStartup;
+        _lastMetroBeat = int.MinValue;
 
         if (startBeat < 0f)
         {
@@ -2031,5 +2060,82 @@ public class Stage1ChartEditorWindow : EditorWindow
             _stopMethod?.Invoke(null, null);
         }
         catch { }
+    }
+
+    // 실제 오디오 재생 위치(초). 벽시계 추정이 아니라 오디오 엔진이 보고하는 현재 위치라
+    // 재생바가 소리보다 앞서가는 문제가 없음. 파일 sample 0 기준.
+    float GetPreviewAudioPosition()
+    {
+        try
+        {
+            Type util = GetAudioUtil();
+            if (_posMethod == null)
+                _posMethod = util.GetMethod("GetPreviewClipPosition", BindingFlags.Static | BindingFlags.Public);
+            if (_posMethod != null) return (float)_posMethod.Invoke(null, null);
+        }
+        catch { }
+        return -999f;
+    }
+
+    bool IsPreviewAudioPlaying()
+    {
+        try
+        {
+            Type util = GetAudioUtil();
+            if (_isPlayingMethod == null)
+                _isPlayingMethod = util.GetMethod("IsPreviewClipPlaying", BindingFlags.Static | BindingFlags.Public);
+            if (_isPlayingMethod != null) return (bool)_isPlayingMethod.Invoke(null, null);
+        }
+        catch { }
+        return true; // 알 수 없으면 재생 중으로 간주(실제 위치 사용)
+    }
+
+    // ── Metronome ──────────────────────────────────────────────────────────
+    // 재생/녹음 중, 현재 오디오 위치가 그리드 박을 지날 때마다 "딱" 소리. 마디 첫 박(4의 배수)은
+    // 살짝 높은 accent. bpm/introDelay를 이 소리와 음악 비트가 겹치게 맞추면 그리드가 곡에 정렬됨.
+    // AudioUtil 프리뷰는 슬롯이 하나뿐이라(음악이 쓰는 중) 별도의 숨김 GameObject+AudioSource로 냄.
+    void FireMetronome()
+    {
+        if (!_metronome || _pattern == null || _pattern.bpm <= 0f) return;
+        EnsureMetronome();
+        if (_metroSrc == null) return;
+
+        float beatInterval = _pattern.BeatInterval;
+        // 그리드 박 i는 오디오 시간 (introDelay + i*beatInterval)에 있음 (BeatToTime과 동일).
+        float beatFloat = (_currentSongTime - _pattern.introDelay) / beatInterval;
+        int beat = Mathf.FloorToInt(beatFloat);
+        if (beat < 0 || beat == _lastMetroBeat) return;
+        _lastMetroBeat = beat;
+        var clip = (beat % 4 == 0) ? _metroAccent : _metroTick;
+        if (clip != null) _metroSrc.PlayOneShot(clip, 0.7f);
+    }
+
+    void EnsureMetronome()
+    {
+        if (_metroSrc != null) return;
+        _metroGO = new GameObject("~ChartEditorMetronome") { hideFlags = HideFlags.HideAndDontSave };
+        _metroSrc = _metroGO.AddComponent<AudioSource>();
+        _metroSrc.playOnAwake = false;
+        _metroSrc.spatialBlend = 0f;
+        // 소리가 나려면 씬에 AudioListener가 있어야 함(보통 Main Camera에 있음). 없으면 조용히 무음 —
+        // 여기서 추가하면 나중에 리스너 있는 씬 로드 시 중복 경고가 나므로 안 붙임.
+        _metroTick   = MakeClick(2000f, 0.030f);
+        _metroAccent = MakeClick(2800f, 0.035f);
+    }
+
+    static AudioClip MakeClick(float freq, float dur)
+    {
+        const int rate = 44100;
+        int n = Mathf.Max(1, (int)(rate * dur));
+        var data = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / rate;
+            float env = Mathf.Exp(-t / (dur * 0.25f)); // 빠른 감쇠 = 딱 소리
+            data[i] = Mathf.Sin(2f * Mathf.PI * freq * t) * env * 0.9f;
+        }
+        var clip = AudioClip.Create("metroClick", n, 1, rate, false);
+        clip.SetData(data, 0);
+        return clip;
     }
 }
