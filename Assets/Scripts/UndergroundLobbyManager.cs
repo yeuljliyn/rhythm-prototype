@@ -79,6 +79,7 @@ public class UndergroundLobbyManager : MonoBehaviour
     /// <summary>지상 로비로 돌아가기 버튼에 연결.</summary>
     public void GoSurfaceLobby()
     {
+        SFXManager.PlayBack();
         SceneTransitionManager.Instance.LoadSceneWithFade("SurfaceLobbyScene");
     }
 
@@ -103,8 +104,11 @@ public class UndergroundLobbyManager : MonoBehaviour
 
     void MoveTo(int index)
     {
-        _targetIndex = Mathf.Clamp(index, 0, stageCount - 1);
+        int clamped = Mathf.Clamp(index, 0, stageCount - 1);
+        if (clamped == _targetIndex) return; // 이미 끝 슬롯 — 헛 이동음 안 냄
+        _targetIndex = clamped;
         UndergroundLobbyProgress.SaveLastIndex(_targetIndex); // 다음에 돌아왔을 때 이 자리부터 시작
+        SFXManager.PlayNavigate();
     }
 
     // Stage1Scene(구 물타기 프로토타입)은 이제 안 쓰는 씬이라 여기서 목적지로 안 씀(사용자 확인 완료).
@@ -122,6 +126,7 @@ public class UndergroundLobbyManager : MonoBehaviour
     {
         if (_targetIndex > maxEnterableIndex) return; // 가림벽으로 막힌 슬롯 — 조용히 무시
         if (_targetIndex >= StageIntroScenes.Length) return; // 아직 목적지 안 정해진 스테이지
+        SFXManager.PlayConfirm();
         SceneTransitionManager.Instance.LoadSceneWithFade(StageIntroScenes[_targetIndex]);
     }
 

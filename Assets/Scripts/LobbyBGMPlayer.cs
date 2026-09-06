@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 public class LobbyBGMPlayer : MonoBehaviour
 {
     const string ResourcePath = "Music/LobbyBGM";
+    const float  BgmLevel = 0.55f; // BGM은 UI 효과음(클릭/이동/선택)에 묻히지 않게 살짝 낮춰서
     static readonly string[] LobbyScenes = { "SurfaceLobbyScene", "UndergroundLobbyScene" };
 
     static LobbyBGMPlayer _instance;
@@ -21,7 +22,7 @@ public class LobbyBGMPlayer : MonoBehaviour
     {
         if (_instance != null)
         {
-            if (_instance._src != null) _instance._src.volume = SettingsManager.Volume;
+            if (_instance._src != null) _instance._src.volume = SettingsManager.Volume * BgmLevel;
             return;
         }
 
@@ -35,7 +36,7 @@ public class LobbyBGMPlayer : MonoBehaviour
         _instance._src.clip        = clip;
         _instance._src.loop        = true;
         _instance._src.playOnAwake = false;
-        _instance._src.volume      = SettingsManager.Volume;
+        _instance._src.volume      = SettingsManager.Volume * BgmLevel;
         _instance._src.Play();
 
         SceneManager.sceneLoaded += _instance.OnSceneLoaded;

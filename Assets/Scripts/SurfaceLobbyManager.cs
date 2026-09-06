@@ -106,17 +106,26 @@ public class SurfaceLobbyManager : MonoBehaviour
         }
     }
 
-    void MoveTo(int index) => _targetIndex = Mathf.Clamp(index, 0, stageCount - 1);
+    void MoveTo(int index)
+    {
+        int clamped = Mathf.Clamp(index, 0, stageCount - 1);
+        if (clamped == _targetIndex) return; // 이미 끝 슬롯 — 헛 이동음 안 냄
+        _targetIndex = clamped;
+        SFXManager.PlayNavigate();
+    }
 
     /// <summary>ESC — StartScene(타이틀 화면)으로.</summary>
     void GoStartScene()
     {
+        SFXManager.PlayBack();
         SceneTransitionManager.Instance.LoadSceneWithFade("StartScene");
     }
 
     void TrySelect()
     {
         if (_targetIndex > maxEnterableIndex) return; // 아직 안 열린 스테이지 — 조용히 무시
+
+        SFXManager.PlayConfirm();
         // 지금은 스테이지1 하나뿐이라 분기 없음 — 스테이지가 늘어나면 _targetIndex별로 목적지를 나눌 것.
 
         // 지하 로비는 평소엔 "마지막으로 있던 자리"를 기억하지만(스테이지 플레이 후 복귀 시), 지상에서
