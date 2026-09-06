@@ -120,6 +120,20 @@ public class Stage1ChartEditorWindow : EditorWindow
     float  _phaseDragBeatDelta;
     [SerializeField] string _newPhaseStyleId = "1-1"; // remembered default for the next phase created
 
+    // ── SFX cue lane (CallPatternData.sfxCues — pure sound triggers, no judgement) ─────────────
+    // A second strip below the PHASE lane. Each cue is a point on the beat timeline carrying one
+    // AudioClip; CallNoteSfxPlayer plays it at that beat in game. Functionally nothing to do with
+    // Tap/Hold — it's the phase-lane interaction shape (click = add, drag = move, right-click =
+    // delete) minus the length. Own single-selection state, kept out of _selection like _selectedPhase.
+    const float SFX_LANE_H = 24f;
+    SfxCueEntry _selectedSfx;
+    bool   _isSfxDragging;
+    float  _sfxDragOriginMouseX;
+    float  _sfxDragOriginBeat;
+    float  _sfxDragBeatDelta;
+
+    static readonly Color SfxCueColor = new Color(0.35f, 0.80f, 1.00f);
+
     static readonly Color[] PhasePalette =
     {
         new Color(0.95f, 0.55f, 0.55f),
@@ -253,7 +267,7 @@ public class Stage1ChartEditorWindow : EditorWindow
             {
                 var next = (CallPatternData)EditorGUILayout.ObjectField(
                     "채보 데이터", _pattern, typeof(CallPatternData), false);
-                if (next != _pattern) { StopSession(); _pattern = next; ClearSelection(); _selectedPhase = null; _currentGroupId = NextFreeGroupId(next); }
+                if (next != _pattern) { StopSession(); _pattern = next; ClearSelection(); _selectedPhase = null; _selectedSfx = null; _currentGroupId = NextFreeGroupId(next); }
                 if (GUILayout.Button("새로 만들기", GUILayout.Width(80))) CreateNewCallPattern();
             }
 
@@ -315,7 +329,8 @@ public class Stage1ChartEditorWindow : EditorWindow
                 : "–";
             EditorGUILayout.LabelField(
                 $"전체 노트: {total}개  (Tap {taps} / Hold {holds})   Call {calls} / Response {responses}   재생 시간: {durStr}   " +
-                $"사용 중인 레인: {SUBROWS}   선택됨: {_selection.Count}개   Phase: {_pattern.phases?.Count ?? 0}개",
+                $"사용 중인 레인: {SUBROWS}   선택됨: {_selection.Count}개   Phase: {_pattern.phases?.Count ?? 0}개   " +
+                $"SFX: {_pattern.sfxCues?.Count ?? 0}개",
                 EditorStyles.miniLabel);
         }
     }
@@ -481,9 +496,22 @@ public class Stage1ChartEditorWindow : EditorWindow
                     new GUIContent("새 Phase 스타일", "아래 PHASE 레인의 빈 공간을 클릭해 새 phase를 만들 때 찍히는 스타일 태그."),
                     EditorStyles.miniLabel, GUILayout.Width(90));
                 _newPhaseStyleId = EditorGUILayout.TextField(_newPhaseStyleId, GUILayout.Width(70));
+                GUILayout.Space(16);
+                EditorGUILayout.LabelField(
+                    new GUIContent("새 SFX 클립", "맨 아래 SFX 레인에 새 큐를 찍을 때 자동 배정되는 클립. " +
+                        "큐마다 개별 변경 가능(큐 클릭 → 바로 위 칸). 비워두면 클립 없이 찍힘."),
+                    EditorStyles.miniLabel, GUILayout.Width(72));
+                EditorGUI.BeginChangeCheck();
+                var ndc = (AudioClip)EditorGUILayout.ObjectField(_pattern.sfxCueDefaultClip, typeof(AudioClip), false, GUILayout.Width(130));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(_pattern, "Set New Sfx Cue Clip");
+                    _pattern.sfxCueDefaultClip = ndc;
+                    EditorUtility.SetDirty(_pattern);
+                }
                 GUILayout.Space(12);
                 EditorGUILayout.LabelField(
-                    "기존 phase의 스타일을 수정하려면: 아래 PHASE 레인에서 해당 색깔 띠를 클릭 — 바로 위에 수정 칸이 나타남.",
+                    "기존 phase/SFX 큐 수정: 아래 레인에서 해당 항목 클릭 — 바로 위에 수정 칸이 나타남.",
                     EditorStyles.miniLabel);
                 GUILayout.FlexibleSpace();
             }
@@ -506,8 +534,10 @@ public class Stage1ChartEditorWindow : EditorWindow
                     "Tap/Hold 몸통 드래그 = 선택된 것 전체를 함께 이동(리사이즈 핸들은 그 노트만).   " +
                     "Ctrl+C = 복사, Ctrl+V = 탐색 박자 위치에 붙여넣기(새 그룹 #).   Ctrl+A = 전체 선택.   Del = 선택 삭제.   Esc = 선택 해제.   " +
                     $"Z = 그룹 #{_currentGroupId}의 Call을 Response로 복사, 이후 #{_currentGroupId + 1}로 이동.   " +
-                    "PHASE 레인(맨 아래, 1-5같이 여러 스테이지가 섞인 곡용): 빈 공간 클릭 = " +
-                    "'새 Phase 스타일' 태그로 phase 추가, 가장자리 드래그 = 크기 조절, 몸통 드래그 = 이동, 우클릭 = 삭제.",
+                    "PHASE 레인(1-5같이 여러 스테이지가 섞인 곡용): 빈 공간 클릭 = " +
+                    "'새 Phase 스타일' 태그로 phase 추가, 가장자리 드래그 = 크기 조절, 몸통 드래그 = 이동, 우클릭 = 삭제.   " +
+                    "SFX 레인(맨 아래, 판정과 무관한 순수 효과음): 빈 공간 클릭 = '새 SFX 클립'으로 큐 추가, " +
+                    "큐 클릭 = 선택(바로 위 칸에서 클립 지정/▶ 미리듣기), 드래그 = 이동, 우클릭 = 삭제, Del = 선택 삭제.",
                     EditorStyles.wordWrappedMiniLabel);
             }
         }
@@ -539,13 +569,16 @@ public class Stage1ChartEditorWindow : EditorWindow
         // layout (nothing above it moves), so none of the existing note-lane Y math needed to
         // change to make room for it.
         float noteLanesH = LANE_H * TOTAL_ROWS;
-        float contentH   = RULER_H + noteLanesH + PHASE_LANE_H;
+        float contentH   = RULER_H + noteLanesH + PHASE_LANE_H + SFX_LANE_H;
 
         Rect labelsRect = new Rect(full.x, full.y + RULER_H, LABEL_W, noteLanesH);
         DrawLaneLabels(labelsRect);
+        var stripLabelStyle = new GUIStyle(EditorStyles.boldLabel)
+            { alignment = TextAnchor.MiddleCenter, normal = { textColor = new Color(0.7f, 0.7f, 0.7f) } };
         Rect phaseLabelRect = new Rect(full.x, full.y + RULER_H + noteLanesH, LABEL_W, PHASE_LANE_H);
-        GUI.Label(phaseLabelRect, "PHASE", new GUIStyle(EditorStyles.boldLabel)
-            { alignment = TextAnchor.MiddleCenter, normal = { textColor = new Color(0.7f, 0.7f, 0.7f) } });
+        GUI.Label(phaseLabelRect, "PHASE", stripLabelStyle);
+        Rect sfxLabelRect = new Rect(full.x, full.y + RULER_H + noteLanesH + PHASE_LANE_H, LABEL_W, SFX_LANE_H);
+        GUI.Label(sfxLabelRect, "SFX", stripLabelStyle);
 
         Rect scrollRect  = new Rect(full.x + LABEL_W, full.y, full.width - LABEL_W, full.height);
         Rect contentRect = new Rect(0f, 0f, contentW, contentH);
@@ -558,6 +591,7 @@ public class Stage1ChartEditorWindow : EditorWindow
         DrawCallResponseGroups(contentH);
         DrawCalls();
         DrawPhases(contentW, noteLanesH);
+        DrawSfxCues(contentW, noteLanesH);
         if (_isMarqueeSelecting) DrawMarquee();
         if (_isRecording && _isPressed) DrawRecordingPreview();
         DrawScrubMarker(contentH);
@@ -912,6 +946,63 @@ public class Stage1ChartEditorWindow : EditorWindow
         }
     }
 
+    // ── SFX cue lane ────────────────────────────────────────────────────────
+    void DrawSfxCues(float totalW, float noteLanesH)
+    {
+        float y = RULER_H + noteLanesH + PHASE_LANE_H;
+        EditorGUI.DrawRect(new Rect(0f, y, totalW, SFX_LANE_H), new Color(0.08f, 0.11f, 0.13f));
+
+        if (_pattern.sfxCues == null) return;
+
+        float noteY = y + 3f;
+        float noteH = SFX_LANE_H - 6f;
+
+        foreach (var c in _pattern.sfxCues)
+        {
+            float beat = (c == _selectedSfx && _isSfxDragging) ? _sfxDragOriginBeat + _sfxDragBeatDelta : c.beat;
+            float x    = BeatX(beat) - NOTE_W * 0.5f;
+            bool  selected = c == _selectedSfx;
+
+            if (selected)
+                DrawRectOutline(new Rect(x - 2f, noteY - 2f, NOTE_W + 4f, noteH + 4f),
+                    _isSfxDragging ? new Color(1f, 0.9f, 0.1f) : Color.white);
+            EditorGUI.DrawRect(new Rect(x, noteY, NOTE_W, noteH), SfxCueColor);
+            EditorGUI.DrawRect(new Rect(x + 2f, noteY + 2f, NOTE_W - 4f, noteH * 0.4f), new Color(1f, 1f, 1f, 0.35f));
+
+            if (_isSfxDragging && selected)
+                GUI.Label(new Rect(x - 12f, noteY - 15f, 60f, 14f), $"B {beat:F2}",
+                    new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(1f, 0.9f, 0.1f) }, fontStyle = FontStyle.Bold });
+            else if (_zoom > 80f)
+                GUI.Label(new Rect(x + NOTE_W + 3f, noteY - 1f, 120f, noteH),
+                    c.clip != null ? c.clip.name : "(none)",
+                    new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = new Color(1f, 1f, 1f, 0.75f) } });
+
+            // Clip picker inline right above the selected cue (same reasoning as the phase styleId
+            // editor — never fights the toolbar for horizontal space).
+            if (selected && !_isSfxDragging)
+            {
+                var editRect = new Rect(x - 60f, y - 22f, 150f, 18f);
+                EditorGUI.DrawRect(new Rect(editRect.x - 2f, editRect.y - 2f, editRect.width + 4f + 24f, editRect.height + 4f),
+                    new Color(0f, 0f, 0f, 0.8f));
+                EditorGUI.BeginChangeCheck();
+                var newClip = (AudioClip)EditorGUI.ObjectField(editRect, c.clip, typeof(AudioClip), false);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(_pattern, "Change Sfx Cue Clip");
+                    c.clip = newClip;
+                    EditorUtility.SetDirty(_pattern);
+                }
+                if (GUI.Button(new Rect(editRect.xMax + 2f, editRect.y, 20f, 18f), "▶") && c.clip != null)
+                    PlayAudio(c.clip, 0);
+                GUI.Label(new Rect(editRect.x, editRect.y - 14f, 240f, 14f), $"beat {c.beat:F2}   (우클릭 = 삭제, Del = 삭제)",
+                    new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = Color.white } });
+            }
+
+            if (!_isSfxDragging)
+                EditorGUIUtility.AddCursorRect(new Rect(x - 6f, noteY, NOTE_W + 12f, noteH), MouseCursor.MoveArrow);
+        }
+    }
+
     void DrawRecordingPreview()
     {
         float x0 = BeatX(_pressStartBeat);
@@ -965,6 +1056,7 @@ public class Stage1ChartEditorWindow : EditorWindow
     {
         Event e = Event.current;
         float phaseLaneTop = RULER_H + noteLanesH;
+        float sfxLaneTop   = phaseLaneTop + PHASE_LANE_H;
 
         if (e.type == EventType.MouseDown)
         {
@@ -984,6 +1076,14 @@ public class Stage1ChartEditorWindow : EditorWindow
                     e.Use();
                     Repaint();
                 }
+                return;
+            }
+
+            if (mp.y >= sfxLaneTop)
+            {
+                HandleSfxLaneMouseDown(mp, e.button);
+                e.Use();
+                Repaint();
                 return;
             }
 
@@ -1117,6 +1217,14 @@ public class Stage1ChartEditorWindow : EditorWindow
                 e.Use();
                 Repaint();
             }
+            else if (_isSfxDragging && _selectedSfx != null)
+            {
+                float deltaPixels = e.mousePosition.x - _sfxDragOriginMouseX;
+                float deltaBeat   = deltaPixels / (_zoom * _pattern.BeatInterval);
+                _sfxDragBeatDelta = SnapBeat(Mathf.Max(0f, _sfxDragOriginBeat + deltaBeat)) - _sfxDragOriginBeat;
+                e.Use();
+                Repaint();
+            }
         }
         else if (e.type == EventType.MouseUp)
         {
@@ -1135,6 +1243,12 @@ public class Stage1ChartEditorWindow : EditorWindow
             else if (_isPhaseDragging)
             {
                 CommitPhaseDrag();
+                e.Use();
+                Repaint();
+            }
+            else if (_isSfxDragging)
+            {
+                CommitSfxDrag();
                 e.Use();
                 Repaint();
             }
@@ -1239,6 +1353,85 @@ public class Stage1ChartEditorWindow : EditorWindow
         GUIUtility.hotControl = 0;
     }
 
+    // ── SFX cue lane interaction ────────────────────────────────────────────
+    void HandleSfxLaneMouseDown(Vector2 mp, int button)
+    {
+        if (button == 0)
+        {
+            var hit = FindSfxNearPixel(mp, 12f);
+            if (hit != null)
+            {
+                _selectedSfx = hit;
+                BeginSfxDrag(hit, mp.x);
+            }
+            else
+            {
+                // introDelay is already baked into TimeToBeat — no manual subtraction.
+                float clickBeat = SnapBeat(_pattern.TimeToBeat(mp.x / _zoom));
+                Undo.RecordObject(_pattern, "Add Sfx Cue");
+                var cue = new SfxCueEntry { line = 0, beat = clickBeat, clip = _pattern.sfxCueDefaultClip };
+                if (_pattern.sfxCues == null) _pattern.sfxCues = new List<SfxCueEntry>();
+                _pattern.sfxCues.Add(cue);
+                _pattern.sfxCues.Sort((a, b) => a.beat.CompareTo(b.beat));
+                EditorUtility.SetDirty(_pattern);
+                _selectedSfx = cue;
+                // No drag started — an SFX cue is a point (no length), like a Tap.
+            }
+        }
+        else if (button == 1)
+        {
+            var hit = FindSfxNearPixel(mp, 12f);
+            if (hit != null)
+            {
+                Undo.RecordObject(_pattern, "Delete Sfx Cue");
+                _pattern.sfxCues.Remove(hit);
+                if (_selectedSfx == hit) _selectedSfx = null;
+                EditorUtility.SetDirty(_pattern);
+            }
+            else
+            {
+                _selectedSfx = null;
+            }
+        }
+    }
+
+    SfxCueEntry FindSfxNearPixel(Vector2 mp, float tol)
+    {
+        if (_pattern.sfxCues == null) return null;
+        SfxCueEntry best = null;
+        float bestDist = tol;
+        foreach (var c in _pattern.sfxCues)
+        {
+            float d = Mathf.Abs(mp.x - BeatX(c.beat));
+            if (d <= bestDist) { bestDist = d; best = c; }
+        }
+        return best;
+    }
+
+    void BeginSfxDrag(SfxCueEntry cue, float mouseX)
+    {
+        _isSfxDragging       = true;
+        _sfxDragOriginMouseX = mouseX;
+        _sfxDragOriginBeat   = cue.beat;
+        _sfxDragBeatDelta    = 0f;
+        GUIUtility.hotControl = GUIUtility.GetControlID(FocusType.Passive);
+    }
+
+    void CommitSfxDrag()
+    {
+        if (_selectedSfx != null)
+        {
+            Undo.RecordObject(_pattern, "Move Sfx Cue");
+            _selectedSfx.beat = Mathf.Max(0f, _sfxDragOriginBeat + _sfxDragBeatDelta);
+            _pattern.sfxCues.Sort((a, b) => a.beat.CompareTo(b.beat));
+            EditorUtility.SetDirty(_pattern);
+        }
+
+        _isSfxDragging    = false;
+        _sfxDragBeatDelta = 0f;
+        GUIUtility.hotControl = 0;
+    }
+
     void CommitMarquee()
     {
         Rect box = MarqueeRect();
@@ -1339,7 +1532,18 @@ public class Stage1ChartEditorWindow : EditorWindow
             if (e.keyCode == KeyCode.A) { SelectAll(); e.Use(); Repaint(); return; }
         }
 
-        if (e.keyCode == KeyCode.Escape) { ClearSelection(); e.Use(); Repaint(); return; }
+        if (e.keyCode == KeyCode.Escape) { ClearSelection(); _selectedSfx = null; e.Use(); Repaint(); return; }
+
+        // SFX cue delete — separate from the CallEntry selection (an SFX cue is never in _selection).
+        if (_selectedSfx != null && (e.keyCode == KeyCode.Delete || e.keyCode == KeyCode.Backspace))
+        {
+            Undo.RecordObject(_pattern, "Delete Sfx Cue");
+            _pattern.sfxCues?.Remove(_selectedSfx);
+            _selectedSfx = null;
+            EditorUtility.SetDirty(_pattern);
+            e.Use(); Repaint();
+            return;
+        }
 
         if (_selection.Count == 0) return;
 

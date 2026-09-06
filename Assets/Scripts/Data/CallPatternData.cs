@@ -62,6 +62,17 @@ public class CallPatternData : ScriptableObject
              "다시 1-1 구간.")]
     public List<ChartPhase> phases = new List<ChartPhase>();
 
+    [Tooltip("Chart Editor의 SFX 레인에서 찍는 순수 효과음 큐 목록 — 각 큐는 '이 박자에 이 클립을 " +
+             "한 번 재생'. Tap/Hold(콜/리스폰스)와 기능이 완전히 다름: 판정·입력·게임오브젝트와 " +
+             "무관하고 소리만 남. 비어있으면(기본값) 아무 영향 없음. 연습 루프 차트(loopLengthBeats>0)면 " +
+             "매 루프마다 반복 재생. 런타임 재생은 CallNoteSfxPlayer가 담당.")]
+    public List<SfxCueEntry> sfxCues = new List<SfxCueEntry>();
+
+    [Tooltip("Chart Editor SFX 레인에서 새로 찍는 큐에 자동 배정되는 클립(작업 편의용, 큐마다 확정 " +
+             "클립을 따로 들고 있어서 나중에 바꿔도 이미 찍은 큐엔 영향 없음). 비워두면 클립 없이 찍힘. " +
+             "위의 newNoteDefaultClip(CallEntry용)과는 별개.")]
+    public AudioClip sfxCueDefaultClip;
+
     public float BeatInterval               => 60f / Mathf.Max(1f, bpm);
 
     // introDelay is folded directly into this conversion (not just used as CallClock's real-world

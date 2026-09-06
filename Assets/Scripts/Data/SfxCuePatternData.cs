@@ -34,6 +34,9 @@ public class SfxCuePatternData : ScriptableObject
 /// One instantaneous SFX trigger. 'clip' is copied in at authoring time (whatever the editor's
 /// Q/W/E/R slot held when this note was stamped) — it is never a live reference to that slot, so
 /// reassigning a key's slot later never retroactively changes notes already placed.
+///
+/// Also reused by CallPatternData.sfxCues (the Chart Editor's SFX lane) — there it's a single
+/// lane so 'line' stays 0, and CallNoteSfxPlayer is the runtime consumer instead of SfxCuePlayer.
 /// </summary>
 [Serializable]
 public class SfxCueEntry
