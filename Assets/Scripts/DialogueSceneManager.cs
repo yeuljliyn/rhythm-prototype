@@ -72,10 +72,10 @@ public class DialogueSceneManager : MonoBehaviour
             Choices=new[]{ "그래서 나한테 뭘 어쩌라고.", "할부는 네 사정이지." } },
         // 8: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="제 사정이 곧 목숨입니다.\n사람은 못 갚으면 신용불량자가 되지만, 저는 <b>몸을 뜯어갑니다.</b>", Next=9 },
+            Text="제 사정이 곧 목숨입니다.\n사람은 못 갚으면 신용불량자가 되지만, 저는 몸을 뜯어갑니다.", Next=9 },
         // 9: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="기계는 고철값으로 계산되거든요.\n다음 달까지 못 넣으면 압류돼서 폐차장으로 갑니다. <b>캔으로 압축되는 겁니다.</b>", Next=10 },
+            Text="기계는 고철값으로 계산되거든요.\n다음 달까지 못 넣으면 압류돼서 폐차장으로 갑니다. 캔으로 압축되는 겁니다.", Next=10 },
         // 10: 선택지 (신령님)
         new Node { Type=NodeType.Choice, Next=11,
             Choices=new[]{ "그래서 굿을 한다고?", "그거랑 나랑 무슨 상관인데." } },

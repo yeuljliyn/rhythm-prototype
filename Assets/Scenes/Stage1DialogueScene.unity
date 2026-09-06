@@ -329,10 +329,10 @@ MonoBehaviour:
   - key: "\uC7AD\uB450_\uC6C3\uC74C1"
     sprite: {fileID: 21300000, guid: bc92ce6bad09d6f4181e8bd910f9bca5, type: 3}
   - key: "\uBB3C\uADC0\uC2E0_\uC2AC\uD514"
-    sprite: {fileID: 21300000, guid: 90c2129e8b5db6842a4514757b916c63, type: 3}
+    sprite: {fileID: -1755181272497951136, guid: 4563c71a3de0ee447992ebf625947cd0, type: 3}
   - key: "\uBB3C\uADC0\uC2E0_\uBD84\uB178"
-    sprite: {fileID: 21300000, guid: 184a71de269f8094397dc411896f7ab1, type: 3}
-  _bgSprite: {fileID: 21300000, guid: d4e1361f3d3df9f4ea21db4f5bdc2be9, type: 3}
+    sprite: {fileID: 4187988894255942548, guid: ca8233ec0ac001949891c218a9b4ac85, type: 3}
+  _bgSprite: {fileID: -3191693777204587425, guid: 48bc11bffebdfbf4c915610d5582f180, type: 3}
 --- !u!1 &294591970
 GameObject:
   m_ObjectHideFlags: 0
@@ -777,7 +777,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d4e1361f3d3df9f4ea21db4f5bdc2be9, type: 3}
+  m_Sprite: {fileID: -3191693777204587425, guid: 48bc11bffebdfbf4c915610d5582f180, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -937,7 +937,7 @@ RectTransform:
   m_GameObject: {fileID: 1114795102}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.52, y: 0.52, z: 0.52}
+  m_LocalScale: {x: 0.39683458, y: 0.39683458, z: 0.39683458}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1992341697}
@@ -945,7 +945,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 620, y: -150}
+  m_AnchoredPosition: {x: 529, y: 370}
   m_SizeDelta: {x: 3050, y: 1705}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1114795104
@@ -968,7 +968,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f244183d975b00248a80df97649b1a79, type: 3}
+  m_Sprite: {fileID: 1029643948778271314, guid: d1de88977066d34469717ec910c5647b, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

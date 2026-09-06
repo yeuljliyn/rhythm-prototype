@@ -70,13 +70,13 @@ public class Stage1DialogueSceneManager : MonoBehaviour
             Choices=new[]{ "분장한 건 뭔데.", "광대 같은데 저거." } },
         // 6: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_놀람_당황",
-            Text="...광대 분장이군요.\n<b>영감입니다.</b> 도깨비요.", Next=7 },
+            Text="...광대 분장이군요.\n영감입니다. 도깨비요.", Next=7 },
         // 7: 선택지 (신령님)
         new Node { Type=NodeType.Choice, Next=8,
             Choices=new[]{ "도깨비가 왜 붙어.", "귀신 아니고?" } },
         // 8: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="도깨비는 재물신입니다. 부자로 만들어주기도 하고, 저 꼴로 만들기도 하죠.\n저 양반이 좇던 대박이 저겁니다. <b>도깨비불이었던 거예요.</b>", Next=9 },
+            Text="도깨비는 재물신입니다. 부자로 만들어주기도 하고, 저 꼴로 만들기도 하죠.\n저 양반이 좇던 대박이 저겁니다. 도깨비불이었던 거예요.", Next=9 },
         // 9: 선택지 (신령님)
         new Node { Type=NodeType.Choice, Next=10,
             Choices=new[]{ "너랑 비슷하네.", "돈 때문에 저렇게 된 거잖아." } },
@@ -91,7 +91,7 @@ public class Stage1DialogueSceneManager : MonoBehaviour
             Choices=new[]{ "어떻게 보내는데.", "때려서 쫓아내?" } },
         // 13: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="<b>영감이면 영감놀이입니다.</b> 놀아드리고 보내는 굿이죠.\n쫓으면 화내고 돌아옵니다. 실컷 놀아드려야 갑니다.", Next=14 },
+            Text="영감이면 영감놀이입니다. 놀아드리고 보내는 굿이죠.\n쫓으면 화내고 돌아옵니다. 실컷 놀아드려야 갑니다.", Next=14 },
         // 14: 선택지 (신령님)
         new Node { Type=NodeType.Choice, Next=15,
             Choices=new[]{ "이기는 게 아니라?", "그게 무슨 굿이야." } },
@@ -100,7 +100,7 @@ public class Stage1DialogueSceneManager : MonoBehaviour
             Text="이기면 안 됩니다. 지는 것도 아니고요.\n끝까지 같이 놀아드리는 게 전부입니다.", Next=16 },
         // 16: 물귀신
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
-            Text="안 가! 안 간다고!\n<b>존버는 승리한다!!</b> 나는 아직 안 팔았어!!", Next=17 },
+            Text="안 가! 안 간다고!\n존버는 승리한다!! 나는 아직 안 팔았어!!", Next=17 },
         // 17: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
             Text="...기운은 좋으시군요.\n저 정도면 잘 노시겠습니다. 시작하시죠.", Next=18 },
@@ -214,18 +214,24 @@ public class Stage1DialogueSceneManager : MonoBehaviour
         { "잭두_놀람_당황",     "Assets/대사씬시작/대사씬0_잭두_놀람당황.png" },
         { "잭두_슬픔2",        "Assets/대사씬시작/대사씬0_잭두_슬픔2.png" },
         { "잭두_웃음1",        "Assets/대사씬시작/대사씬0_잭두_웃음1.png" },
-        // 광대(물귀신)는 새 아트가 아직 없어 기존 EmotionImage로 임시 — 나중에 교체.
-        { "물귀신_슬픔",       "Assets/EmotionImage/광대물귀신_슬픔.png" },
-        { "물귀신_분노",       "Assets/EmotionImage/광대물귀신_분노.png" },
+        // 광대(물귀신)도 §1 전용 새 아트(Assets/대사씬시작/대사씬1_광대_*)로 교체됨.
+        // 분노 노드는 화남 아트를 씀. 일반/웃음 아트도 있음(현재 노드에선 미사용).
+        { "물귀신_슬픔",       "Assets/대사씬시작/대사씬1_광대_슬픔.png" },
+        { "물귀신_분노",       "Assets/대사씬시작/대사씬1_광대_화남.png" },
     };
 
-    [ContextMenu("Auto-Load Emotions from Assets/EmotionImage")]
+    [ContextMenu("Auto-Load Emotions from Assets/대사씬시작")]
     void EditorAutoLoadEmotions()
     {
         var list = new List<EmotionEntry>();
         foreach (var kv in EmotionKeyToPath)
         {
+            // Sprite/Single이면 LoadAssetAtPath로, Sprite/Multiple(서브스프라이트 1개)이면
+            // LoadAllAssetRepresentationsAtPath로 — 대사씬1_* 아트가 Multiple로 들어와 있어서.
             var spr = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(kv.Value);
+            if (spr == null)
+                foreach (var o in UnityEditor.AssetDatabase.LoadAllAssetRepresentationsAtPath(kv.Value))
+                    if (o is Sprite s) { spr = s; break; }
             if (spr != null)
             {
                 list.Add(new EmotionEntry { key = kv.Key, sprite = spr });
