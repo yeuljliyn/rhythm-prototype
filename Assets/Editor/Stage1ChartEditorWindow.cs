@@ -1957,6 +1957,14 @@ public class Stage1ChartEditorWindow : EditorWindow
         StopAudio();
         if (wasDirty && _pattern != null)
         {
+            // 정지한 지점에 재생바(스크럽 마커)를 그대로 두기 — 채보 찍을 때 "여기까지 듣고
+            // 멈춰서 이 자리에 노트" 흐름이 편하게. 스냅 안 함(들린 그대로의 위치). 다음에
+            // "▶ 여기서 ▸"/붙여넣기도 이 지점부터 시작됨. (곡 끝을 넘겼으면 곡 길이로 클램프.)
+            float stopBeat = _pattern.TimeToBeat(_currentSongTime);
+            if (_pattern.music != null)
+                stopBeat = Mathf.Min(stopBeat, _pattern.TimeToBeat(_pattern.music.length));
+            _scrubBeat = Mathf.Max(0f, stopBeat);
+
             EditorUtility.SetDirty(_pattern);
             AssetDatabase.SaveAssets();
         }
