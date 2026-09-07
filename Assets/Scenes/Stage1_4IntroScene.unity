@@ -1344,7 +1344,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioFadeInOut
   clip: {fileID: 8300000, guid: 2466ea5b2b0e5604297a410ae58049d1, type: 3}
   targetVolume: 1
-  fadeInSeconds: 0.5
+  fadeInSeconds: 0
   fadeOutSeconds: 1.5
   totalDuration: 5
 --- !u!82 &1981127033
