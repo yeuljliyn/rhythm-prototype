@@ -46,12 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stage1ResultScreen
   director: {fileID: 0}
   stageIndex: 0
-  _sprPopup: {fileID: 21300000, guid: 0c62336c915913e4b837fa887e591163, type: 3}
+  _sprPopup: {fileID: 21300000, guid: 229ff876ec15025479d02dea7d68e4fd, type: 3}
   _sprRankText: {fileID: 21300000, guid: 44a2d11b349402045ba43f3acde09e25, type: 3}
-  _sprRankS: {fileID: 21300000, guid: 23bba1a79e7acd54495abb9f024c53d4, type: 3}
-  _sprRankA: {fileID: 21300000, guid: 173fcc48e7ce96a4eb15befa02687b6e, type: 3}
-  _sprRankB: {fileID: 21300000, guid: 3ccb0c6007586004ca9cdeadab1e073e, type: 3}
-  _sprRankC: {fileID: 21300000, guid: a1458c736bb69de4fb76e3f0a9524f9e, type: 3}
-  _sprUnlockText: {fileID: 21300000, guid: 1e10938d5cec11045b0e58537172b50e, type: 3}
-  _sprRetryText: {fileID: 21300000, guid: 77b6df2c90711344aa5650ba9f9a4241, type: 3}
+  _sprRankS: {fileID: 21300000, guid: 2207f21928d20874db1755049df34f7e, type: 3}
+  _sprRankA: {fileID: 21300000, guid: 9522f68455510bc45849bb527c46b499, type: 3}
+  _sprRankB: {fileID: 21300000, guid: 75f851da4acb6aa44aaea90f7ccb67d0, type: 3}
+  _sprRankC: {fileID: 21300000, guid: d5624500d38b359488e9cf603ecd624d, type: 3}
+  _sprUnlockText: {fileID: 21300000, guid: 2dcba124ca6c04d4c9b638e7f031bd4c, type: 3}
+  _sprRetryText: {fileID: 21300000, guid: 7c7ac796a5214e84a8075cbec0667407, type: 3}
   _sprArrow: {fileID: 21300000, guid: 26629c416402d8e41a9a53246175b483, type: 3}

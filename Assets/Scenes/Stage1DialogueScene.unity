@@ -329,9 +329,9 @@ MonoBehaviour:
   - key: "\uC7AD\uB450_\uC6C3\uC74C1"
     sprite: {fileID: 21300000, guid: bc92ce6bad09d6f4181e8bd910f9bca5, type: 3}
   - key: "\uBB3C\uADC0\uC2E0_\uC2AC\uD514"
-    sprite: {fileID: -1755181272497951136, guid: 4563c71a3de0ee447992ebf625947cd0, type: 3}
+    sprite: {fileID: 6394877445810783751, guid: e2927165627f9fb4f972496ab4a2f269, type: 3}
   - key: "\uBB3C\uADC0\uC2E0_\uBD84\uB178"
-    sprite: {fileID: 4187988894255942548, guid: ca8233ec0ac001949891c218a9b4ac85, type: 3}
+    sprite: {fileID: -7154392251204631475, guid: 53ed28cbb8be3924aae5aa340cf1e92a, type: 3}
   _bgSprite: {fileID: -3191693777204587425, guid: 48bc11bffebdfbf4c915610d5582f180, type: 3}
 --- !u!1 &294591970
 GameObject:
@@ -968,7 +968,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1029643948778271314, guid: d1de88977066d34469717ec910c5647b, type: 3}
+  m_Sprite: {fileID: 246910130359819689, guid: 498e8f45e26a2784ebded312034ad0f0, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
