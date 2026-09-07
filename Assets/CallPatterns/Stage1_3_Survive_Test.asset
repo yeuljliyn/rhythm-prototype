@@ -16,8 +16,8 @@ MonoBehaviour:
   music: {fileID: 8300000, guid: 78dafec7ec4f26247a76b59062638e70, type: 3}
   bpm: 107
   introDelay: 2
-  hitWindow: 0.3
-  missWindow: 0.2
+  hitWindow: 0.12
+  missWindow: 0.38
   minInputIntervalSeconds: 0
   liveInputStartBeat: 0
   calls:
@@ -25,7 +25,7 @@ MonoBehaviour:
     role: 0
     groupId: 1
     cueBeat: 5
-    releaseBeat: 12.999999
+    releaseBeat: 13
   - type: 0
     role: 1
     groupId: 1
@@ -39,12 +39,12 @@ MonoBehaviour:
   - type: 0
     role: 1
     groupId: 1
-    cueBeat: 14.999999
+    cueBeat: 15
     releaseBeat: 0
   - type: 1
     role: 0
     groupId: 2
-    cueBeat: 14.999999
+    cueBeat: 15
     releaseBeat: 21
   - type: 0
     role: 1
@@ -296,16 +296,16 @@ MonoBehaviour:
     groupId: 14
     cueBeat: 99
     releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 14
-    cueBeat: 101
-    releaseBeat: 0
   - type: 1
     role: 0
     groupId: 15
     cueBeat: 101
     releaseBeat: 107
+  - type: 0
+    role: 1
+    groupId: 14
+    cueBeat: 101
+    releaseBeat: 0
   - type: 0
     role: 1
     groupId: 15
@@ -356,16 +356,16 @@ MonoBehaviour:
     groupId: 17
     cueBeat: 114
     releaseBeat: 0
-  - type: 1
-    role: 0
-    groupId: 18
-    cueBeat: 116
-    releaseBeat: 121
   - type: 0
     role: 1
     groupId: 17
     cueBeat: 116
     releaseBeat: 0
+  - type: 1
+    role: 0
+    groupId: 18
+    cueBeat: 116
+    releaseBeat: 121
   - type: 0
     role: 1
     groupId: 18
@@ -416,16 +416,16 @@ MonoBehaviour:
     groupId: 20
     cueBeat: 135
     releaseBeat: 0
-  - type: 0
-    role: 1
-    groupId: 20
-    cueBeat: 139
-    releaseBeat: 0
   - type: 1
     role: 0
     groupId: 21
     cueBeat: 139
     releaseBeat: 144
+  - type: 0
+    role: 1
+    groupId: 20
+    cueBeat: 139
+    releaseBeat: 0
   - type: 0
     role: 1
     groupId: 21
