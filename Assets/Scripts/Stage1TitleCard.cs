@@ -25,6 +25,14 @@ public class Stage1TitleCard : MonoBehaviour
     [SerializeField] float    sfxDelay = 0f;
     [SerializeField] string   nextSceneName = "Stage1_1Scene";
 
+    [Header("타이틀 지연 등장 (docs/design.md 인트로 등장)")]
+    [Tooltip("배경이 먼저 보이고 타이틀은 이만큼 뒤에 페이드인. TitleImage(또는 TitleText)를 배선. 비우면 기존처럼 즉시 표시.")]
+    [SerializeField] Graphic  titleGraphic;
+    [SerializeField] float    titleDelay = 0.7f;
+    [SerializeField] float    titleFadeSeconds = 0.35f;
+    [Tooltip("페이드인하며 이 배율에서 1로 커짐")]
+    [SerializeField] float    titleScaleFrom = 0.92f;
+
     AudioSource _sfxSource;
 
     void Awake()
@@ -34,6 +42,12 @@ public class Stage1TitleCard : MonoBehaviour
         Time.timeScale = 1f;
 
         if (titleText != null) titleText.text = titleString;
+
+        if (titleGraphic != null)
+        {
+            var c = titleGraphic.color; c.a = 0f; titleGraphic.color = c;
+            titleGraphic.rectTransform.localScale = Vector3.one * titleScaleFrom;
+        }
 
         if (oneShotSfx != null)
         {
@@ -45,6 +59,26 @@ public class Stage1TitleCard : MonoBehaviour
     void Start()
     {
         StartCoroutine(Sequence());
+        if (titleGraphic != null) StartCoroutine(TitleReveal());
+    }
+
+    // 연기가 걷히며 배경이 먼저 드러난 뒤, 타이틀이 살짝 커지며 찍힌다.
+    IEnumerator TitleReveal()
+    {
+        if (titleDelay > 0f) yield return new WaitForSeconds(titleDelay);
+        float t = 0f;
+        var c = titleGraphic.color;
+        var rt = titleGraphic.rectTransform;
+        while (t < titleFadeSeconds)
+        {
+            t += Time.deltaTime;
+            float u = Mathf.Clamp01(t / titleFadeSeconds);
+            float e = 1f - (1f - u) * (1f - u);
+            c.a = u; titleGraphic.color = c;
+            rt.localScale = Vector3.one * Mathf.Lerp(titleScaleFrom, 1f, e);
+            yield return null;
+        }
+        c.a = 1f; titleGraphic.color = c; rt.localScale = Vector3.one;
     }
 
     IEnumerator Sequence()

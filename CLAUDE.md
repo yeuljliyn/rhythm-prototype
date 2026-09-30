@@ -1,88 +1,111 @@
 # rhythm-prototype
 
-Unity 리듬 배틀 게임 프로토타입. 플레이어가 한국 귀신 테마 보스(물귀신/지박령/총각귀신/처녀귀신/달걀귀신) 5명과 턴제 리듬 배틀을 벌이는 구조.
+Unity 리듬 게임 프로토타입. 기계 무당 **잭두**가 플레이어(**신령님**, 화면 밖 존재로 초상화 없음, 대사는 선택지로만)의 박자를 빌려 한 맺힌 귀신을 "놀아드리고 보내는" 굿을 벌인다. 스테이지 1의 손님은 주식에 물려 죽은 **물귀신**(광대 분장 = 도깨비/영감이 씌인 것). 리듬천국식 **콜(게임이 리듬을 보여줌) → 리스폰스(플레이어가 따라 침)** 구조, 버튼은 Space/마우스 좌클릭 하나, 판정은 Hit/Miss만.
 
-Unity Editor는 MCP 도구로 조작합니다 (`.claude/skills/` 참고 — `gameobject-*`, `scene-*`, `assets-*` 등). 씬 YAML을 직접 손으로 편집하지 말고 이 도구들을 사용하세요.
+Unity Editor는 **Unity 공식 CLI MCP 서버**(`.mcp.json`의 `unity`, 도구 이름 `mcp__unity__*`: `editor_status`, `get_scene_hierarchy`, `find_gameobjects`, `open_scene`, `set_component_properties`, `set_serialized_field`, `editor_play` 등)로 조작한다. 씬 YAML을 손으로 편집하지 말 것. `.claude/skills`에 남아 있는 `gameobject-*`, `scene-*`, `assets-*`, `ping` 같은 스킬은 ivanmurzak 브릿지(`unity-mcp-cli`)용이라 **쓰지 않는다** — 로그인을 요구하고 이 프로젝트에 MCP 서버로 등록돼 있지도 않다. 세션 시작 시 연결 확인은 `mcp__unity__editor_status` 한 번이면 충분.
 
-## 씬 흐름
+## 씬 흐름 (빌드에 포함된 것만)
 
 ```
-StartScene → LobbyScene(스테이지 선택) → DialogueScene
-           → BattleScene (또는 TutorialIntroScene → TutorialBattleScene → TutorialClearScene)
-           → BattleResultScreen
+첫 실행 (opening_seen 없음):
+StartScene
+ → DialogueScene            §0 오프닝(옥탑방, 잭두 혼자). 게임 통틀어 1회 — PlayerPrefs "opening_seen". 끝나면 로비 없이 §1로 직행
+ → Stage1DialogueScene      §1 물귀신 등장. 1회 — "stage1_underground_intro_seen". 끝에 잭두가 연기 속에서 개미로 변신,
+                            그 화면이 연기 와이프(LoadSceneWithSmoke)로 1-1 인트로에 이어짐
+ → Stage1_1IntroScene → Stage1_1Scene → 결과창 → 판 후 대사 → UndergroundLobbyScene(첫 등장)
+
+두 번째 실행부터:
+StartScene
+ → SurfaceLobbyScene        지상 로비. 스테이지 슬롯 5개 가로 스크롤, 지금은 스테이지1만 입장 가능
+ → UndergroundLobbyScene    지하 로비. 1-1~1-5 슬롯, 벽 구멍으로 각 판 배경이 보임, 미해금은 가림벽. 판 선택 시 연기 와이프
+ → Stage1_NIntroScene       판별 인트로(타이틀 이미지 0.7초 지연 페이드인 + 짧은 연출 + IntroBGM, ~5초, 입력 없음, 글자 없음)
+ → Stage1_NScene            연습 세그먼트(Stage1PracticeGate) → 본편 → Stage1ResultScreen → (S/A 첫 클리어면) 판 후 대사 오버레이
+ → UndergroundLobbyScene    (돌아오면 마지막에 있던 슬롯 그대로)
 ```
 
-`SceneTransitionManager` (싱글톤, DontDestroyOnLoad)가 페이드 인/아웃 전환을 전담. 씬 전환은 항상 `SceneTransitionManager.Instance.LoadSceneWithFade("SceneName")`을 통해서.
+- 씬 전환은 `SceneTransitionManager.Instance.LoadSceneWithFade("SceneName")`(검정 페이드). **판에 들어갈 때**(지하 로비→인트로, §1 변신→1-1)만 `LoadSceneWithSmoke` — 연기 퍼프(`Assets/Resources/Smoke/puff_*.png`, 파이썬 절차 생성)가 덮었다 걷힘. `SmokeCoverOnly/SmokeClearNow`는 씬 전환 없이 덮기만 할 때. 둘 다 unscaled 시간.
+- "1회만" 게이팅은 **대상 씬 안에서 하지 않고 호출부에서** 한다(`StartSceneManager`, `SurfaceLobbyManager`, `UndergroundLobbyManager.TrySelect`, `Stage1ResultScreen`). 대사씬 안에서 체크하면 그 씬을 직접 열어 Play 테스트할 때마다 튕겨나간다(실제로 겪음). 대사씬은 완주 시 플래그만 세팅.
+- PlayerPrefs 키: `opening_seen`, `stage1_underground_intro_seen`, `stage1_post_dialogue_seen_N`(N=0..4, 판 후 대사 1회), `underground_unlocked_index`(0-based, 해금된 마지막 판), `underground_last_index`(지하 로비 커서 위치). 초기화 ContextMenu가 `StartSceneManager`/`Stage1DialogueSceneManager`에 있음.
 
-## 배틀 시스템 (현재 사용 중 — "direction-pattern" 방식)
+## 스테이지 1 — 5판
 
-- `PatternData` (ScriptableObject, `Assets/Chapter/*.asset`): 실제 사용되는 차트 포맷. `DirectionGroup` 목록 = [화살표 입력 시퀀스(`DirectionInputEntry`: ArrowDir + beat)] + 확인용 `spaceBeat`.
-- `RhythmManager`: dspTime 기반으로 `SongTime` 계산해 오디오 동기화. 노트 레인 스폰(`BuildSchedule`/`SpawnNote`)은 **비활성화됨** — 레거시 호환용으로만 남아있음.
-- `BattleDirector`: 배틀 진행의 실제 주체. 코루틴으로 그룹을 순회:
-  1. 보스 턴 — `BossController.ShowDirection()`으로 방향 순차 표시
-  2. 플레이어 턴 — 같은 리듬으로 화살표 입력 받아 판정 (Hit/Miss, 0.2초 윈도우) → `GameManager.RegisterJudgement()`
-- `GameManager` (싱글톤): 점수/콤보/Hit/Miss 집계, S/A/B/C 랭크 산출.
-- `BossController`: 방향/아이들(둠칫둠칫) 스프라이트 전환. `Resources.LoadAll`로 스프라이트 로드.
-- `GameProgressManager`: PlayerPrefs로 스테이지 해금/랭크/무구(장비) 저장.
+| 판 | 이름 | 미니게임 | 비주얼 글루 | 인트로 씬 요소 |
+|---|---|---|---|---|
+| 1-1 | 파도타기 | 개미 4마리가 파도 올 때 차례로 손 들고(콜), 5번째 개미(나)가 친다 | `Stage1WaveRideVisuals` | 바다·모래·떠가는 양동이(`Stage1IntroBucketDrift`)·잭두·개미 |
+| 1-2 | 넘기기 | 목 마른 광대에게 잔을 개미 손에서 손으로 릴레이, 마지막이 나. 여러 잔이 겹쳐 돈다(컵 풀) | `Stage1QuickTapVisuals` | 광대, 말풍선 이미지 2개(흔들림) |
+| 1-3 | 버티기 | 위에서 물을 퍼붓는 중 꾹 누르고(Hold) 숨 쉴 때 떼기. 광대→개미→나 순서로 물 밖에 나옴 | `Stage1SurviveVisuals` | 수조, 그림자 리빌 |
+| 1-4 | 물타기 | 왼쪽 큰손이 붓는 대로(콜) 내 개미가 따라 붓기 | `Stage1AntPourVisuals` | 손, 풍선, 광대, 잭두 |
+| 1-5 | 이별이여 작별이여 배 놓아가자 | 1-1~1-4 리믹스. 영감 굿노래에서 발췌한 이름 | `Stage1RemixPhaseSwitcher`가 4개 화면 중 하나만 켬 | 바다, 광대(양동이 타고 출렁), 잭두 |
 
-## 레거시 / 미사용
+- 판 이름 흐름이 물귀신의 주식 인생(추격매수 → 물량 넘기기 → 존버 → 물타기 → 손절/보내기)과 겹치도록 설계됨.
+- 인트로 씬 타이틀은 5판 전부 이미지(`TitleImage`, `Stage1TitleCard.titleGraphic`에 배선 → 0.7초 뒤 페이드인하며 0.92→1 스케일). `TitleText`는 1-3~1-5에 있지만 비활성이라 `titleString`은 화면에 안 나옴. **인트로 씬에 글자를 넣지 않는다**(한 줄 캡션과 판 전 대사 씬을 넣었다가 둘 다 철회 — 설명은 §1 변신 장면과 판 후 대사가 맡음). 코드로 TMP를 새로 만들 땐 폰트를 `Assets/Resources/Fonts/NeoDunggeunmoProSDF`로 명시(기본 LiberationSans가 물려 한글이 깨짐 — 실제로 겪음).
+- 1-5 리믹스는 같은 스타일이 한 곡 안에 여러 번 나온다. 각 Visuals는 `OnEnable/OnDisable`로 `CallDirector` 이벤트를 구독/해제하고, 꺼질 때 코루틴·상태를 반드시 초기화해야 한다(안 하면 "1-1 끝나고 1-2로 넘어가면 1-1 상태 그대로" 같은 버그가 남 — 실제로 겪음).
 
-`NoteManager`, `Note`, `ArrowSprite`, `CircleSprites`, `LaneIndicator` 등은 예전 "노트 레인" 방식의 잔재. direction-pattern 방식으로 대체되어 현재 사용 안 함 — 이쪽을 되살릴 게 아니라면 건드릴 필요 없음.
+## 리듬 엔진 (Stage1 계열 전부 공용)
 
-## Stage1 콜-리스폰스 배틀 (신규 — `Stage1Scene`, 진행 중)
+- `CallPatternData` (`Assets/Scripts/Data/CallPatternData.cs`, 에셋 `Assets/CallPatterns/`): `music`, `bpm`, `introDelay`, `hitWindow`/`missWindow`, `minInputIntervalSeconds`(마구누르기 쿨다운), 플랫한 `calls`(`CallEntry`: `Tap`/`Hold`, `role` = `Call`(데모, 판정·입력 없음)/`Response`(판정 대상), `groupId`, `cueBeat`/`releaseBeat`, 노트별 효과음 `clip`), `loopLengthBeats`(>0이면 연습용 1사이클 차트), `phases`(리믹스용 `styleId` 구간), `sfxCues`(판정 무관 효과음 큐). **콜은 시간상 겹칠 수 있다** — 이게 이 엔진의 핵심 요구사항.
+  - `groupId`는 에디터가 배치 시점에 명시적으로 찍는 값. 시간/순서로 추론하지 않음. 이벤트 소비자가 "어느 그룹의 몇 번째 콜인지"를 알아야 할 때(1-2 컵 릴레이처럼 그룹이 진짜로 인터리브될 때)는 `OnCallCueGroup`/`OnGroupJudged`(groupId 실림)를 쓰고, 단순 순차면 `OnCallCue` 발화 횟수 mod N으로 충분.
+- `CallClock`: dspTime 기반 `SongTime`. `Pause()/Resume()`로 진짜 일시정지(dspTime은 `Time.timeScale`과 무관하게 흐르므로 기준점을 밀어서 보정). **`CallDirector.Update()`는 `clock.IsPaused`면 통째로 스킵** — 안 그러면 일시정지 중에도 미스 판정+효과음이 계속 남(실제로 겪음). `Awake()`에서 `Time.timeScale = 1f` 리셋(이전 씬의 일시정지/결과창이 0으로 남기는 문제).
+- `CallDirector`: 겹치는 콜들의 판정 상태머신. 입력은 열려 있는 Response 콜 중 **마감이 가장 임박한 것**에 배정. Hold는 릴리즈 시점만 판정, 조기 이탈은 즉시 미스. 이벤트: `OnCallCue`, `OnCallCueGroup(groupId)`, `OnResponsePress`(판정 무관, 누르는 순간), `OnResponseRelease`, `OnGroupJudged`, `OnPhaseChanged(bool isResponse)`, `OnSongEnded`. **Hand/Ants/Clown 같은 구체 오브젝트는 전혀 모름** — 그건 판별 Visuals 글루의 일. AudioSource도 모름(효과음은 `CallNoteSfxPlayer`).
+- `GameManager`(싱글톤): Hit/Miss 집계 → `GetRank()` S/A/B/C. `IsClear`(B 이상)는 구 무구 경제 기준으로 **Stage1 결과창은 안 씀**.
+- Visuals 글루 공통 규칙: 캐릭터는 **자유 루프 금지, 이벤트 없인 정지**. 콜 큐/플레이어 입력 이벤트가 올 때만 스프라이트 스왑 또는 1회 펄스. `SetActive` 토글로 숨기지 않음.
 
-배틀씬을 완전히 다른 방식으로 새로 만드는 중. **기존 `BattleScene`/`BattleDirector`는 그대로 두고, `Assets/Scenes/Stage1Scene.unity`에서 독립적으로 작업.** 기존 시스템을 "고친다"는 가정으로 수정하지 말 것.
+## 스테이지 씬 안의 구성
 
-리듬천국 스타일 콜(Call, 게임이 박자를 알려줌) + 리스폰스(Response, 탭/홀드릴리즈 입력) 엔진. 버튼 1개(Space·마우스 좌클릭을 같은 응답으로 처리), 판정은 Hit/Miss 2단뿐, 플레이 중 점수·콤보·%는 화면에 안 띄우고 콜마다 즉시 반응만 보여줌. 곡 끝에만 랭크(B 이상 클리어) 표시, 미스해도 곡은 끝까지 진행.
+- `Stage1PracticeGate`: 연습 세그먼트 N개(각각 `AudioSource+CallClock+CallDirector+PracticeLoopExtender`) → 본편 `Director`. 세그먼트 차트는 1사이클만 그리고 `PracticeLoopExtender`가 무한 반복(0회차는 전부 Call로 강제 = 시범, 1회차부터 판정). Hit 3개(`requiredHits`)면 다음으로. 세그먼트/본편 전환은 항상 "옛 것 비활성 → 새 것 활성 + Visuals 재바인딩(`IPracticeRebindable.BindDirector`)" 관용구. 캡션(`introCaption`/`demoStartCaption`/`mainTransitionCaption`)은 인스펙터 문자열 → `Stage1SpeechBubble`(잭두 개미 머리 위, 3초 후 자동 숨김).
+- `Stage1SkipHold`: E 2초 홀드로 연습 스킵. `Stage1PracticeCounter`: N/3 점 표시. 둘 다 씬에 배치된 오브젝트만 구동.
+- `Stage1ResultScreen`: `OnSongEnded`에 팝업. **S/A면 다음 판 해금**(`UndergroundLobbyProgress.UnlockUpTo(stageIndex+1)`) + UnlockText, B/C면 RetryText. 이후 지하 로비로 — 단 S/A로 그 판을 **처음** 클리어했으면 팝업을 걷고 `Stage1PostDialogue`(판 후 대사)를 먼저 재생한 뒤 로비로.
+- `Stage1PostDialogue`: 판 후 대사 오버레이. 프리팹 `Assets/Prefabs/Stage1PostDialoguePanel`(Canvas 정렬 100, Dim + 잭두/물귀신 초상화 + 대사창)이 Stage1_1~1_5 씬마다 비활성으로 하나씩 있고, 결과창의 `postDialogue` 필드에 배선(비면 자동 검색). 노드는 `stageIndex`별로 스크립트 안에 하드코딩, `NextByChoice`로 선택지 반응 분기 후 합류. timeScale 0인 채로 실시간 기준 동작. 1회 게이팅은 호출부(결과창)가 `HasSeen()`으로, 플래그 `stage1_post_dialogue_seen_N`은 완주 시 세팅. 리셋 ContextMenu 있음. 새 대사 씬 만들 때는 `Stage1DialogueSceneManager`를 복제하는 기존 패턴 유지. 팝업이 뜨면 모든 `CallDirector`를 정적 kill switch로 정지(안 하면 팝업 뒤 캐릭터가 입력에 반응). F1/F2는 테스트용 S/C 강제.
+- `Stage1PauseMenuManager`: ESC 토글, 3-2-1 리줌, CONTINUE/SETTINGS/RETRY/LOBBY. 반드시 `CallClock.Pause()/Resume()` 경유. `SettingsManager`가 ESC를 여기로 넘겨줌.
+- Hit/Miss 비네트(`ScreenVignetteFlash`)는 씬 Canvas에 **1개만** (중복 시 두 번 깜빡임, 21:9에서 위아래만 보이는 버그 수정됨).
 
-- `CallPatternData` (ScriptableObject, `Assets/Scripts/Data/CallPatternData.cs`, 에셋은 `Assets/CallPatterns/`): 플랫한 `CallEntry`(`Tap`/`Hold`, `cueBeat`/`releaseBeat`) 리스트. 기존 `PatternData`의 `DirectionGroup`(콜 구간→응답 구간 순차 구조)과 달리 **구조적으로 콜끼리 겹칠 수 있음** — 이게 이번 재작업의 핵심 요구사항.
-  - `CallEntry.role` (`CallRole`: `Call`/`Response`, 엔트리별): `Call`은 보스/손이 보여주기만 하는 데모 큐(판정 안 됨, 입력 안 읽음), `Response`가 실제 판정 대상. 기존 `liveInputStartBeat`(전역 컷오프, 한 번만 전환)와 달리 곡 전체에서 콜↔리스폰스가 반복되는 구조를 표현 가능. `CallDirector`는 `role==Call || cueBeat<liveInputStartBeat`를 데모 판정 기준으로 씀(`CallDirector.BuildLiveCall`).
-  - `CallEntry.groupId` (에디터 전용, 런타임 `CallDirector`는 무시): Z-에코로 묶인 콜/리스폰스 그룹 식별자. **시간/순서로 추론하지 않고 에디터가 배치 시점에 명시적으로 찍음** — 그래서 리스폰스 구간에 다음 콜을 겹쳐(룩어헤드) 찍어도 그룹이 안 섞임.
-- `CallClock`: `RhythmManager`와 별개의 dspTime 기반 클록. `RhythmManager`는 `PatternData` 타입에 결합돼 있어 재사용하지 않고 같은 공식을 새로 구현. `Pause()`/`Resume()`로 진짜 일시정지 지원 — dspTime은 `Time.timeScale`과 무관하게 실시간으로 계속 흐르므로, `Pause()`는 그 순간의 `SongTime`을 얼려서 반환하게 하고 `Resume()`은 정지해 있던 만큼 `_scheduledMusicStartDsp` 기준점을 밀어서 시간이 안 튀게 함. **`CallDirector.Update()`도 `clock.IsPaused`면 통째로 스킵해야 함** — 안 그러면 `Time.timeScale=0`으로 일시정지해도 판정 루프(`ResolveTimeouts`)가 계속 dspTime 기준으로 도는 걸 감지해서 미스 판정+효과음이 계속 발생하는 버그가 남(실제로 겪음). `Stage1PauseMenuManager`는 오디오만 `AudioSource.Pause()` 하지 말고 반드시 `CallClock.Pause()/Resume()`을 통해서 호출할 것.
-- `CallDirector`: 겹치는 콜들의 판정 상태머신. 버튼 입력 시 열려있는 콜 중 **마감이 가장 임박한 콜**에 배정. Hold는 릴리즈 시점만 판정하고, 조기 이탈은 즉시 확정 미스(재시도 불가).
-- `CallCueIndicator`: 플레이스홀더 큐 비주얼. `GameManager`/`ScreenVignetteFlash`/`BattleSFXController`는 방향(ArrowDir) 의존성이 없어 그대로 재사용.
-- 새 에디터 툴 `RhythmGame → Call Map Editor` (`Assets/Editor/Stage1CallMapEditorWindow.cs`): 기존 `RhythmGame → Beat Map Editor`(`BeatMapEditorWindow.cs`)를 참고했지만 절대 수정하지 않고 새로 작성. 기존 툴의 `IsBeatInConfirmedGroup` 같은 겹침 잠금 로직이 없음 — Tap/Hold 두 레인에 언제든 겹쳐 찍을 수 있음. REC 모드는 Space/마우스 클릭을 누르고 있는 길이로 Tap/Hold를 자동 구분.
-  - **콜/리스폰스 워크플로**: 직접 찍거나 REC로 녹음한 노트는 전부 기본값 `role=Call`, 현재 `groupId`(툴바 "Group #" 표시)가 자동으로 찍힘. 콜 그룹을 다 찍은 뒤 **`Z` 키**를 누르면 그 그룹의 콜 리듬(박자 간격, Tap/Hold 모양)을 그대로 복사해 `role=Response`로 자동 생성 — 리스폰스 노트는 손으로 안 찍음. 그 뒤 `_currentGroupId`가 1 증가해서, 리스폰스 구간에 겹쳐 찍는 룩어헤드 콜도 자동으로 "다음 그룹" 취급됨. 노트를 선택하고 `C`로 role을 수동 토글 가능(드문 예외용).
-    - REC/PREVIEW로 음악이 도는 중에 Z를 누르면 **그 순간의 실제 박자**가 리스폰스 시작점(라이브 연주 그대로). 음악이 안 도는 순수 편집 모드에서 누르면 툴바 "Echo Gap"(기본 1박) 고정 오프셋으로 대체.
-  - **레인 레이아웃**: 물리적 줄 순서는 TAP-HOLD-TAP-HOLD 4줄(TAP끼리/HOLD끼리 몰아서가 아님). 노트의 줄(0/1)과 콜/리스폰스 그룹 배경 밴드(0/1)는 **둘 다 같은 `groupId`→밴드 매핑**(`RecomputeGroupBands`, 시작 시간 순으로 그냥 번갈아 0,1,0,1...)을 따름 — 같은 그룹 노트는 항상 같은 줄, 다른 그룹은 항상 다른 줄. 실제 시간 겹침 여부로 줄을 나누던 이전 방식은 그룹 배경과 노트 줄이 어긋나는 버그가 있어서 폐기함.
-  - 그룹 배경(파랑/보라 번갈아 wash), 리스폰스 구간(초록 톤 + "RESPONSE" 라벨), 콜→리스폰스 경계("Z" 마커)는 전부 `groupId` 기준으로 그려짐 — 세션 상태가 아니라 데이터에서 매번 재계산하므로 에디터 재시작/Undo에도 유지됨.
-- Stage1 미니게임 1번째(물붓기, "왼쪽 큰손이 물 붓고(콜) → 오른쪽 개미가 따라 붓고(리스폰스)")의 비주얼 구성: `Assets/물붓는손1.png`(16컷)/`개미군단.png`(4컷)/`광대1.png`·`광대2.png`(각 16컷, 보스가 손 차례일 때/개미 차례일 때) 스프라이트시트를 Sprite/Multiple로 슬라이스하고, 플립북 `AnimationClip` 4개(`Assets/Animations/Stage1/`) + `AnimatorController` 3개(Hand/Ants/Boss, Boss는 `ResponsePhase` bool로 상태 전환) 생성. `Stage1Scene`의 `Canvas` 밑에 `Background`(네온시티 배경, RawImage)/`Boss`/`Hand`/`Ants` UI Image + Animator를 배치함.
-  - **CallDirector 연동 완료**: `CallDirector`에 이벤트 3개 추가, 여전히 Hand/Ants/Boss를 전혀 모르는 범용 상태 유지:
-    - `OnPhaseChanged`(`System.Action<bool>`, true=Response): `SpawnDueCalls`에서 새 콜이 스폰될 때마다 그 콜의 role(정확히는 `!lc.isDemo`)이 직전 상태와 다르면 1회 발화. Boss의 `ResponsePhase` bool 전환에만 사용(Boss1↔Boss2 — 누구 차례인지 표시).
-    - `OnCallCue`(`System.Action`): Call-role(데모) 엔트리가 스폰되는 그 순간(=그 콜의 박자) 발화. 채보 시계가 트리거하는 큐.
-    - `OnResponsePress`(`System.Action`): 플레이어가 Space/마우스 클릭을 누르는 순간(pressEdge) 판정 성공 여부와 무관하게 무조건 발화. 플레이어 입력이 트리거하는 큐.
-    - Hand/Ants는 **자유 루프 금지, 이벤트 없인 정지**: 각각 `OnCallCue`/`OnResponsePress`가 올 때만 `Stage1WaterPourVisuals`(`Assets/Scripts/Stage1WaterPourVisuals.cs`, `Director`에 부착)가 해당 Animator를 프레임 0부터 1회 재생(`Animator.Play(현재stateHash, 0, 0f)` + `speed=1`)시키고, 그 상태의 `length`만큼 코루틴으로 대기한 뒤 다시 `speed=0`으로 멈춤 — 그래서 Hand는 매 콜 박자마다, Ants는 매 플레이어 클릭마다만 "펄스"하듯 한 번씩 움직인다(둘 다 항상 화면엔 보임, `SetActive` 토글 안 함). Boss도 같은 펄스를 `OnCallCue`/`OnResponsePress`에 맞춰 받음(현재 활성 state — Boss1 or Boss2 — 를 재생만 다시 트리거, 상태 자체는 `ResponsePhase` bool이 결정). `Start()`에서 전부 `speed=0`으로 시작하고 `pattern.calls[0].role`로 Boss 초기 bool만 세팅.
-    - **알려진 이슈**: `Time.timeScale`이 이전 플레이 세션(다른 씬의 일시정지/결과화면 등)에서 0으로 남는 경우가 있음(`RhythmManager`에 이미 있는 방어 로직과 동일 문제) — `CallClock.Awake()`에서 `Time.timeScale = 1f`로 리셋해서 해결함. Animator는 스케일된 시간 기준이라 timeScale=0이면 `speed`를 얼마로 세팅해도 프레임이 안 넘어감(반면 `CallDirector`/`CallClock`은 dspTime 기반이라 timeScale 영향 안 받아서 판정 로직만 보면 멀쩡해 보이는 함정이 있었음).
-    - MCP 스크립트로 헤드리스 Play 테스트할 때 에디터가 포커스 없으면 프레임 자체가 극도로 드물게 도는 경우가 있어(예: 4.6초 동안 `Time.frameCount`가 2만 증가) `WaitForSeconds` 기반 코루틴 타이밍 검증이 신뢰도가 낮음 — 실제 프레임 페이싱/느낌은 에디터에 포커스를 두고 직접 플레이해서 확인할 것.
-- **아직 안 된 것**: 나머지 미니게임 4개(존버/초단타/리믹스 보스 등) 전용 캐릭터 비주얼·사운드(각각 `Stage1WaterPourVisuals` 같은 전용 글루 스크립트 필요, `CallDirector`는 그대로 재사용), 여러 `CallPatternData`를 이어 재생하는 시퀀스 매니저, 기존에 이미 있던 `CallEntry`(groupId=-1, 미지정) 데이터를 새 groupId 체계로 옮기는 마이그레이션.
+## 에디터 툴 (`RhythmGame` 메뉴)
 
-### 결과창 / 일시정지 — Stage1Scene이 이제 BattleScene을 대체하는 배틀씬 역할
+- **Chart Editor** (`Assets/Editor/Stage1ChartEditorWindow.cs`) — 현행. 겹치는 그룹을 그리디 인터벌 스케줄링으로 레인에 배치(3그룹 이상 동시 가능), 다중 선택/마키, SFX 레인, PHASE 레인, 노트 클릭 시 인라인 효과음 클립, 재생바가 실제 오디오 위치를 따름, 그리드 메트로놈, introDelay 미세조정.
+- **Call Map Editor** (`Stage1CallMapEditorWindow.cs`) — 1세대. 레인 2개 고정. 1-1/1-4처럼 단순한 차트엔 여전히 동작. 수정하지 않음.
+  - 공통 워크플로: 손으로 찍는 노트는 전부 `role=Call` + 현재 groupId. 콜 그룹 완성 후 **Z**로 같은 리듬의 Response 그룹 자동 생성(리스폰스는 손으로 안 찍음), groupId +1. **C**로 role 수동 토글. REC 모드는 Space/클릭 누른 길이로 Tap/Hold 구분. 1-1 같은 "콜 4개 → 리스폰스 1개" 형태는 Z 안 쓰고 손으로.
+- **Sfx Cue Editor** (`Stage1SfxCueEditorWindow.cs`): 별도 `SfxCuePatternData`용. Q/W/E/R 레인에 판정 무관 효과음 큐. 지금은 대부분 Chart Editor의 SFX 레인(`CallPatternData.sfxCues`)으로 흡수됨.
+- `BeatMapEditorWindow.cs`는 레거시 `PatternData`용. 안 건드림.
 
-`BattleScene`은 그대로 두되(참고용, 삭제 안 함), 앞으로 실제로 플레이할 배틀씬은 `Stage1Scene`. `BattleResultScreen`/`PauseMenuManager`와 동일한 룩·동작을 갖는 Stage1 전용 버전을 새로 만듦(기존 파일 수정 안 함):
+## 사운드
 
-- `Stage1ResultScreen`(`Assets/Scripts/Stage1ResultScreen.cs`, `Stage1ResultScreen` GameObject): `BattleResultScreen`과 완전히 동일한 스프라이트 에셋(`_sprPopup`/`_sprRankText`/`_sprRankS~C`/`_sprUnlockText`/`_sprRetryText`/`_sprArrow` — 같은 GUID, `Assets/Image/`)을 재사용해 절차적으로 팝업을 생성. `CallDirector.OnSongEnded`를 구독해 트리거. **BattleResultScreen과 달리 단일 페이지만 있음** — Stage1Scene은 아직 Lobby의 스테이지 해금/무구 경제(Page2, `PlayerPrefs` stage index)에 편입 안 됐으므로 페이지1만 보여주고 화살표는 항상 LobbyScene으로 이동. 기존 `Stage1ResultUI.cs`(플레이스홀더, 텍스트만)는 완전히 대체되어 삭제함 — 씬의 `Canvas/ResultPanel`(RankLabel/ClearLabel 손으로 배치했던 것)도 같이 제거.
-- `Stage1PauseMenuManager`(`Assets/Scripts/Stage1PauseMenuManager.cs`, `Stage1PauseMenuManager` GameObject): `PauseMenuManager`와 동일한 UI/동작(ESC 토글, 3-2-1 리줌 카운트다운, CONTINUE/SETTINGS/RETRY/LOBBY) — RETRY는 `Stage1Scene`을 리로드, 게임 오디오는 `RhythmManager` 대신 `CallClock`의 AudioSource를 찾음.
-- 공유 인프라인 `SettingsManager.cs`만 최소 확장(BattleScene 파일 자체는 안 건드림): ESC 핸들러가 `PauseMenuManager.Instance`뿐 아니라 `Stage1PauseMenuManager.Instance`도 확인해서 넘겨줌, `FindGameAudio()`가 `RhythmManager` 없으면 `CallClock`으로 폴백, `Close()`의 "배틀씬이라 카운트다운 리줌 써야 하나" 판단에 씬 이름 `"Stage1Scene"`도 포함.
+- `CallNoteSfxPlayer`: `CallEntry.clip`과 `sfxCues`를 그 박자에 재생. `CallDirector`와 같은 오브젝트, `Clock.SongTime` 폴링. 연습 루프면 `loopLengthBeats` 단위로 스스로 반복. 씬 로드 시 자동 부착(손 배선 불필요).
+- `SFXManager`: UI 효과음(클릭/이동/선택/뒤로). wav 로드 후 피크 정규화. RuntimeInitialize 자동 부트스트랩.
+- `LobbyBGMPlayer`: 지상/지하 로비 공용 BGM, DontDestroyOnLoad. 로비 매니저 `Awake()`에서 `Ensure()`만 호출. 로비 아닌 씬으로 가면 스스로 정리.
+- 인트로 씬: `IntroBGM`(`Assets/인트로/1-N_intro.wav`) + `BackgroundAudio`(`AudioFadeInOut`) 레이어 분리. `Stage1TitleCard.oneShotSfx`는 별개.
+- `StartSceneManager`는 `Resources/Music/StartBGM`을 씬마다 새로 만듦.
 
-### 스테이지 내장 튜토리얼 (신규 — 기획서 기반, "물타기" 파트만 우선 구현)
+## 화면 / 종횡비
 
-기획서 반영: 별도 `TutorialIntroScene/TutorialBattleScene/TutorialClearScene` 3단계를 없애고 **스테이지 씬 하나 안에 튜토리얼(앞) → 본편(뒤)을 로딩·암전 없이 이어붙이는** 구조로 전환. **기존 튜토리얼 씬 3개는 삭제하지 않고 그대로 둠**(레거시 보존 — 참조하는 곳 6곳 이상 있음: `BattleResultScreen`/`StartSceneManager`/`StockChartBackground`/`BossController` 등, 안 건드림). 이번 작업은 **물타기(Stage1Scene)에만** 적용 — 파도타기는 신규 미니게임이라 별도 아트/차트 필요, 아직 미착수.
+- 모든 Canvas는 Overlay + CanvasScaler(1920×1080, `matchWidthOrHeight=1`). 21:9 대응은 **SafeFrame**(16:9 고정 영역) 안에 UI를 두고 배경만 밖으로 넘치게 함(`AspectRatioLetterbox`). 결과창처럼 코드로 만드는 UI도 SafeFrame 밑에 붙일 것.
+- `CameraBackgroundEnforcer`: 씬 로드마다 카메라 클리어를 검정 단색으로 강제(21:9 화면 밖이 유니티 기본 파랑으로 뜨던 문제).
 
-- `Stage1DialogueSceneManager`(`Assets/Scripts/Stage1DialogueSceneManager.cs`, 씬 `Assets/Scenes/Stage1DialogueScene.unity`): `DialogueScene`/`DialogueSceneManager`를 **복제**(원본 수정 안 함 — 나중에 되돌릴 수도 있어서)해서 만듦. §0 오프닝(사이버 신당, 잭두-신령님 첫 만남, 신령님은 선택지 전용이라 초상화 불필요) + §1 물귀신 등장/인트로를 새로 채움. 끝나면 `BattleScene` 대신 `Stage1Scene`으로 전환. 원본에 없던 `Node.BgKey` 필드를 추가해서 §0→§1 전환 시 배경을 `튜토_사이버신당` → `스테1_폐허사이버증권거래소`로 교체. **§2(물타기 콜 시작 대사, "이제 진짜입니다" 등 인게임 코칭 한두 줄)는 이번 범위에 포함 안 함** — Stage1Scene 안에서 라이브로 트리거되어야 하는데 별도 캡션 시스템이 없어서 보류.
-- `Stage1_Tutorial.asset`(`Assets/CallPatterns/`): `Stage1_MVP_Test`를 복제해서 만든 튜토리얼 전용 차트. 같은 음악(`Stage1_Battle.wav`)·같은 BPM(120, **템포를 늦추지 않음** — 기획서 요구사항) 재사용, `hitWindow`만 살짝 넓힘(0.15). 단순한 Call→Response 페어를 8세트(groupId 0~7) 넉넉하게 반복 배치 — "무한 관대(성공할 때까지 반복)"를 엔진이 진짜로 되감아서 구현하는 대신, **데이터에 필요량보다 훨씬 많은 반복을 미리 깔아두고 3세트 성공하면 조기 종료**하는 방식으로 단순화(사용자 확인받음). 실제 콜/응답 리듬 디자인은 임시로 직접 짠 것 — 기획자가 나중에 `Call Map Editor`로 다시 짤 수 있음.
-- `Stage1TutorialGate`(`Assets/Scripts/Stage1TutorialGate.cs`, `Stage1Scene`의 `Stage1TutorialGate` GameObject): 튜토리얼→본편 전환 오케스트레이터.
-  - `Stage1Scene`에 `Director`(본편, `Stage1_MVP_Test`)와 `TutorialDirector`(`Director`를 복제, `pattern`만 `Stage1_Tutorial`로 교체 — **`CallClock.pattern`과 `CallDirector.pattern` 둘 다 명시적으로 와이어링돼 있어서 둘 다 바꿔야 함**, 안 그러면 `CallClock.Pattern` 통해 자동으로 잡히는 것 대신 `CallDirector`가 예전 값을 그대로 씀) 두 벌의 `AudioSource+CallClock+CallDirector`가 나란히 존재. 씬 저장 시 `Director`는 `activeSelf=false`, `TutorialDirector`는 `activeSelf=true`가 기본값 — `Stage1TutorialGate.Start()`가 실제로 어느 쪽을 켤지 결정.
-  - `PlayerPrefs`(`stage1_tutorial_seen`)를 봐서: 이미 봤으면 튜토리얼 GameObject를 끄고 바로 본편 활성화. 처음이면 튜토리얼만 켜고, `GameManager.OnJudgement`를 구독해 Hit 3번 쌓이면(미스는 카운트 안 함, 그냥 무시) 튜토리얼 끄고 `GameManager.ResetGame()`으로 튜토리얼 중 쌓인 점수/미스를 지운 뒤 본편 활성화 + 플래그 저장.
-  - **버그 하나 실제로 겪음**: 처음 구현 시 "이미 봤음" 분기에서 본편만 켜고 튜토리얼 GameObject를 끄는 걸 깜빡해서 둘 다 동시에 켜져 있었음(둘 다 같은 GameManager/판정에 간섭) — `SwitchToMain()`이 반드시 `tutorialDirectorGO.SetActive(false)`도 같이 해야 함.
-- `Stage1WaterPourVisuals`가 `CallDirector`를 하나만 붙들고 있던 것에서 **런타임 재바인딩 가능**하게 확장(`BindDirector(CallDirector)` 메서드) — Hand/Ants/Boss는 이제 `Director`가 아니라 별도의 항상-활성 `PourVisuals` GameObject에 있고, `Stage1TutorialGate`가 처음엔 `TutorialDirector`에, 게이트 통과 후엔 `Director`에 바인딩을 갈아끼움. 이걸 위해 `CallDirector`에 `StartsInResponsePhase` 프로퍼티(정렬된 `_calls[0].role`로 계산) 추가해서 `Stage1WaterPourVisuals`가 자체 `CallPatternData` 참조 없이도 재바인딩 시 초기 페이즈를 알 수 있게 함.
-- 랭크 클리어 기준은 **그대로 B 이상 유지**(기획서에 "클리어 = A 이상"이라 적혀 있었지만 사용자가 "기획자님이 착각한 것 같다"며 기존 B+ 유지로 확인 — 나중에 진짜 A로 올려야 하면 다시 알려주기로 함, 이 메모는 그 결정을 기록해두는 용도).
+## 대사 씬
+
+- `DialogueSceneManager`(§0 오프닝, 7노드) / `Stage1DialogueSceneManager`(§1 물귀신, 5노드). 노드 배열이 C# 안에 하드코딩(`Nodes`), `Line`/`Choice`/`End`. 선택지는 신령님의 태도(냉소/호기심) 두 축이고, `NextByChoice[i]`로 잭두 반응 노드가 갈린 뒤 공통 노드로 합류. "저게 뭐야?"형 질문 선택지는 쓰지 않는다(`docs/design.md` 서사 전달 규칙). UI 오브젝트는 씬에 직접 배치(두 씬 Hierarchy 동일, 필드명도 동일하게 유지). 표정 스프라이트는 `EmotionKey` → `Assets/대사씬시작/`, ContextMenu "Auto-Load Emotions"로 재수집.
+- 캐릭터 강조는 색 디밍만. `localScale`은 코드에서 안 건드림(에디터 값을 덮어써서 Play 시 초상화가 커지던 버그).
+- 서사 전달 구조(2026-09-30 방향 B·변신판): 짧은 §0·§1 → §1 끝 **변신**(잭두 초상화 주변 연기 → 개미 잭두 스프라이트, `Stage1DialogueSceneManager.TransformIntoAnt`, 개미 크기·위치는 `_antDisplayHeight/_antOffsetX`) → 1-1 직행 → 판 후 대사(`Stage1PostDialogue`)로 물귀신이 한 단계씩 풀림. 세계관 규칙: 영감놀이 = 무리로 변해서 같이 놀아줌, 개미 몸은 신령님 장단에만 움직임, 개미 잭두는 말풍선으로만 말함. 상세는 `docs/design.md`.
 
 ## 컨벤션
 
-- **오브젝트는 에디터에서 바로 보이게, 실행(Play)해야 보이는 방식 지양.** 기존 씬 매니저 중 일부(`LobbySceneManager.BuildUI()` 등)는 UI 전체를 `Start()`에서 코드로 절차적 생성 — 그래서 Play해야만 Hierarchy에 오브젝트가 보임. 앞으로는 GameObject/프리팹을 MCP 도구(`gameobject-create`, `assets-prefab-create` 등)로 에디터에 직접 만들어서, Play 없이도 Hierarchy에서 보고 위치 등을 직접 수정할 수 있게 할 것.
-- **UI 위치를 코드에서 손으로 더하거나 뺄 때(RectTransform 계층 밖에서) `canvas.scaleFactor`를 반드시 곱할 것.** 이 프로젝트의 Canvas들은 `Screen Space - Overlay` + `CanvasScaler`를 `Scale With Screen Size`(기준 해상도 1920×1080)로 씀 — 이 모드에서 `RectTransform.position`(world position)은 이미 "현재 Game 뷰 해상도 기준 실제 픽셀"이라, 여기에 고정 숫자(예: `target.position + new Vector3(0, 90, 0)`)를 그냥 더하면 그 오프셋만 해상도에 안 맞물려서 일반 Game 뷰랑 maximize한 Game 뷰(=해상도/스케일이 다름)에서 위치가 달라 보임 — 실제로 겪은 버그(`Stage1QuickTapVisuals`의 컵 오프셋/튀는 높이, `ScaledOffset()` 헬퍼로 해결). 캐릭터 크기·간격 등 나머지는 Canvas가 자동으로 스케일하는데 손으로 더한 오프셋만 안 따라가서 어긋나는 것 — 앞으로 비슷하게 코드에서 위치를 오프셋하는 곳(다른 미니게임 비주얼 등)엔 전부 `canvas.scaleFactor`를 곱해서 적용할 것.
+- **오브젝트는 에디터에서 바로 보이게.** `Start()`에서 UI를 절차 생성하는 방식(`LobbySceneManager.BuildUI()` 등 레거시) 지양. 스크립트는 인스펙터에 배선된 오브젝트를 "구동"만 한다. 에디터에서 잡은 위치/크기를 코드가 매 프레임 덮어쓰지 않도록 주의(`Stage1SpeechBubble`은 Awake에서 배치 위치를 역산해 오프셋으로 씀).
+- **RectTransform 계층 밖에서 world/screen 좌표에 오프셋을 더할 때는 `canvas.scaleFactor`를 곱한다.** `anchoredPosition`만 쓰면 불필요.
+- 기존 시스템을 "고친다"는 가정으로 바꾸지 말고, 필요하면 **복제해서 새 파일**로 만들고 원본은 그대로 둔다(`Stage1ResultScreen`↔`BattleResultScreen`, `Stage1DialogueSceneManager`↔`DialogueSceneManager`, Chart Editor↔Call Map Editor 모두 이 패턴). 공유 인프라(`SettingsManager`)만 최소 확장.
+- 새 씬을 만들면 `Awake()`에서 `Time.timeScale = 1f` 방어. 코루틴/애니메이터는 스케일된 시간이라 0이 남아 있으면 멈춰 보인다.
+- MCP 헤드리스 Play 테스트는 에디터 포커스가 없으면 프레임이 거의 안 돌아 타이밍 검증 신뢰도가 낮다. 느낌 확인은 직접 플레이.
+
+## 레거시 (빌드 미포함, 삭제 안 함, 건드리지 않음)
+
+- 구 배틀: `BattleScene`, `BattleDirector`, `RhythmManager`, `PatternData`(`Assets/Chapter/`), `BossController`, `BattleResultScreen`, `PauseMenuManager`, `GameProgressManager`(무구 경제), `LobbyScene`/`LobbySceneManager`.
+- 더 옛 노트 레인: `NoteManager`, `Note`, `ArrowSprite`, `CircleSprites`, `LaneIndicator`.
+- 구 튜토리얼 씬 3개: `TutorialIntroScene`/`TutorialBattleScene`/`TutorialClearScene`. 참조하는 곳이 많아 남겨둠.
+- 물붓기 프로토: `Stage1Scene` + `Stage1TutorialGate` + `Stage1WaterPourVisuals`(Animator 플립북 방식). 1-4 물타기의 전신. `Stage1PracticeGate`가 이걸 일반화한 것.
+- `Stage1_1Scene_NewArt` + `Stage1WaveRideVisuals_NewArt`: 1-1 새 아트 비교용. 방향 정해지면 하나 삭제.
+- `SpiritOrb`, `GaugeManager`, `UIManager`, `StockChartBackground`, `TurnSpotlightEffect`, `PlayerDanceAnimator` 등은 구 배틀 연출.
+- `Calibration*`은 레거시 아님 — StartScene/SettingsManager에서 쓰는 입력 보정.
 
 ## 참고
 
 - 이 컴퓨터엔 독립 git이 PATH에 없음. GitHub Desktop 번들 git 사용: `$env:LocalAppData\GitHubDesktop\app-*\resources\app\git\cmd\git.exe`
-- MCP 브릿지(`com.ivanmurzak.unity.mcp`)가 컴파일 에러(`CS0115` 등)로 안 뜨면 `Assets/Plugins/NuGet`의 의존 DLL 버전 불일치일 가능성이 높음. `Tools → AI Game Developer → Dependencies → Force Resolve NuGet DLLs`로 재해결 시도. 그래도 안 바뀌면 Unity 프로세스가 그 DLL을 물고 있어서(Windows 파일 잠금) 그런 것이니 에디터를 완전히 껐다 켠 뒤 다시 시도.
+- 공식 MCP 서버(`unity.exe mcp --project-path ...`)가 응답하지 않으면 먼저 Unity Editor가 이 프로젝트를 열고 있는지, 컴파일 에러로 멈춰 있지 않은지 확인(`editor_status`의 `compiling`/`status`). 에디터를 완전 재시작하면 대부분 복구됨.
+- 프로젝트에는 예전 ivanmurzak 브릿지(`com.ivanmurzak.unity.mcp`, `Assets/Plugins/NuGet`)가 아직 남아 있다. 이 패키지 때문에 컴파일 에러(`CS0115` 등)가 나면 `Tools → AI Game Developer → Dependencies → Force Resolve NuGet DLLs`로 DLL 버전을 맞춘다. 조작 경로로는 쓰지 않는다.

@@ -1039,6 +1039,10 @@ MonoBehaviour:
   oneShotSfx: {fileID: 0}
   sfxDelay: 0
   nextSceneName: Stage1_1Scene
+  titleGraphic: {fileID: 1940960872}
+  titleDelay: 0.7
+  titleFadeSeconds: 0.35
+  titleScaleFrom: 0.92
 --- !u!114 &1809504251
 MonoBehaviour:
   m_ObjectHideFlags: 0

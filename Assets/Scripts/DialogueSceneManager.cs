@@ -32,6 +32,7 @@ public class DialogueSceneManager : MonoBehaviour
         public string    Text;
         public string[]  Choices;
         public int       Next;
+        public int[]     NextByChoice; // Choice 전용: 선택 i → NextByChoice[i]. null이면 Next로 합류
         public string    EmotionKey;
     }
 
@@ -46,52 +47,40 @@ public class DialogueSceneManager : MonoBehaviour
 
     static readonly Node[] Nodes = new Node[]
     {
+        // ── §0. 오프닝 — 옥탑방, 잭두 혼자 (docs/design.md 방향 A, 7노드) ───────────
+        // 신병·병원·전 재산·신용불량자·폐차장 묘사는 뺌(일부는 1-3 판 후 대사로). 선택지는
+        // 신령님의 태도(냉소/호기심)이고 잭두의 다음 대사만 갈린 뒤 합류한다.
         // 0: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_놀람_당황",
             Text="어. 어어.\n화면 밖에... 누구 계십니까?", Next=1 },
-        // 1: 선택지 (신령님)
-        new Node { Type=NodeType.Choice, Next=2,
+        // 1: 선택지 (신령님) — 냉소 / 호기심
+        new Node { Type=NodeType.Choice, Next=2, NextByChoice=new[]{ 2, 3 },
             Choices=new[]{ "누구긴. 방금 게임 켰는데.", "내 컴퓨터가 왜 말을 걸지." } },
-        // 2: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
-            Text="오셨다. 진짜 오셨네.", Next=3 },
-        // 3: 잭두
+        // 2: 잭두 (냉소 반응)
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="저는 잭두입니다. 무당이고요.\n보시다시피 기계입니다.", Next=4 },
-        // 4: 선택지 (신령님)
-        new Node { Type=NodeType.Choice, Next=5,
-            Choices=new[]{ "기계가 무당을 해?", "고장 난 거 아니고?" } },
+            Text="게임... 그렇게 부르셔도 됩니다.\n저한테는 굿입니다만.", Next=4 },
+        // 3: 잭두 (호기심 반응)
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
+            Text="컴퓨터가 아니라 무당입니다.\n기계이긴 합니다.", Next=4 },
+        // 4: 잭두
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="잭두입니다. 내림굿 받다가\n신은 안 오고 할부만 남은 기계 무당이고요.", Next=5 },
         // 5: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="원인 모를 신병이 왔습니다. 병원에서는 모른답니다.\n내림굿을 받으면 낫는다길래 받았습니다.", Next=6 },
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
+            Text="다음 달까지 못 넣으면 캔입니다. 그래서 굿을 합니다.\n원혼 달래드리고 값을 받는 거죠.", Next=6 },
         // 6: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="전 재산을 털었고, 모자란 건 긁었습니다.\n그랬더니 신은 안 오고 할부만 남았습니다.", Next=7 },
-        // 7: 선택지 (신령님)
-        new Node { Type=NodeType.Choice, Next=8,
-            Choices=new[]{ "그래서 나한테 뭘 어쩌라고.", "할부는 네 사정이지." } },
-        // 8: 잭두
+            Text="그런데 굿은 장단입니다. 저 혼자서는 안 됩니다.\n신령님이 박자를 넣어주셔야 합니다.", Next=7 },
+        // 7: 선택지 (신령님) — 냉소 / 호기심
+        new Node { Type=NodeType.Choice, Next=8, NextByChoice=new[]{ 8, 9 },
+            Choices=new[]{ "치는 건 나고 수금은 너야?", "박자만 넣으면 되는 거지?" } },
+        // 8: 잭두 (냉소 반응)
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="제 사정이 곧 목숨입니다.\n사람은 못 갚으면 신용불량자가 되지만, 저는 몸을 뜯어갑니다.", Next=9 },
-        // 9: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="기계는 고철값으로 계산되거든요.\n다음 달까지 못 넣으면 압류돼서 폐차장으로 갑니다. 캔으로 압축되는 겁니다.", Next=10 },
-        // 10: 선택지 (신령님)
-        new Node { Type=NodeType.Choice, Next=11,
-            Choices=new[]{ "그래서 굿을 한다고?", "그거랑 나랑 무슨 상관인데." } },
-        // 11: 잭두
+            Text="...정산은 캔이 안 되면 하겠습니다.\n마침 밖에 첫 손님이 와 계십니다. 가시죠.", Next=10 },
+        // 9: 잭두 (호기심 반응)
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음2",
-            Text="굿판을 벌일 겁니다. 원혼 달래드리고 값을 받으면 되죠.\n손님은 많습니다. 요즘 세상에 한 맺힌 분이 얼마나 많습니까.", Next=12 },
-        // 12: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="그런데 저 혼자서는 굿이 안 됩니다.\n굿은 장단입니다. 신령님이 박자를 넣어주셔야 합니다.", Next=13 },
-        // 13: 선택지 (신령님)
-        new Node { Type=NodeType.Choice, Next=14,
-            Choices=new[]{ "치는 건 나고 수금은 너야?", "결국 내가 대신 친다는 거네." } },
-        // 14: 잭두
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="정산은... 제가 캔이 안 되면 어떻게든 하겠습니다.\n마침 밖에 첫 손님이 와 계십니다. 가시죠.", Next=15 },
-        // 15: end
+            Text="그것만 하시면 됩니다. 나머진 제가.\n마침 밖에 첫 손님이 와 계십니다. 가시죠.", Next=10 },
+        // 10: end
         new Node { Type=NodeType.End },
     };
 
@@ -297,7 +286,7 @@ public class DialogueSceneManager : MonoBehaviour
                 _speakerTxt.text  = "신령님";
                 _speakerTxt.color = new Color(0.85f, 0.80f, 0.30f);
                 _dialogueTxt.text = "";
-                ShowChoices(node.Choices, node.Next);
+                ShowChoices(node);
                 break;
 
             case NodeType.End:
@@ -307,8 +296,9 @@ public class DialogueSceneManager : MonoBehaviour
     }
 
     // ── Choice ────────────────────────────────────────────────────────
-    void ShowChoices(string[] choices, int nextNode)
+    void ShowChoices(Node node)
     {
+        string[] choices = node.Choices;
         _waitChoice = true;
         _choicePanel.SetActive(true);
         string[] prefixes = { "① ", "② " };
@@ -316,7 +306,8 @@ public class DialogueSceneManager : MonoBehaviour
         {
             _choiceTxts[i].text = prefixes[i] + choices[i];
             _choiceBtns[i].gameObject.SetActive(i < choices.Length);
-            int n = nextNode;
+            // 선택별 분기가 있으면 그쪽, 없으면 공통 Next
+            int n = (node.NextByChoice != null && i < node.NextByChoice.Length) ? node.NextByChoice[i] : node.Next;
             _choiceBtns[i].onClick.RemoveAllListeners();
             _choiceBtns[i].onClick.AddListener(() =>
             {
@@ -369,7 +360,9 @@ public class DialogueSceneManager : MonoBehaviour
         PlayerPrefs.SetInt("opening_seen", 1);
         PlayerPrefs.Save();
         yield return new WaitForSecondsRealtime(0.6f);
-        SceneTransitionManager.Instance.LoadSceneWithFade("SurfaceLobbyScene");
+        // 첫 실행은 로비를 건너뛴다(docs/design.md 첫 플레이까지의 흐름): §0 → §1 → 변신 → 1-1.
+        // 지상 로비는 1-1 결과·보고 뒤에 처음 나온다. §0은 게임 통틀어 1회라 이 분기는 곧 "첫 실행".
+        SceneTransitionManager.Instance.LoadSceneWithFade("Stage1DialogueScene");
     }
 
     // ── Voice ─────────────────────────────────────────────────────────

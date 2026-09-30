@@ -19,6 +19,10 @@ public class Stage1ResultScreen : MonoBehaviour
              "이 값+1을 해금 처리하는 데 씀.")]
     [SerializeField] int stageIndex = 0;
 
+    [Tooltip("판 후 대사(Stage1PostDialoguePanel 프리팹 인스턴스). 비우면 씬에서 자동 검색. " +
+             "S/A로 처음 클리어했을 때 결과창 뒤, 지하 로비로 가기 전에 1회 재생.")]
+    [SerializeField] Stage1PostDialogue postDialogue;
+
     [Header("Same sprite assets as BattleResultScreen")]
     [SerializeField] Sprite _sprPopup;
     [SerializeField] Sprite _sprRankText;
@@ -32,7 +36,9 @@ public class Stage1ResultScreen : MonoBehaviour
 
     bool _triggered;
     bool _advanced;
+    bool _unlockedNext;
     float _shownRealtime;
+    GameObject _canvasGO;
 
     // 결과창이 뜬 직후 짧은 유예 — 곡이 끝나는 순간 마침 누르고 있던 Space/클릭이 결과창을 보기도
     // 전에 그대로 "다음으로" 스킵돼버리지 않도록.
@@ -90,6 +96,7 @@ public class Stage1ResultScreen : MonoBehaviour
         // 아무 것도 안 열리는 불일치가 있었음(신고받은 버그). S/A일 때만 UnlockText, B/C는 RetryText.
         bool unlockedNext = rank == "S" || rank == "A";
 
+        _unlockedNext = unlockedNext;
         if (unlockedNext)
             UndergroundLobbyProgress.UnlockUpTo(stageIndex + 1);
 
@@ -99,6 +106,7 @@ public class Stage1ResultScreen : MonoBehaviour
     IEnumerator ShowResult(string rank, bool unlockedNext)
     {
         var cvGO = new GameObject("Stage1ResultCanvas");
+        _canvasGO = cvGO;
         var cv   = cvGO.AddComponent<Canvas>();
         cv.renderMode   = RenderMode.ScreenSpaceOverlay;
         cv.sortingOrder = 99;
@@ -144,6 +152,25 @@ public class Stage1ResultScreen : MonoBehaviour
     {
         if (_advanced) return;   // 화살표 버튼 클릭 / Space / 좌클릭 어느 쪽으로 들어와도 전환은 한 번만
         _advanced = true;
+
+        // 판 후 대사 — S/A로 다음 판을 처음 연 순간에만, 결과창을 걷고 이 판 배경 위에서 1회.
+        // 게이팅은 여기(호출부)서: 대사 쪽은 완주 플래그만 세팅(docs/design.md, 대사씬 규칙과 동일).
+        var pd = postDialogue != null
+            ? postDialogue
+            : FindFirstObjectByType<Stage1PostDialogue>(FindObjectsInactive.Include);
+        if (_unlockedNext && pd != null
+            && Stage1PostDialogue.HasNodes(stageIndex) && !Stage1PostDialogue.HasSeen(stageIndex))
+        {
+            if (_canvasGO != null) _canvasGO.SetActive(false);
+            pd.Play(stageIndex, LoadUndergroundLobby);   // timeScale은 0 그대로(대사는 실시간 기준)
+            return;
+        }
+
+        LoadUndergroundLobby();
+    }
+
+    void LoadUndergroundLobby()
+    {
         Time.timeScale = 1f;
         SceneTransitionManager.Instance.LoadSceneWithFade("UndergroundLobbyScene");
     }

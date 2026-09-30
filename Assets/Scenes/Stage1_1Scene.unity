@@ -783,9 +783,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stage1PracticeGate
   segments:
   - directorRoot: {fileID: 25827580}
-    introCaption: "\uD30C\uB3C4\uAC00 \uBC00\uB824\uC62C \uB54C\uB9C8\uB2E4 \uC190\uC744
-      \uB4E4\uC5B4\uC8FC\uC2ED\uC2DC\uC624."
-    demoStartCaption: "\uD574\uBCF4\uC2ED\uC2DC\uC624."
+    introCaption: "\uC800\uB294 \uC774\uC81C \uBABB \uC6C0\uC9C1\uC785\uB2C8\uB2E4.\n\uC2E0\uB839\uB2D8\uC774
+      \uCCD0 \uC8FC\uC154\uC57C \uD569\uB2C8\uB2E4."
+    demoStartCaption: "\uD30C\uB3C4\uAC00 \uC62C \uB54C\uB9C8\uB2E4 \uC190\uC744.\n\uD574\uBCF4\uC2ED\uC2DC\uC624."
   mainDirectorGO: {fileID: 1605954056}
   mainTransitionCaption: "\uC774\uC81C \uC9C4\uC9DC\uC785\uB2C8\uB2E4."
   requiredHits: 3
@@ -1257,6 +1257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stage1ResultScreen
   director: {fileID: 1605954057}
   stageIndex: 0
+  postDialogue: {fileID: 1531232794}
   _sprPopup: {fileID: 21300000, guid: 229ff876ec15025479d02dea7d68e4fd, type: 3}
   _sprRankText: {fileID: 21300000, guid: b6887da95a0df254c8679608344831c5, type: 3}
   _sprRankS: {fileID: 21300000, guid: 2207f21928d20874db1755049df34f7e, type: 3}
@@ -1996,6 +1997,114 @@ RectTransform:
   m_AnchoredPosition: {x: 53.4, y: 0}
   m_SizeDelta: {x: 24, y: 26}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1001 &1531232793
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4339722415319648604, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6353874498894577313, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+      propertyPath: m_Name
+      value: Stage1PostDialoguePanel
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+--- !u!114 &1531232794 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 994174021793936768, guid: 3651ba393aac2b540bf0e10e465f55d6, type: 3}
+  m_PrefabInstance: {fileID: 1531232793}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b863e53418fec94fa3e12cb63d86800, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Stage1PostDialogue
 --- !u!1 &1584364856
 GameObject:
   m_ObjectHideFlags: 0
@@ -3022,3 +3131,4 @@ SceneRoots:
   - {fileID: 1648010845}
   - {fileID: 25827585}
   - {fileID: 519388630}
+  - {fileID: 1531232793}

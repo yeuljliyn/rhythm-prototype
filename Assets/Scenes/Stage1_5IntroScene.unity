@@ -227,11 +227,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stage1TitleCard
   titleText: {fileID: 361710958}
-  titleString: "1-5. \uB9AC\uBBF9\uC2A4"
+  titleString: "1-5. \uC774\uBCC4\uC774\uC5EC \uC791\uBCC4\uC774\uC5EC\n\uBC30 \uB193\uC544\uAC00\uC790"
   displaySeconds: 5
   oneShotSfx: {fileID: 0}
   sfxDelay: 0
   nextSceneName: Stage1_5Scene
+  titleGraphic: {fileID: 428721239}
+  titleDelay: 0.7
+  titleFadeSeconds: 0.35
+  titleScaleFrom: 0.92
 --- !u!114 &40101641
 MonoBehaviour:
   m_ObjectHideFlags: 0

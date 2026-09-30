@@ -127,7 +127,8 @@ public class UndergroundLobbyManager : MonoBehaviour
         if (_targetIndex > maxEnterableIndex) return; // 가림벽으로 막힌 슬롯 — 조용히 무시
         if (_targetIndex >= StageIntroScenes.Length) return; // 아직 목적지 안 정해진 스테이지
         SFXManager.PlayConfirm();
-        SceneTransitionManager.Instance.LoadSceneWithFade(StageIntroScenes[_targetIndex]);
+        // 판에 들어갈 땐 검정 페이드 대신 연기 와이프 — "판에 들어간다 = 개미로 변해 들어간다"(docs/design.md 인트로 등장)
+        SceneTransitionManager.Instance.LoadSceneWithSmoke(StageIntroScenes[_targetIndex]);
     }
 
     static void SetX(RectTransform rt, float x)
