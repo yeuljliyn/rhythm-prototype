@@ -783,9 +783,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Stage1PracticeGate
   segments:
   - directorRoot: {fileID: 25827580}
-    introCaption: "\uC800\uB294 \uC774\uC81C \uBABB \uC6C0\uC9C1\uC785\uB2C8\uB2E4.\n\uC2E0\uB839\uB2D8\uC774
-      \uCCD0 \uC8FC\uC154\uC57C \uD569\uB2C8\uB2E4."
-    demoStartCaption: "\uD30C\uB3C4\uAC00 \uC62C \uB54C\uB9C8\uB2E4 \uC190\uC744.\n\uD574\uBCF4\uC2ED\uC2DC\uC624."
+    introCaption: "\uC800\uB294 \uC774\uC81C \uBABB \uC6C0\uC9C1\uC785\uB2C8\uB2E4.
+      \uC2E0\uB839\uB2D8\uC774 \uCCD0 \uC8FC\uC154\uC57C \uD569\uB2C8\uB2E4."
+    demoStartCaption: "\uD30C\uB3C4\uAC00 \uC62C \uB54C\uB9C8\uB2E4 \uC190\uC744.
+      \uD574\uBCF4\uC2ED\uC2DC\uC624."
   mainDirectorGO: {fileID: 1605954056}
   mainTransitionCaption: "\uC774\uC81C \uC9C4\uC9DC\uC785\uB2C8\uB2E4."
   requiredHits: 3

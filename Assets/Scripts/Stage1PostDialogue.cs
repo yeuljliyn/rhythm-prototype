@@ -50,11 +50,11 @@ public class Stage1PostDialogue : MonoBehaviour
     {
         // 남 따라 탄 걸 인정
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔",
-            Text="...그때 다들 손 들길래.", Next=1 },
+            Text="...그때 다들 손을 들길래.\n나도 들었지. 그게 다야.", Next=1 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="타셨죠. 다들 탈 때.", Next=2 },
+            Text="타셨죠. 남들 다 탈 때.\n파도는 원래 그렇게 타는 겁니다.", Next=2 },
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
-            Text="그래도 안 팔아.", Next=3 },
+            Text="그래도 안 팔아.\n내려온 건 다시 올라가.", Next=3 },
         new Node { Type=NodeType.End },
     };
 
@@ -62,15 +62,15 @@ public class Stage1PostDialogue : MonoBehaviour
     {
         // 개미를 알아봄
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_일반",
-            Text="...쟤들 왜 여기 있어.", Next=1 },
+            Text="...쟤들 왜 여기 있어.\n내가 부른 적 없는데.", Next=1 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="저 양반 따라 들어왔다가 같이 잠긴 것들입니다.\n저 양반 없이는 못 나갑니다.", Next=2 },
+            Text="저 양반이 넘긴 잔을 받은 개미들입니다.\n같이 잠겼고, 저 양반 없인 못 나갑니다.", Next=2 },
         new Node { Type=NodeType.Choice, Next=3, NextByChoice=new[]{ 3, 4 },
             Choices=new[]{ "지 탓이네.", "같이 보낼 수 있어?" } },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="...그렇게 되죠.", Next=5 },
+            Text="...그렇게 되죠.\n본인은 아직 모르는 눈치지만.", Next=5 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="저 양반이 가면 따라갑니다.", Next=5 },
+            Text="저 양반이 가면 따라갑니다.\n그러니 저 양반부터입니다.", Next=5 },
         new Node { Type=NodeType.End },
     };
 
@@ -78,15 +78,17 @@ public class Stage1PostDialogue : MonoBehaviour
     {
         // 존버가 약해짐, 잭두와 겹침
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔",
-            Text="존버는... 승리...", Next=1 },
+            Text="존버는... 승리...\n...한다니까.", Next=1 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="남 일 같지 않습니다. 저도 다음 달까지 못 넣으면 저 옆자리입니다.\n사람은 신용불량자가 되지만 저는 고철값입니다.", Next=2 },
-        new Node { Type=NodeType.Choice, Next=3, NextByChoice=new[]{ 3, 4 },
+            Text="남 일 같지 않습니다.\n저도 다음 달까지 못 넣으면 저 옆자리예요.", Next=2 },
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="사람은 신용불량자가 되지만\n저는 고철값으로 계산됩니다.", Next=3 },
+        new Node { Type=NodeType.Choice, Next=4, NextByChoice=new[]{ 4, 5 },
             Choices=new[]{ "너도 물렸네.", "그래서 더 잘 보내야겠네." } },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="...물렸죠.", Next=5 },
+            Text="...물렸죠.\n다만 저는 아직 팔 수 있습니다.", Next=6 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="그래서 더 잘 보내드려야 합니다.", Next=5 },
+            Text="예. 잘 보내드려야\n저도 다음 달이 있습니다.", Next=6 },
         new Node { Type=NodeType.End },
     };
 
@@ -94,13 +96,13 @@ public class Stage1PostDialogue : MonoBehaviour
     {
         // 분장이 도깨비였음을 앎, "...팔걸"
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_일반",
-            Text="이 분장... 내가 한 거 아닌데.", Next=1 },
+            Text="이 분장... 내가 한 거 아닌데.\n언제부터 이랬지.", Next=1 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="도깨비입니다. 재물신이죠.\n부자로 만들기도 하고 저 꼴로 만들기도 합니다.", Next=2 },
+            Text="도깨비입니다. 재물신이죠.\n부자로도 만들고, 저 꼴로도 만듭니다.", Next=2 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="좇던 대박이 도깨비불이었던 겁니다.", Next=3 },
+            Text="저 양반이 좇던 대박이 저겁니다.\n도깨비불이었던 거죠.", Next=3 },
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔",
-            Text="...팔걸.", Next=4 },
+            Text="...팔걸.\n9만 원에... 아니, 8만에라도.", Next=4 },
         new Node { Type=NodeType.End },
     };
 
@@ -108,17 +110,17 @@ public class Stage1PostDialogue : MonoBehaviour
     {
         // 배. 엔딩 훅
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_웃음",
-            Text="...개미들은.\n같이 가자.", Next=1 },
+            Text="...개미들은.\n같이 가자. 여기까지 왔으면 됐어.", Next=1 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
-            Text="잘 가셨습니다.", Next=2 },
+            Text="잘 가셨습니다.\n개미들도 따라갔고요.", Next=2 },
         new Node { Type=NodeType.Choice, Next=3, NextByChoice=new[]{ 3, 4 },
             Choices=new[]{ "그래서 수금은.", "캔은 면했어?" } },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="...정산은 넘겼습니다. 이번 달은.", Next=5 },
+            Text="...정산은 넘겼습니다. 이번 달은.\n다음 달 얘기는 다음 달에.", Next=5 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
-            Text="면했습니다. 이번 달은.", Next=5 },
+            Text="면했습니다. 이번 달은요.\n신령님 덕입니다.", Next=5 },
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="다음 손님이 와 계십니다.", Next=6 },
+            Text="다음 손님이 와 계십니다.\n가시죠, 신령님.", Next=6 },
         new Node { Type=NodeType.End },
     };
 

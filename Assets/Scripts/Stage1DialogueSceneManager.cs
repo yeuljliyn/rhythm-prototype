@@ -49,32 +49,39 @@ public class Stage1DialogueSceneManager : MonoBehaviour
 
     static readonly Node[] Nodes = new Node[]
     {
-        // ── §1. 스테이지 1 — 물귀신 등장/인트로 (docs/design.md 방향 A, 5노드) ─────
-        // 개미·광대 분장·도깨비·잭두 사연은 여기서 설명하지 않는다. 그 대상이 화면에 나오는
-        // 판의 인트로 한 줄 / 판 후 대사로 옮겨감. 선택지는 신령님의 태도(냉소/호기심)이고
-        // 잭두의 다음 대사만 갈린 뒤 합류한다.
+        // ── §1. 스테이지 1 — 물귀신 등장 (docs/design.md 방향 B, 변신으로 끝남) ─────────
+        // 개미·광대 분장·도깨비·잭두 사연은 여기서 설명하지 않는다(판 후 대사로). 선택지는
+        // 신령님의 태도(냉소/호기심)이고 잭두의 다음 대사만 갈린 뒤 합류한다.
         // 0: 물귀신
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_슬픔", BgKey="스테1_폐허사이버증권거래소",
             Text="9만 층이요... 사람 있어요...\n구조대... 아직인가요...", Next=1 },
         // 1: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="주식입니다. 9만 원에 사서 못 팔았다는 뜻이죠.\n물렸다고 합니다. 그러다 진짜 물에 빠지셨고요.", Next=2 },
+            Text="주식입니다. 9만 원에 사서 못 판 겁니다.\n물렸다고 하죠. 그러다 진짜 물에 빠지셨고.", Next=2 },
         // 2: 선택지 (신령님) — 냉소 / 호기심
         new Node { Type=NodeType.Choice, Next=3, NextByChoice=new[]{ 3, 4 },
             Choices=new[]{ "때려서 쫓아내?", "어떻게 보내는데." } },
         // 3: 잭두 (냉소 반응)
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="쫓으면 화내고 돌아옵니다. 이기는 게 아닙니다.\n끝까지 같이 놀아드리는 게 전부입니다.", Next=5 },
+            Text="쫓으면 화만 내고 돌아옵니다.\n이기는 굿이 아닙니다.", Next=5 },
         // 4: 잭두 (호기심 반응)
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="영감놀이입니다. 놀아드리고 보내는 굿이죠.\n끝까지 같이 놀아드리는 게 전부입니다.", Next=5 },
-        // 5: 물귀신
+            Text="놀아드립니다. 영감놀이라고,\n실컷 놀고 나면 스스로 갑니다.", Next=5 },
+        // 5: 잭두 (합류)
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="끝까지 같이 놀아드리는 것.\n그게 전부입니다.", Next=6 },
+        // 6: 물귀신
         new Node { Type=NodeType.Line, Spk=Speaker.B, EmotionKey="물귀신_분노",
-            Text="안 가! 안 간다고!\n존버는 승리한다!! 나는 아직 안 팔았어!!", Next=6 },
-        // 6: 잭두
+            Text="안 가! 안 간다고!\n존버는 승리한다!! 아직 안 팔았어!!", Next=7 },
+        // 7: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
-            Text="...기운은 좋으시군요.\n저 정도면 잘 노시겠습니다. 시작하시죠.", Next=7 },
-        // 7: end
+            Text="...기운은 좋으시군요.\n저 정도면 잘 노시겠습니다.", Next=8 },
+        // 8~9: 변신 이유 — 규칙 두 줄만. 나머지는 변신 장면이 말한다
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="영감놀이는 그 무리로 변해서\n같이 놀아주는 굿입니다.", Next=9 },
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="저 양반 무리는... 개미군요.\n잠깐 개미가 되겠습니다. 박자는 신령님께.", Next=10 },
+        // 10: end → 변신
         new Node { Type=NodeType.End },
     };
 
@@ -118,12 +125,15 @@ public class Stage1DialogueSceneManager : MonoBehaviour
     [SerializeField] float  _transformHold     = 1.3f;    // 개미 잭두를 보여주는 시간
     [SerializeField] int    _transformPuffCount = 14;
     [Tooltip("개미 잭두의 표시 높이(CharA rect 단위, 스케일 전). 초상화 rect(3050x1705)는 사람 아트용이라 그대로 두면 개미가 화면 밖으로 나감")]
-    [SerializeField] float  _antDisplayHeight = 900f;
+    [SerializeField] float  _antDisplayHeight = 1150f;
+    [Tooltip("개미 스프라이트의 위쪽 몇 %만 쓸지(상반신 크롭). 사람 초상화처럼 몸통에서 잘라 대사창에 걸치게")]
+    [Range(0.3f, 1f)]
+    [SerializeField] float  _antBustFraction = 0.62f;
     [Tooltip("개미 잭두의 X(anchoredPosition). 사람 초상화의 실제 몸 중심에 맞춤")]
     [SerializeField] float  _antOffsetX = -520f;
     [Tooltip("연기 구름 중심의 바닥 기준 높이 / 퍼지는 반경 / 퍼프 기본 지름 (SafeFrame px)")]
     [SerializeField] float  _cloudCenterY = 400f;
-    [SerializeField] Vector2 _cloudRadius = new Vector2(300f, 330f);
+    [SerializeField] Vector2 _cloudRadius = new Vector2(360f, 330f);
     [SerializeField] float  _cloudPuffSize = 420f;
     [SerializeField] string _nextSceneAfterTransform = "Stage1_1IntroScene";
 
@@ -166,6 +176,7 @@ public class Stage1DialogueSceneManager : MonoBehaviour
 
         _speakerTxt.text  = "";
         _dialogueTxt.text = "";
+        yield return new WaitForSecondsRealtime(0.6f); // 물귀신이 눈에 들어온 뒤 첫 줄
         PlayNode(0);
     }
 
@@ -420,7 +431,7 @@ public class Stage1DialogueSceneManager : MonoBehaviour
         _promptGO.SetActive(false);
         _dialogueTxt.text = "";
         _speakerTxt.text  = "";
-        yield return new WaitForSecondsRealtime(0.35f);
+        yield return new WaitForSecondsRealtime(0.5f);
 
         yield return StartCoroutine(TransformIntoAnt());
         yield return new WaitForSecondsRealtime(_transformHold);
@@ -488,14 +499,33 @@ public class Stage1DialogueSceneManager : MonoBehaviour
         // 정점: 스프라이트 교체 + rect를 개미 크기로. 발(pivot 0,0.5 바닥)은 그대로 두고 높이만 줄인다.
         if (_antJackdooSprite != null)
         {
-            _charAImg.sprite = _antJackdooSprite;
+            // 상반신 크롭: 원본 스프라이트의 위쪽 _antBustFraction만 잘라 새 스프라이트로. 초상화 구도와 맞춘다.
+            var src = _antJackdooSprite;
+            var r = src.rect;
+            float bustH = r.height * _antBustFraction;
+            var bust = Sprite.Create(src.texture, new Rect(r.x, r.y + r.height - bustH, r.width, bustH),
+                                     new Vector2(0.5f, 0f), src.pixelsPerUnit);
+            _charAImg.sprite = bust;
             _charAImg.preserveAspect = true;
             _charAImg.color = ColActive;
-            float aspect = _antJackdooSprite.rect.width / _antJackdooSprite.rect.height;
+            float aspect = r.width / bustH;
             _charARt.sizeDelta = new Vector2(_antDisplayHeight * aspect, _antDisplayHeight);
             _charARt.anchoredPosition = new Vector2(_antOffsetX, _charARt.anchoredPosition.y);
         }
-        yield return new WaitForSecondsRealtime(0.15f);
+        // 살짝 튀어오르는 팝 — 스케일은 에디터 값(0.63)을 기준으로 0.92→1배
+        {
+            var baseScale = _charARt.localScale;
+            float pt = 0f; const float popDur = 0.28f;
+            while (pt < popDur)
+            {
+                pt += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(pt / popDur);
+                float k = 0.92f + 0.08f * (1f - Mathf.Pow(1f - u, 3f)) + 0.04f * Mathf.Sin(u * Mathf.PI);
+                _charARt.localScale = baseScale * k;
+                yield return null;
+            }
+            _charARt.localScale = baseScale;
+        }
 
         // 걷히기 — 위로 흩어지며 사라짐
         var basePos = new Vector2[puffs.Count];

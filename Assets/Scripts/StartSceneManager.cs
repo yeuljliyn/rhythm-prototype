@@ -56,6 +56,31 @@ public class StartSceneManager : MonoBehaviour
         string next = openingSeen ? "SurfaceLobbyScene" : "DialogueScene";
         SceneTransitionManager.Instance.LoadSceneWithFade(next);
     }
+    // "처음부터" — 이야기 진행 플래그를 전부 지우고 §0 오프닝부터 다시. 스타트 씬의 텍스트 버튼(NewGameButton)에
+    // 배선. 테스트 중 플래그가 쌓여 대사가 하나도 안 나오는 상황("스타트부터 돌렸는데 대사가 사라짐")을
+    // 에디터 ContextMenu 없이 게임 안에서 풀 수 있게. 해금 진행도(underground_unlocked_index)도 같이 지운다.
+    public void OnNewGame()
+    {
+        SFXManager.PlayClick();
+        SettingsManager.Instance?.Close();
+        ResetAllProgress();
+        SceneTransitionManager.Instance.LoadSceneWithFade("DialogueScene");
+    }
+
+    public static void ResetAllProgress()
+    {
+        PlayerPrefs.DeleteKey("opening_seen");
+        PlayerPrefs.DeleteKey("stage1_underground_intro_seen");
+        for (int i = 0; i < 5; i++) PlayerPrefs.DeleteKey(Stage1PostDialogue.SeenKey(i));
+        PlayerPrefs.DeleteKey("underground_unlocked_index");
+        PlayerPrefs.DeleteKey("underground_last_index");
+        PlayerPrefs.Save();
+        Debug.Log("[StartScene] 진행 초기화 — 오프닝·§1·판 후 대사·해금 전부 리셋");
+    }
+
+    [ContextMenu("진행 전체 초기화(처음부터)")]
+    void ResetAllProgressMenu() => ResetAllProgress();
+
     public void OnBonus()    { SFXManager.PlayClick(); SettingsManager.Instance?.Open(1); }
     public void OnSettings() { SFXManager.PlayClick(); SettingsManager.Instance?.Open(); }
     public void OnQuit()     { SFXManager.PlayClick(); Application.Quit(); }

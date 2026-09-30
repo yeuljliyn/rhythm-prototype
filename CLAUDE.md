@@ -23,9 +23,9 @@ StartScene
  → UndergroundLobbyScene    (돌아오면 마지막에 있던 슬롯 그대로)
 ```
 
-- 씬 전환은 `SceneTransitionManager.Instance.LoadSceneWithFade("SceneName")`(검정 페이드). **판에 들어갈 때**(지하 로비→인트로, §1 변신→1-1)만 `LoadSceneWithSmoke` — 연기 퍼프(`Assets/Resources/Smoke/puff_*.png`, 파이썬 절차 생성)가 덮었다 걷힘. `SmokeCoverOnly/SmokeClearNow`는 씬 전환 없이 덮기만 할 때. 둘 다 unscaled 시간.
+- 씬 전환은 `SceneTransitionManager.Instance.LoadSceneWithFade("SceneName")`(검정 페이드 0.4초). 여운이 필요한 곳은 `LoadSceneWithFade(name, outSec, inSec)`로 한 번만 길게(§0 → §1은 1.0/1.0). **판에 들어갈 때**(지하 로비→인트로, §1 변신→1-1)만 `LoadSceneWithSmoke` — 연기 퍼프(`Assets/Resources/Smoke/puff_*.png`, 파이썬 절차 생성)가 덮었다 걷힘. `SmokeCoverOnly/SmokeClearNow`는 씬 전환 없이 덮기만 할 때. 둘 다 unscaled 시간.
 - "1회만" 게이팅은 **대상 씬 안에서 하지 않고 호출부에서** 한다(`StartSceneManager`, `SurfaceLobbyManager`, `UndergroundLobbyManager.TrySelect`, `Stage1ResultScreen`). 대사씬 안에서 체크하면 그 씬을 직접 열어 Play 테스트할 때마다 튕겨나간다(실제로 겪음). 대사씬은 완주 시 플래그만 세팅.
-- PlayerPrefs 키: `opening_seen`, `stage1_underground_intro_seen`, `stage1_post_dialogue_seen_N`(N=0..4, 판 후 대사 1회), `underground_unlocked_index`(0-based, 해금된 마지막 판), `underground_last_index`(지하 로비 커서 위치). 초기화 ContextMenu가 `StartSceneManager`/`Stage1DialogueSceneManager`에 있음.
+- PlayerPrefs 키: `opening_seen`, `stage1_underground_intro_seen`, `stage1_post_dialogue_seen_N`(N=0..4, 판 후 대사 1회), `underground_unlocked_index`(0-based, 해금된 마지막 판), `underground_last_index`(지하 로비 커서 위치). 초기화는 **스타트 씬 왼쪽 아래 "처음부터" 버튼**(`StartSceneManager.OnNewGame` → `ResetAllProgress()`: 위 키 전부 삭제 후 §0로) 또는 `StartSceneManager`/`Stage1DialogueSceneManager`의 ContextMenu. 테스트로 플래그가 쌓이면 스타트에서 시작해도 대사 없이 로비로 직행하니, "대사가 사라졌다" 싶으면 이 버튼.
 
 ## 스테이지 1 — 5판
 
@@ -82,9 +82,12 @@ StartScene
 
 ## 대사 씬
 
-- `DialogueSceneManager`(§0 오프닝, 7노드) / `Stage1DialogueSceneManager`(§1 물귀신, 5노드). 노드 배열이 C# 안에 하드코딩(`Nodes`), `Line`/`Choice`/`End`. 선택지는 신령님의 태도(냉소/호기심) 두 축이고, `NextByChoice[i]`로 잭두 반응 노드가 갈린 뒤 공통 노드로 합류. "저게 뭐야?"형 질문 선택지는 쓰지 않는다(`docs/design.md` 서사 전달 규칙). UI 오브젝트는 씬에 직접 배치(두 씬 Hierarchy 동일, 필드명도 동일하게 유지). 표정 스프라이트는 `EmotionKey` → `Assets/대사씬시작/`, ContextMenu "Auto-Load Emotions"로 재수집.
-- 캐릭터 강조는 색 디밍만. `localScale`은 코드에서 안 건드림(에디터 값을 덮어써서 Play 시 초상화가 커지던 버그).
-- 서사 전달 구조(2026-09-30 방향 B·변신판): 짧은 §0·§1 → §1 끝 **변신**(잭두 초상화 주변 연기 → 개미 잭두 스프라이트, `Stage1DialogueSceneManager.TransformIntoAnt`, 개미 크기·위치는 `_antDisplayHeight/_antOffsetX`) → 1-1 직행 → 판 후 대사(`Stage1PostDialogue`)로 물귀신이 한 단계씩 풀림. 세계관 규칙: 영감놀이 = 무리로 변해서 같이 놀아줌, 개미 몸은 신령님 장단에만 움직임, 개미 잭두는 말풍선으로만 말함. 상세는 `docs/design.md`.
+- `DialogueSceneManager`(§0 오프닝, 13노드) / `Stage1DialogueSceneManager`(§1 물귀신, 11노드, 끝에 변신). 노드 배열이 C# 안에 하드코딩(`Nodes`), `Line`/`Choice`/`End`. 선택지는 신령님의 태도(냉소/호기심) 두 축이고, `NextByChoice[i]`로 잭두 반응 노드가 갈린 뒤 공통 노드로 합류. "저게 뭐야?"형 질문 선택지는 쓰지 않는다(`docs/design.md` 서사 전달 규칙). UI 오브젝트는 씬에 직접 배치(두 씬 Hierarchy 동일, 필드명도 동일하게 유지). 표정 스프라이트는 `EmotionKey` → `Assets/대사씬시작/`, ContextMenu "Auto-Load Emotions"로 재수집.
+- 초상화 크기 위계: **광대(물귀신) > 잭두**. 적이라 위압감이 있어야 함. §0·§1·판 후 대사 프리팹 모두 CharA(잭두) 스케일 0.52, §1 CharB(광대) 0.40(원본 아트가 커서 표시 높이는 광대 약 680px, 잭두 약 600px). 개미 잭두도 `_antDisplayHeight`=1150으로 사람 잭두와 같은 높이.
+- 캐릭터 강조는 색 디밍만. `localScale`은 코드에서 안 건드림(에디터 값을 덮어써서 Play 시 초상화가 커지던 버그). 예외: 변신 팝은 에디터 스케일을 기준으로 잠깐 곱했다가 원복.
+- 대사창 글자: 본문 40pt(줄간격 8)·화자 26·선택지 34. 본문은 한 줄 30자 이내, 최대 2줄(`
+`으로 직접 나눔). 넘치면 노드를 쪼갠다. 판 후 대사 프리팹도 같은 값. 문체: 잭두 건조한 존댓말(반응 줄만 삐딱), 물귀신 반말. 각 줄은 앞 줄을 받아서 잇는다(뚝뚝 끊기지 않게).
+- 서사 전달 구조(2026-09-30 방향 B·변신판): 짧은 §0·§1 → §1 끝 **변신**(변신 이유 두 줄 뒤, 잭두 초상화 주변 연기 → 개미 잭두를 **허벅지 선에서 크롭**(`_antBustFraction`=0.8)해 초상화 구도로, `Stage1DialogueSceneManager.TransformIntoAnt`, 크기·위치는 `_antDisplayHeight/_antOffsetX`) → 1-1 직행 → 판 후 대사(`Stage1PostDialogue`)로 물귀신이 한 단계씩 풀림. 세계관 규칙: 영감놀이 = 무리로 변해서 같이 놀아줌, 개미 몸은 신령님 장단에만 움직임, 개미 잭두는 말풍선으로만 말함. 상세는 `docs/design.md`.
 
 ## 컨벤션
 

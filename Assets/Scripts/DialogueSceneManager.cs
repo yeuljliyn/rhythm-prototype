@@ -47,9 +47,9 @@ public class DialogueSceneManager : MonoBehaviour
 
     static readonly Node[] Nodes = new Node[]
     {
-        // ── §0. 오프닝 — 옥탑방, 잭두 혼자 (docs/design.md 방향 A, 7노드) ───────────
-        // 신병·병원·전 재산·신용불량자·폐차장 묘사는 뺌(일부는 1-3 판 후 대사로). 선택지는
-        // 신령님의 태도(냉소/호기심)이고 잭두의 다음 대사만 갈린 뒤 합류한다.
+        // ── §0. 오프닝 — 옥탑방, 잭두 혼자 (docs/design.md 방향 B). ───────────────────
+        // 잭두: 건조한 존댓말, 사무적인데 속은 절박(캔). 선택지는 신령님 태도(냉소/호기심)이고
+        // 잭두의 다음 대사만 갈린 뒤 합류. 신병·병원·전 재산 묘사는 뺐다(일부는 1-3 판 후 대사).
         // 0: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_놀람_당황",
             Text="어. 어어.\n화면 밖에... 누구 계십니까?", Next=1 },
@@ -58,29 +58,35 @@ public class DialogueSceneManager : MonoBehaviour
             Choices=new[]{ "누구긴. 방금 게임 켰는데.", "내 컴퓨터가 왜 말을 걸지." } },
         // 2: 잭두 (냉소 반응)
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="게임... 그렇게 부르셔도 됩니다.\n저한테는 굿입니다만.", Next=4 },
+            Text="게임... 예. 그렇게 부르셔도 됩니다.\n제 쪽에선 굿입니다만.", Next=4 },
         // 3: 잭두 (호기심 반응)
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
-            Text="컴퓨터가 아니라 무당입니다.\n기계이긴 합니다.", Next=4 },
+            Text="컴퓨터가 아니라 무당입니다.\n...몸이 기계인 건 맞습니다만.", Next=4 },
         // 4: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="잭두입니다. 내림굿 받다가\n신은 안 오고 할부만 남은 기계 무당이고요.", Next=5 },
+            Text="잭두라고 합니다. 내림굿을 받았는데\n신은 안 오고 할부만 왔습니다.", Next=5 },
         // 5: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정2_화남",
-            Text="다음 달까지 못 넣으면 캔입니다. 그래서 굿을 합니다.\n원혼 달래드리고 값을 받는 거죠.", Next=6 },
+            Text="다음 달까지 못 넣으면 캔입니다.\n압축돼서 고철값으로 팔린다는 뜻이죠.", Next=6 },
         // 6: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
-            Text="그런데 굿은 장단입니다. 저 혼자서는 안 됩니다.\n신령님이 박자를 넣어주셔야 합니다.", Next=7 },
-        // 7: 선택지 (신령님) — 냉소 / 호기심
-        new Node { Type=NodeType.Choice, Next=8, NextByChoice=new[]{ 8, 9 },
-            Choices=new[]{ "치는 건 나고 수금은 너야?", "박자만 넣으면 되는 거지?" } },
-        // 8: 잭두 (냉소 반응)
-        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
-            Text="...정산은 캔이 안 되면 하겠습니다.\n마침 밖에 첫 손님이 와 계십니다. 가시죠.", Next=10 },
-        // 9: 잭두 (호기심 반응)
+            Text="그래서 굿을 합니다.\n한 맺힌 분 놀아드리고, 값을 받고.", Next=7 },
+        // 7: 잭두
         new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음2",
-            Text="그것만 하시면 됩니다. 나머진 제가.\n마침 밖에 첫 손님이 와 계십니다. 가시죠.", Next=10 },
-        // 10: end
+            Text="근데 굿은 장단이 있어야 합니다.\n저 혼자서는 박자가 안 나옵니다.", Next=8 },
+        // 8: 선택지 (신령님) — 냉소 / 호기심
+        new Node { Type=NodeType.Choice, Next=9, NextByChoice=new[]{ 9, 10 },
+            Choices=new[]{ "치는 건 나고 수금은 너야?", "박자만 넣으면 되는 거지?" } },
+        // 9: 잭두 (냉소 반응)
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_슬픔2",
+            Text="...정산은 제가 캔이 안 된 다음에\n꼭 하겠습니다.", Next=11 },
+        // 10: 잭두 (호기심 반응)
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_웃음1",
+            Text="예. 제가 보여드리는 대로만\n따라 쳐 주시면 됩니다.", Next=11 },
+        // 11: 잭두 — 처음으로 "신령님"이라 부름
+        new Node { Type=NodeType.Line, Spk=Speaker.A, EmotionKey="잭두_무표정",
+            Text="마침 밖에 첫 손님이 와 계십니다.\n가시죠, 신령님.", Next=12 },
+        // 12: end
         new Node { Type=NodeType.End },
     };
 
@@ -156,6 +162,7 @@ public class DialogueSceneManager : MonoBehaviour
 
         _speakerTxt.text  = "";
         _dialogueTxt.text = "";
+        yield return new WaitForSecondsRealtime(0.4f); // 페이드인 뒤 한 박자 쉬고 첫 줄
         PlayNode(0);
     }
 
@@ -362,7 +369,8 @@ public class DialogueSceneManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.6f);
         // 첫 실행은 로비를 건너뛴다(docs/design.md 첫 플레이까지의 흐름): §0 → §1 → 변신 → 1-1.
         // 지상 로비는 1-1 결과·보고 뒤에 처음 나온다. §0은 게임 통틀어 1회라 이 분기는 곧 "첫 실행".
-        SceneTransitionManager.Instance.LoadSceneWithFade("Stage1DialogueScene");
+        // 옥탑방 → 지하(물귀신)는 장면이 크게 바뀌니 느리게: 1초 아웃, 1초 인.
+        SceneTransitionManager.Instance.LoadSceneWithFade("Stage1DialogueScene", 1.0f, 1.0f);
     }
 
     // ── Voice ─────────────────────────────────────────────────────────

@@ -80,6 +80,18 @@ public class SceneTransitionManager : MonoBehaviour
         StartCoroutine(FadeOutThenLoad(sceneName));
     }
 
+    /// <summary>이번 한 번만 페이드아웃/인 길이를 바꿔서 전환(대사 씬 사이처럼 여운이 필요할 때).</summary>
+    public void LoadSceneWithFade(string sceneName, float fadeOutSeconds, float fadeInSeconds)
+    {
+        if (_isTransitioning) return;
+        Time.timeScale = 1f;
+        _fadeOutOverride = fadeOutSeconds;
+        _fadeInOverride  = fadeInSeconds;
+        StartCoroutine(FadeOutThenLoad(sceneName));
+    }
+
+    float _fadeOutOverride = -1f, _fadeInOverride = -1f;
+
     /// <summary>연기가 화면을 덮은 뒤 씬을 로드하고, 새 씬 위에서 연기가 걷힌다.</summary>
     public void LoadSceneWithSmoke(string sceneName)
     {
@@ -106,7 +118,9 @@ public class SceneTransitionManager : MonoBehaviour
     {
         _isTransitioning = true;
         _overlay.raycastTarget = true;
-        yield return StartCoroutine(Fade(0f, 1f));
+        float d = _fadeOutOverride > 0f ? _fadeOutOverride : fadeDuration;
+        _fadeOutOverride = -1f;
+        yield return StartCoroutine(Fade(0f, 1f, d));
         SceneManager.LoadScene(sceneName);
         // FadeIn will be triggered by OnSceneLoaded
     }
@@ -115,19 +129,21 @@ public class SceneTransitionManager : MonoBehaviour
     {
         SetAlpha(1f);
         _overlay.raycastTarget = true;
-        yield return StartCoroutine(Fade(1f, 0f));
+        float d = _fadeInOverride > 0f ? _fadeInOverride : fadeDuration;
+        _fadeInOverride = -1f;
+        yield return StartCoroutine(Fade(1f, 0f, d));
         _overlay.raycastTarget = false;
         _isTransitioning = false;
     }
 
-    IEnumerator Fade(float from, float to)
+    IEnumerator Fade(float from, float to, float duration)
     {
         float elapsed = 0f;
         SetAlpha(from);
-        while (elapsed < fadeDuration)
+        while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
-            SetAlpha(Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / fadeDuration)));
+            SetAlpha(Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration)));
             yield return null;
         }
         SetAlpha(to);
